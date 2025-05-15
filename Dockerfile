@@ -11,11 +11,15 @@ RUN npm ci
 # Copiar o resto dos arquivos
 COPY . .
 
-# Definir a porta do servidor
-ENV PORT=6000
+# Construir a aplicação
+RUN npm run build
 
-# Expor a porta
+# Configurar porta
+ENV PORT=6000
+ENV NODE_ENV=production
+
+# Expor porta
 EXPOSE 6000
 
-# Comando para iniciar a aplicação
-CMD ["npm", "run", "dev"]
+# Iniciar a aplicação em modo produção
+CMD ["node", "dist/index.js"]
