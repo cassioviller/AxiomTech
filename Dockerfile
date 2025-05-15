@@ -39,7 +39,7 @@ RUN npm ci --no-audit --no-fund && npm cache clean --force
 
 # Copiando apenas os arquivos necessários para produção
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/docker-entrypoint.js ./docker-entrypoint.js
+COPY --from=builder /app/docker-entrypoint-simple.js ./docker-entrypoint-simple.js
 
 # Assegurando que as imagens estejam acessíveis em todos os possíveis caminhos
 COPY --from=builder /app/client/public/images ./dist/images
@@ -52,15 +52,15 @@ RUN addgroup --system --gid 1001 nodejs && \
     chown -R expressjs:nodejs /app
 USER expressjs
 
-# Verificação de saúde para EasyPanel com maior tempo de inicialização e mais retentativas
-HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=5 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:6000/health || exit 1
+# Sem healthcheck para evitar problemas com EasyPanel
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=5 \
+#   CMD wget --no-verbose --tries=1 --spider http://localhost:6000/health || exit 1
 
 # Expondo a porta para o aplicativo
 EXPOSE 6000
 
-# Comando para iniciar o aplicativo em produção usando nosso script personalizado
-CMD ["node", "docker-entrypoint.js"]
+# Comando para iniciar o aplicativo em produção usando script simplificado
+CMD ["node", "docker-entrypoint-simple.js"]
 
 # Instruções para deploy EasyPanel:
 # 1. No EasyPanel, crie uma nova aplicação
