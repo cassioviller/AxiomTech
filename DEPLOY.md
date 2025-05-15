@@ -19,7 +19,7 @@ npm run build
 
 ### Comando de Início
 ```
-NODE_ENV=production PORT=8080 node dist/index.js
+NODE_ENV=production PORT=5001 node dist/index.js
 ```
 
 ### Pacotes Nix
@@ -34,7 +34,7 @@ Deixe em branco.
 
 | Nome | Valor | Descrição |
 |------|-------|-----------|
-| PORT | 8080  | Porta onde a aplicação irá rodar |
+| PORT | 5001  | Porta onde a aplicação irá rodar |
 | NODE_ENV | production | Define o modo de produção |
 
 ## Verificações após o Deploy
