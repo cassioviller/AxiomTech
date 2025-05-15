@@ -1,0 +1,61 @@
+Crie um site one-page moderno e profissional para a empresa 'Axiom Strategic Technologies', liderada por Cássio Viller. O site deve ser construído com HTML, CSS e JavaScript, priorizando um design limpo, sofisticado e responsivo, adequado para uma consultoria de alto nível que oferece soluções de engenharia inteligente e automação de processos para grandes corporações.
+
+**Estrutura e Conteúdo do Site One-Page:**
+
+1.  **Barra de Navegação Fixa (Topo):**
+    *   Logo da 'Axiom Strategic Technologies' à esquerda (com um placeholder claro no HTML para inserir a URL da imagem da logo, ex: `<img src="URL_DA_SUA_LOGO_AQUI" alt="Axiom Strategic Technologies Logo" id="company-logo">`).
+    *   Links de navegação que rolam suavemente para as seções: Sobre, Soluções, Abordagem, Resultados, Contato.
+
+2.  **Seção de Abertura (Hero Section):**
+    *   **Título Principal (H1):** "Axiom Strategic Technologies: Engenharia Inteligente e Automação de Alto Impacto para Transformar Seu Negócio."
+    *   **Subtítulo:** "Capacitando grandes organizações a alcançar excelência operacional e ROI significativo através de soluções customizadas lideradas por Cássio Viller."
+    *   **Call to Action (CTA) Primário (Botão):** "Descubra Nossas Soluções"
+
+3.  **Seção Sobre Nós / Nossa Expertise:**
+    *   **Título:** "Sobre a Axiom: A Interseção da Engenharia com a Inovação Tecnológica"
+    *   **Parágrafo Introdutório:** Focado na missão da Axiom Strategic Technologies e na expertise de Cássio Viller em unir engenharia e sistemas de informação para resolver desafios complexos.
+    *   **Foto de Perfil de Cássio Viller:** (Com um placeholder claro no HTML para inserir a URL da foto, ex: `<img src="URL_DA_SUA_FOTO_DE_PERFIL_AQUI" alt="Cássio Viller" id="profile-picture">`).
+    *   **Diferenciais Chave (Listar em tópicos ou cards):**
+        *   Visão Integrada: Engenharia Civil + Sistemas de Informação.
+        *   Foco em Automação Inteligente e ROI Comprovado.
+        *   Abordagem Ágil e Prototipagem Rápida.
+        *   Parceria Estratégica e Soluções Customizadas.
+
+4.  **Seção Soluções / Nossos Serviços:**
+    *   **Título:** "Soluções Estratégicas para Otimizar Sua Performance"
+    *   **Apresentar 3-4 Blocos de Soluções Principais (Exemplos, adaptar conforme o portfólio final da Axiom):**
+        *   **Automação Inteligente de Processos:** (Descrição breve e benefícios: Redução de custos, aumento de eficiência).
+        *   **Engenharia de Dados e KPIs Estratégicos:** (Descrição breve e benefícios: Decisões baseadas em dados, alinhamento estratégico).
+        *   **Otimização de Operações e Rotinas Técnicas:** (Descrição breve e benefícios: Ganho de produtividade, padronização).
+
+5.  **Seção Nossa Abordagem / Metodologia:**
+    *   **Título:** "Nossa Metodologia: Da Análise à Implementação de Alto Impacto"
+    *   **Descrever o processo em 3-5 passos simples e visuais** (Diagnóstico, Desenho da Solução, Desenvolvimento Ágil, Implementação, Acompanhamento).
+
+6.  **Seção Resultados / Cases de Sucesso (Inicial):**
+    *   **Título:** "Resultados que Impulsionam o Sucesso"
+    *   **Destaque para o Case Principal de Cássio Viller:** (Desafio, Solução Implementada, Resultados Quantitativos como ROI de ~258% no primeiro mês e economia de horas/custos). Deixar claro que este é um exemplo do impacto que a Axiom pode gerar.
+
+7.  **Seção de Contato:**
+    *   **Título:** "Inicie a Transformação da Sua Empresa Hoje"
+    *   **Texto breve:** "Entre em contato com Cássio Viller e a Axiom Strategic Technologies para discutir seus desafios."
+    *   **Link Direto para WhatsApp (Botão ou Link Destacado):** "Contate Cássio Viller via WhatsApp" ou "Fale Conosco no WhatsApp" com link para `https://wa.me/5512982071116`.
+    *   **Formulário de Contato Simples (Opcional, se preferir focar no WhatsApp):** Nome, Empresa, Email, Mensagem.
+    *   **Informações de Contato Adicionais:** Email (ex: contato@axiomstrategic.tech - placeholder), LinkedIn de Cássio Viller (placeholder para URL).
+
+**Requisitos Técnicos e de Design:**
+
+*   **HTML5 Semântico e CSS3 Moderno.**
+*   **JavaScript para interatividades suaves** (como scroll da navegação).
+*   **Design Responsivo:** O site deve se adaptar perfeitamente a desktops, tablets e smartphones.
+*   **Paleta de Cores:** Profissional e sofisticada. Sugestão: Azuis escuros, cinzas, branco, com um toque de cor vibrante (ex: laranja ou verde tecnológico) para CTAs e destaques.
+*   **Tipografia:** Fontes modernas e legíveis (Ex: Montserrat, Open Sans, Lato).
+*   **Código Comentado:** Especialmente nas áreas onde as URLs das imagens (logo e foto de perfil) devem ser inseridas, para facilitar a personalização por Cássio Viller. Exemplo de comentário: `<!-- Substitua 'URL_DA_SUA_LOGO_AQUI' pelo link da sua imagem de logo -->`
+*   **Estrutura de Arquivos:** Organizar CSS e JS em arquivos separados (styles.css, script.js).
+
+**Instruções Adicionais para a IA do Replit:**
+
+*   Gerar o código completo para `index.html`, `styles.css`, e `script.js`.
+*   Certificar-se de que os placeholders para as imagens da logo e da foto de perfil estejam claramente indicados no `index.html` com comentários explicativos.
+*   Incluir um botão ou link bem visível na seção de contato para o WhatsApp: `https://wa.me/5512982071116`.
+*   O design deve ser elegante e minimalista, transmitindo confiança e expertise.
