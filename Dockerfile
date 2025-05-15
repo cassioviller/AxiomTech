@@ -14,7 +14,7 @@ RUN npm ci --production=false --no-audit --no-fund
 COPY . .
 
 # Compilando o aplicativo
-RUN npm run build && mkdir -p dist/client && cp -r client/public/images dist/client/
+RUN npm run build
 
 # Imagem de produção - mínima
 FROM node:20-alpine AS runner
@@ -39,8 +39,7 @@ RUN npm ci --production --no-audit --no-fund && npm cache clean --force
 # Copiando apenas os arquivos necessários para produção
 COPY --from=builder /app/dist ./dist
 
-# Assegurando que as imagens estejam acessíveis
-COPY --from=builder /app/client/public/images ./dist/client/images
+# As imagens já estão incluídas na pasta dist/public/images após o build
 
 # Definindo usuário não-root para segurança
 RUN addgroup --system --gid 1001 nodejs && \

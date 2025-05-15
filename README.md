@@ -90,7 +90,7 @@ Para facilitar a atualização das imagens do site após o deploy sem precisar r
 
 1. Acesse o painel de controle do EasyPanel
 2. Encontre sua aplicação e abra o terminal/console
-3. Navegue até a pasta `/app/dist/client/images/`
+3. Navegue até a pasta `/app/dist/public/images/`
 4. Use o comando `cp` para substituir as imagens existentes ou faça upload de novas imagens
 
 ### Se estiver usando Docker Compose:
