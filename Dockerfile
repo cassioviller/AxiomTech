@@ -1,14 +1,22 @@
-FROM nginx:alpine
+FROM node:18-alpine
 
-COPY client/public /usr/share/nginx/html
+WORKDIR /app
 
-RUN mkdir -p /usr/share/nginx/html/images
+# Copiar arquivos do projeto
+COPY . .
 
-# Configurar para usar uma porta específica (6000)
-RUN sed -i 's/listen       80;/listen       6000;/g' /etc/nginx/conf.d/default.conf
-RUN sed -i 's/listen  \[::\]:80;/listen  \[::\]:6000;/g' /etc/nginx/conf.d/default.conf
+# Instalar dependências
+RUN npm ci
 
-# Expor porta 6000
+# Configurar porta e ambiente
+ENV PORT=6000
+ENV NODE_ENV=production
+
+# Construir a aplicação
+RUN npm run build
+
+# Expor porta
 EXPOSE 6000
 
-CMD ["nginx", "-g", "daemon off;"]
+# Iniciar a aplicação em modo produção
+CMD ["node", "dist/index.js"]
