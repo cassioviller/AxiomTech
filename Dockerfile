@@ -18,6 +18,9 @@ RUN npm run build && \
     mkdir -p dist/public/images && \
     cp -r client/public/images/* dist/public/images/ || true
 
+# Injetando configuração de porta no aplicativo
+RUN echo "PORT=6000" > .env
+
 # Imagem de produção - mínima
 FROM node:20-alpine AS runner
 
@@ -44,6 +47,7 @@ COPY --from=builder /app/package.json /app/package-lock.json ./
 
 # Copiando apenas os arquivos necessários para produção
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/.env ./
 
 # As imagens já estão incluídas na pasta dist/public/images após o build
 

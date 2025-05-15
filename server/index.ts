@@ -56,15 +56,16 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Configuração única: sempre usa a porta 6000 tanto para produção quanto desenvolvimento
+  // Usando a porta 6000 para todos os ambientes
+  // Isso é necessário para compatibilidade com o Replit e EasyPanel
   const port = 6000;
   
-  // Iniciar servidor na porta 6000
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  // Iniciar o servidor na porta apropriada
+  try {
+    server.listen(port, "0.0.0.0", () => {
+      log(`Server running at http://0.0.0.0:${port}`);
+    });
+  } catch (error) {
+    log(`Error starting server: ${error instanceof Error ? error.message : String(error)}`);
+  }
 })();
