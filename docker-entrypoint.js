@@ -76,9 +76,11 @@ app.use(express.static(staticPath));
 
 // Adiciona rota healthcheck para diagnóstico
 app.get('/health', (req, res) => {
-  // Verifica se o arquivo index.html existe no path escolhido
+  // Verifica se os arquivos importantes existem
   const indexFile = path.join(staticPath, "index.html");
+  const testFile = path.join(staticPath, "test.html");
   const indexExists = fs.existsSync(indexFile);
+  const testExists = fs.existsSync(testFile);
   
   // Obtém informações do sistema 
   const systemInfo = {
@@ -102,20 +104,38 @@ app.get('/health', (req, res) => {
     }
   });
   
+  // Cria links para teste
+  const host = req.headers.host || `localhost:${PORT}`;
+  const protocol = req.secure ? 'https' : 'http';
+  const baseUrl = `${protocol}://${host}`;
+  
   // Retorna informações detalhadas
   res.status(200).send({
     status: 'ok',
     message: 'Server is running properly',
     time: new Date().toISOString(),
     path: staticPath,
-    indexHtml: {
-      path: indexFile,
-      exists: indexExists,
-      size: indexExists ? fs.statSync(indexFile).size : null,
+    testLinks: {
+      main: `${baseUrl}/`,
+      testPage: `${baseUrl}/test.html`,
+      health: `${baseUrl}/health`
     },
-    files: fs.readdirSync(staticPath),
+    files: {
+      indexHtml: {
+        path: indexFile,
+        exists: indexExists,
+        size: indexExists ? fs.statSync(indexFile).size : null,
+      },
+      testHtml: {
+        path: testFile,
+        exists: testExists,
+        size: testExists ? fs.statSync(testFile).size : null,
+      }
+    },
+    allFiles: fs.readdirSync(staticPath),
     routes: routes,
-    system: systemInfo
+    system: systemInfo,
+    headers: req.headers
   });
 });
 
@@ -124,9 +144,21 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(staticPath, "index.html"));
 });
 
+// Função para iniciar o servidor com um pequeno atraso
+const startServer = () => {
+  console.log('Preparando para iniciar o servidor...');
+  
+  // Atraso de 2 segundos antes de iniciar o servidor
+  // Isso pode ajudar com problemas de timing em alguns ambientes
+  setTimeout(() => {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Serving static files from: ${staticPath}`);
+      console.log(`Health check available at: http://localhost:${PORT}/health`);
+      console.log(`Servidor pronto para receber conexões!`);
+    });
+  }, 2000);
+};
+
 // Inicia o servidor
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Serving static files from: ${staticPath}`);
-  console.log(`Health check available at: http://localhost:${PORT}/health`);
-});
+startServer();

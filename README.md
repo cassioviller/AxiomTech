@@ -115,18 +115,26 @@ Se você encontrar um desses erros durante o deploy no EasyPanel:
 
 Se o site não estiver sendo carregado, mas o container está rodando:
 
-1. Verifique se o healthcheck do serviço está passando:
-   - Acesse `https://[seu-domínio]/health` para verificar se o servidor está funcionando
-   - Isso deve retornar um JSON com status "ok" e informações do servidor
+1. **Teste com páginas alternativas**:
+   - Tente acessar `https://[seu-domínio]/basic.html` - página básica apenas HTML
+   - Tente acessar `https://[seu-domínio]/test.html` - página de teste com CSS embutido
+   - Tente acessar `https://[seu-domínio]/health` - para diagnóstico avançado do servidor
 
-2. Verifique as configurações do EasyPanel:
-   - Confirme que a porta 6000 está mapeada corretamente
-   - Verifique se o domínio está configurado corretamente
-   - Assegure-se de que HTTPS está habilitado (se necessário)
+2. **Soluções específicas para EasyPanel**:
+   - **Problema 1**: Tente desabilitar HTTPS temporariamente 
+   - **Problema 2**: Verifique se o domínio tem DNS configurado corretamente
+   - **Problema 3**: Tente mudar o mapeamento de portas no EasyPanel:
+     - Ajuste para porta 80 externa → 6000 interna
+     - Ou experimente porta 443 externa → 6000 interna (para HTTPS)
 
-3. Problemas de proxy:
-   - Em alguns casos, o EasyPanel pode ter problemas de proxy reverso
-   - Verifique se existe algum firewall ou regra de segurança bloqueando o acesso
+3. **Recursos avançados de diagnóstico**:
+   - Use as ferramentas de desenvolvedor do navegador (F12) para verificar erros no console
+   - Verifique os logs do container para garantir que ele está funcionando corretamente
+   - Tente acessar o site usando seu IP direto ao invés do nome de domínio
+
+4. **Solução alternativa**:
+   - Se nada funcionar, crie uma nova aplicação no EasyPanel com as mesmas configurações
+   - Às vezes, o problema pode ser com a configuração específica da aplicação atual
 
 ### Explicação técnica:
 
