@@ -47,11 +47,47 @@ app.use((req, res, next) => {
   next();
 });
 
+// Verificar se index.html existe no caminho
+let indexHtmlExists = false;
+try {
+  indexHtmlExists = fs.existsSync(path.join(finalPath, "index.html"));
+  console.log(`index.html ${indexHtmlExists ? "encontrado" : "NÃO encontrado"} em ${path.join(finalPath, "index.html")}`);
+} catch (err) {
+  console.error(`Erro ao verificar index.html:`, err.message);
+}
+
 // Servir arquivos estáticos
 app.use(express.static(finalPath));
 
+// Rota para verificar diretamente o index.html
+app.get("/checkindex", (req, res) => {
+  res.send({
+    staticPath: finalPath,
+    indexExists: indexHtmlExists,
+    envVars: {
+      NODE_ENV: process.env.NODE_ENV,
+      PORT: process.env.PORT,
+      HOST: process.env.HOST
+    }
+  });
+});
+
 // Rota principal - envia index.html para qualquer caminho
 app.get("*", (req, res) => {
+  if (!indexHtmlExists) {
+    return res.status(404).send(`
+      <html>
+        <head><title>Erro - Arquivo não encontrado</title></head>
+        <body>
+          <h1>Erro: index.html não encontrado</h1>
+          <p>O arquivo index.html não foi encontrado em ${path.join(finalPath, "index.html")}</p>
+          <h2>Conteúdo do diretório:</h2>
+          <pre>${JSON.stringify(fs.readdirSync(finalPath), null, 2)}</pre>
+        </body>
+      </html>
+    `);
+  }
+  
   res.sendFile(path.join(finalPath, "index.html"));
 });
 
