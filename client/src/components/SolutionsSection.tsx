@@ -4,8 +4,8 @@ const SolutionsSection: React.FC = () => {
   const solutions = [
     {
       title: "Automação Inteligente de Processos",
-      description: "Transformamos processos manuais repetitivos em fluxos automatizados inteligentes, reduzindo custos operacionais e aumentando a precisão e eficiência.",
-      tags: ["Redução de Custos", "Eficiência", "Precisão"],
+      description: "Transformamos processos manuais repetitivos em fluxos automatizados inteligentes, incluindo o desenvolvimento de chatbots avançados integrados a CRMs para otimizar a comunicação e a gestão de clientes, reduzindo custos operacionais e aumentando a precisão e eficiência.",
+      tags: ["Chatbots Integrados", "Redução de Custos", "Eficiência"],
       image: "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=500"
     },
     {

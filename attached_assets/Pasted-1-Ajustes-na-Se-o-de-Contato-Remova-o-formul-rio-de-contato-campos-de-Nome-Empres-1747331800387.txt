@@ -1,0 +1,27 @@
+1.  **Ajustes na Seção de Contato:**
+    *   Remova o formulário de contato (campos de Nome, Empresa, Email, Mensagem).
+    *   Remova as informações de contato por email (ex: contato@axiomstrategic.tech).
+    *   Remova o link para o LinkedIn de Cássio Viller.
+    *   Mantenha apenas o link/botão para o WhatsApp como principal forma de contato. Certifique-se de que o link `https://wa.me/5512982071116` esteja funcional e bem destacado.
+    *   O título da seção pode ser ajustado para algo como "Fale Diretamente Conosco via WhatsApp" ou similar, para refletir a mudança de foco.
+
+2.  **Atualização na Seção de Soluções (Automação Inteligente de Processos):**
+    *   Na descrição da solução "Automação Inteligente de Processos", adicione uma menção clara à capacidade de desenvolver **chatbots inteligentes e integrados a CRMs** como parte das soluções de automação. Por exemplo, o texto poderia ser algo como: "Transformamos processos manuais repetitivos em fluxos automatizados inteligentes, incluindo o desenvolvimento de chatbots avançados integrados a CRMs para otimizar a comunicação e a gestão de clientes, reduzindo custos operacionais e aumentando a precisão e eficiência."
+
+3.  **Ajuste no Tamanho da Logo no Cabeçalho:**
+    *   Aumente o tamanho da logo da "Axiom Strategic Technologies" no cabeçalho (barra de navegação fixa) para que ela tenha maior destaque e visibilidade. Ajuste o CSS correspondente ao elemento com `id="company-logo"` ou similar para aumentar suas dimensões (largura e/ou altura), mantendo a proporção e o alinhamento.
+
+4.  **Adição de Imagem/Vídeo de Fundo na Seção de Abertura (Hero Section):**
+    *   Adicione uma imagem de fundo profissional e moderna ou um vídeo sutil à seção de abertura (Hero Section).
+    *   **Sugestão de Imagem:** Uma imagem abstrata de alta qualidade com tons azuis e cinzas, representando conexões tecnológicas, redes neurais sutis, ou linhas de dados dinâmicas. Pode ter um leve efeito de sobreposição de cor para garantir a legibilidade do texto.
+    *   **Sugestão de Vídeo (Alternativa):** Um vídeo de fundo em loop sutil, com movimento lento, mostrando elementos abstratos de tecnologia, partículas ou fluxos de dados. O vídeo não deve ser distrativo.
+    *   **Efeito Parallax (Opcional, se viável e não comprometer a performance):** Se possível, aplique um efeito parallax sutil à imagem ou vídeo de fundo para adicionar profundidade e modernidade à medida que o usuário rola a página.
+    *   **Implementação:** Instrua a IA a adicionar o CSS necessário para definir a imagem/vídeo como fundo da Hero Section, garantindo que cubra toda a área (`background-size: cover;`), esteja bem posicionada (`background-position: center;`) e que o texto sobreposto (Título Principal e Subtítulo) permaneça claramente legível (pode ser necessário adicionar um overlay escuro ou claro sobre a imagem/vídeo, ou ajustar a cor do texto).
+    *   **Placeholder para Imagem/Vídeo:** Se for uma imagem, adicione um comentário no CSS ou HTML indicando onde a URL da imagem de fundo deve ser inserida. Ex: `background-image: url('URL_DA_IMAGEM_DE_FUNDO_AQUI');`
+
+**Instruções Adicionais para a IA do Replit:**
+
+*   Preservar a estrutura geral e o conteúdo das outras seções do site que não foram mencionadas para alteração.
+*   Manter o design responsivo e a funcionalidade existente (como o scroll suave da navegação).
+*   Garantir que as alterações no CSS sejam bem organizadas e, se possível, comentadas para indicar as modificações realizadas.
+*   O objetivo é refinar o site existente com base neste feedback, melhorando a experiência do usuário e o alinhamento com a marca.

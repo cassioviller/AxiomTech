@@ -46,7 +46,7 @@ const Navbar: React.FC = () => {
             <img 
               src={axiomLogo} 
               alt="Axiom Strategic Technologies Logo" 
-              className="h-14"
+              className="h-20" 
             />
           </a>
           
