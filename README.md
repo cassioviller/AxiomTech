@@ -111,6 +111,23 @@ Se você encontrar um desses erros durante o deploy no EasyPanel:
    ls -la /app               # Verificar se o docker-entrypoint.js existe
    ```
 
+### Erro: "Service is not reachable"
+
+Se o site não estiver sendo carregado, mas o container está rodando:
+
+1. Verifique se o healthcheck do serviço está passando:
+   - Acesse `https://[seu-domínio]/health` para verificar se o servidor está funcionando
+   - Isso deve retornar um JSON com status "ok" e informações do servidor
+
+2. Verifique as configurações do EasyPanel:
+   - Confirme que a porta 6000 está mapeada corretamente
+   - Verifique se o domínio está configurado corretamente
+   - Assegure-se de que HTTPS está habilitado (se necessário)
+
+3. Problemas de proxy:
+   - Em alguns casos, o EasyPanel pode ter problemas de proxy reverso
+   - Verifique se existe algum firewall ou regra de segurança bloqueando o acesso
+
 ### Explicação técnica:
 
 O site foi configurado com um servidor Express personalizado para o ambiente de produção, que não depende do Vite (que é uma ferramenta de desenvolvimento). Isso evita problemas de compatibilidade em produção.

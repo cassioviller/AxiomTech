@@ -52,9 +52,9 @@ RUN addgroup --system --gid 1001 nodejs && \
     chown -R expressjs:nodejs /app
 USER expressjs
 
-# Verificação de saúde para EasyPanel
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:6000/ || exit 1
+# Verificação de saúde para EasyPanel com maior tempo de inicialização e mais retentativas
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=5 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:6000/health || exit 1
 
 # Expondo a porta para o aplicativo
 EXPOSE 6000

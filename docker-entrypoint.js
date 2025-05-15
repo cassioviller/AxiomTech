@@ -64,10 +64,62 @@ function findDistPath() {
 
 const staticPath = findDistPath();
 
+// Adiciona cabeçalhos para possíveis problemas de CORS
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 // Serve os arquivos estáticos
 app.use(express.static(staticPath));
 
-// Para qualquer outra rota, serve o index.html
+// Adiciona rota healthcheck para diagnóstico
+app.get('/health', (req, res) => {
+  // Verifica se o arquivo index.html existe no path escolhido
+  const indexFile = path.join(staticPath, "index.html");
+  const indexExists = fs.existsSync(indexFile);
+  
+  // Obtém informações do sistema 
+  const systemInfo = {
+    nodeVersion: process.version,
+    platform: process.platform,
+    arch: process.arch,
+    uptime: process.uptime(),
+    memoryUsage: process.memoryUsage(),
+    env: {
+      NODE_ENV: process.env.NODE_ENV,
+      PORT: process.env.PORT,
+      HOST: process.env.HOST
+    }
+  };
+  
+  // Obtém todas as rotas registradas
+  const routes = [];
+  app._router.stack.forEach(function(r) {
+    if (r.route && r.route.path) {
+      routes.push(r.route.path);
+    }
+  });
+  
+  // Retorna informações detalhadas
+  res.status(200).send({
+    status: 'ok',
+    message: 'Server is running properly',
+    time: new Date().toISOString(),
+    path: staticPath,
+    indexHtml: {
+      path: indexFile,
+      exists: indexExists,
+      size: indexExists ? fs.statSync(indexFile).size : null,
+    },
+    files: fs.readdirSync(staticPath),
+    routes: routes,
+    system: systemInfo
+  });
+});
+
+// Para qualquer outra rota, serve o index.html (deve vir após todas as outras rotas)
 app.get("*", (req, res) => {
   res.sendFile(path.join(staticPath, "index.html"));
 });
@@ -76,4 +128,5 @@ app.get("*", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Serving static files from: ${staticPath}`);
+  console.log(`Health check available at: http://localhost:${PORT}/health`);
 });
