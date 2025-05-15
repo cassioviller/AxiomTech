@@ -56,43 +56,15 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Configuração dupla: porta 6000 para produção e portas 5000/6000 para desenvolvimento
-  const prodPort = 6000;
-  const devPort = 5000;
+  // Configuração única: sempre usa a porta 6000 tanto para produção quanto desenvolvimento
+  const port = 6000;
   
-  // Em produção, escuta apenas na porta 6000
-  if (app.get("env") === "production") {
-    server.listen({
-      port: prodPort,
-      host: "0.0.0.0",
-      reusePort: true,
-    }, () => {
-      log(`serving on port ${prodPort} (production)`);
-    });
-  } 
-  // Em desenvolvimento, escuta em ambas as portas para compatibilidade
-  else {
-    // Criamos um segundo servidor para a porta 5000 (compatibilidade com Replit)
-    import('http').then(({ createServer }) => {
-      const devServer = createServer(app);
-      
-      // Inicia na porta 6000 (nossa porta padrão)
-      server.listen({
-        port: prodPort,
-        host: "0.0.0.0",
-        reusePort: true,
-      }, () => {
-        log(`serving on port ${prodPort} (development)`);
-      });
-      
-      // Também inicia na porta 5000 (para workflow Replit)
-      devServer.listen({
-        port: devPort,
-        host: "0.0.0.0",
-        reusePort: true,
-      }, () => {
-        log(`serving on port ${devPort} (for Replit preview)`);
-      });
-    });
-  }
+  // Iniciar servidor na porta 6000
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  }, () => {
+    log(`serving on port ${port}`);
+  });
 })();
