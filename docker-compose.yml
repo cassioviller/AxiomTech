@@ -4,7 +4,7 @@ services:
   axiom-web:
     build: 
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.new
     ports:
       - "6000:6000"
     restart: unless-stopped
@@ -12,21 +12,11 @@ services:
       - NODE_ENV=production
       - PORT=6000
       - HOST=0.0.0.0
-    # Usar script simplificado sem healthchecks
-    command: ["node", "docker-entrypoint-simple.js"]
-    # Removido healthcheck para evitar problemas
-    # healthcheck:
-    #   test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:6000/health"]
-    #   interval: 30s
-    #   timeout: 5s
-    #   retries: 3
-    #   start_period: 5s
+    # Sem healthcheck para evitar problemas com EasyPanel
     volumes:
-      # Montar a pasta de imagens para facilitar a substituição de imagens
-      - ./client/public/images:/app/dist/images:ro
-      - ./client/public/images:/app/dist/assets/images:ro
-      - ./client/public/images:/app/dist/client/public/images:ro
+      # Montar a pasta de imagens para facilitar a substituição de imagens (se existir)
+      - ./client/public/images:/app/dist/public/assets/images:ro
     
 # Instruções para uso:
-# 1. Desenvolvimento local: docker-compose up
-# 2. Deploy no EasyPanel: use o Dockerfile diretamente
+# 1. Desenvolvimento local: docker-compose -f docker-compose.new.yml up
+# 2. Deploy no EasyPanel: use o Dockerfile.new diretamente
