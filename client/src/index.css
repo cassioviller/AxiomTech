@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Base colors */
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  
+  /* Card colors */
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  
+  /* Popover colors */
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  
+  /* Border colors */
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  
+  /* Primary colors - Axiom blue */
+  --primary: 217 61% 26%; /* #19376D */
+  --primary-dark: 218 85% 15%; /* #0B2447 */
+  --primary-light: 217 61% 46%;
+  --primary-foreground: 210 40% 98%;
+  
+  /* Secondary colors */
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  
+  /* Muted colors */
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  
+  /* Accent colors - Axiom orange */
+  --accent: 28 100% 50%; /* #FF7E00 */
+  --accent-foreground: 0 0% 100%;
+  
+  /* Destructive colors */
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  
+  /* Chart colors */
+  --chart-1: 217 61% 26%;
+  --chart-2: 28 100% 50%;
+  --chart-3: 199 89% 48%;
+  --chart-4: 217 91% 60%;
+  --chart-5: 129 50% 54%;
+  
+  /* Sidebar colors */
+  --sidebar-background: 222 47% 11%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 217 61% 26%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 28 100% 50%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 217 33% 17%;
+  --sidebar-ring: 215.4 16.3% 46.9%;
+  
+  /* Other */
+  --ring: 215 20.2% 65.1%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 213 31% 91%;
+  
+  /* Card colors */
+  --card: 222 47% 11%;
+  --card-foreground: 213 31% 91%;
+  
+  /* Popover colors */
+  --popover: 222 47% 11%;
+  --popover-foreground: 213 31% 91%;
+  
+  /* Border colors */
+  --border: 216 34% 17%;
+  --input: 216 34% 17%;
+  
+  /* Primary colors - Axiom blue (darker) */
+  --primary: 218 85% 15%; /* #0B2447 */
+  --primary-dark: 217 92% 10%;
+  --primary-light: 218 85% 35%;
+  --primary-foreground: 210 40% 98%;
+  
+  /* Secondary colors */
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+  
+  /* Muted colors */
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20.2% 65.1%;
+  
+  /* Accent colors - Axiom orange */
+  --accent: 28 100% 50%; /* #FF7E00 */
+  --accent-foreground: 0 0% 100%;
+  
+  /* Destructive colors */
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 100%;
+  
+  /* Chart colors */
+  --chart-1: 217 61% 26%;
+  --chart-2: 28 100% 50%;
+  --chart-3: 199 89% 48%;
+  --chart-4: 217 91% 60%;
+  --chart-5: 129 50% 54%;
+  
+  /* Other */
+  --ring: 217.2 32.6% 17.5%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-opensans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-montserrat font-semibold;
+  }
+}
+
+/* Custom classes for the Axiom site */
+@layer components {
+  .custom-gradient {
+    @apply bg-gradient-to-br from-primary-dark to-primary;
+  }
+  
+  .btn-primary {
+    @apply bg-accent hover:bg-accent/90 text-white font-montserrat font-semibold px-6 py-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  .btn-secondary {
+    @apply bg-primary hover:bg-primary-dark text-white font-montserrat font-semibold px-6 py-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  .section-title {
+    @apply font-bold text-3xl md:text-4xl mb-4 text-primary-dark;
+  }
+  
+  .pattern-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .custom-shadow {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .font-montserrat {
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .font-opensans {
+    font-family: 'Open Sans', sans-serif;
+  }
+  
+  .font-lato {
+    font-family: 'Lato', sans-serif;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
