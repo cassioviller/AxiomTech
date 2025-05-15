@@ -37,12 +37,11 @@ Este projeto pode ser facilmente implantado usando o EasyPanel com Docker:
    - Crie uma nova aplicação
    - Escolha a opção "Usando Dockerfile"
    - Aponte para o repositório do seu projeto
-   - Configure a porta 6000 para acesso externo
+   - Configure a porta 5000 para acesso externo
 
-3. **Variáveis de ambiente** (específicas para o EasyPanel):
+3. **Variáveis de ambiente** (se necessário):
    - `NODE_ENV`: Production
-   - `PORT`: 6000
-   - `HOST`: 0.0.0.0
+   - Outras variáveis específicas que possam ser necessárias
 
 4. **Implantação**:
    - Inicie o build
@@ -51,7 +50,7 @@ Este projeto pode ser facilmente implantado usando o EasyPanel com Docker:
 
 ## Desenvolvimento
 
-### Opção 1: Desenvolvimento direto (sem Docker)
+Para desenvolvimento local:
 
 ```bash
 # Instalar dependências
@@ -66,36 +65,6 @@ npm run build
 # Iniciar em modo produção
 npm run start
 ```
-
-### Opção 2: Desenvolvimento com Docker
-
-```bash
-# Construir e iniciar o container
-docker-compose up -d
-
-# Ver logs em tempo real
-docker-compose logs -f
-
-# Parar o container
-docker-compose down
-```
-
-Ao usar Docker, você pode acessar o site em `http://localhost:6000`
-
-## Atualizando Imagens após Deploy
-
-Para facilitar a atualização das imagens do site após o deploy sem precisar reconstruir a aplicação inteira:
-
-### No EasyPanel:
-
-1. Acesse o painel de controle do EasyPanel
-2. Encontre sua aplicação e abra o terminal/console
-3. Navegue até a pasta `/app/dist/public/images/`
-4. Use o comando `cp` para substituir as imagens existentes ou faça upload de novas imagens
-
-### Se estiver usando Docker Compose:
-
-O volume montado em `docker-compose.yml` permite substituir as imagens diretamente na pasta `client/public/images/` do seu repositório local, e as alterações serão refletidas automaticamente.
 
 ## Suporte
 

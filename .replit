@@ -4,7 +4,6 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["socat"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -12,12 +11,8 @@ build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
 [[ports]]
-localPort = 3000
+localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 6000
-externalPort = 6000
 
 [workflows]
 runButton = "Project"
@@ -38,4 +33,4 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
-waitForPort = 6000
+waitForPort = 5000
