@@ -10,11 +10,16 @@ COPY package.json package-lock.json ./
 # Instalando dependências com flags de produção para otimização
 RUN npm ci --production=false --no-audit --no-fund
 
-# Copiando os arquivos do projeto (usando .dockerignore para ignorar arquivos desnecessários)
+# Copiando os arquivos do projeto
 COPY . .
 
 # Compilando o aplicativo
 RUN npm run build
+
+# Verificando quais arquivos foram gerados pelo build (para debugging)
+RUN ls -la dist
+RUN ls -la dist/public || true
+RUN find /app/dist -type f -name "*.html" | xargs ls -la || true
 
 # Imagem de produção - mínima
 FROM node:20-alpine AS runner
@@ -32,47 +37,49 @@ ENV NODE_ENV=production
 ENV PORT=6000
 ENV HOST=0.0.0.0
 
-# Instalando todos os pacotes incluindo dependências de desenvolvimento
-# para garantir que o Vite esteja disponível
-COPY --from=builder /app/package.json /app/package-lock.json ./
-RUN npm ci --no-audit --no-fund && npm cache clean --force
-
-# Copiando apenas os arquivos necessários para produção
+# Copiando os arquivos necessários para produção
 COPY --from=builder /app/dist ./dist
 
-# Criando um script de entrada simples diretamente na imagem de produção
+# Instalando apenas express para servir o conteúdo estático
+RUN npm init -y && \
+    npm install express && \
+    npm cache clean --force
+
+# Criando um script simples para servir arquivos estáticos
 RUN echo '#!/usr/bin/env node\n\
 \n\
-import express from "express";\n\
-import path from "path";\n\
-import fs from "fs";\n\
-import { fileURLToPath } from "url";\n\
+/**\n\
+ * Script simplificado para servir o site Axiom no EasyPanel\n\
+ * Sem health checks ou verificações complexas\n\
+ */\n\
 \n\
-const __dirname = path.dirname(fileURLToPath(import.meta.url));\n\
+const express = require("express");\n\
+const path = require("path");\n\
+const fs = require("fs");\n\
+\n\
 const app = express();\n\
 const PORT = process.env.PORT || 6000;\n\
 \n\
-// Possíveis caminhos para os arquivos estáticos\n\
-const paths = [\n\
-  "/app/dist/public",\n\
-  "/app/dist",\n\
-  path.join(__dirname, "dist", "public"),\n\
-  path.join(__dirname, "dist")\n\
-];\n\
+// Caminho para os arquivos estáticos\n\
+const staticPath = "/app/dist/public";\n\
 \n\
-// Encontra o primeiro caminho válido\n\
-let staticPath = "/app/dist";\n\
-for (const p of paths) {\n\
-  try {\n\
-    if (fs.existsSync(p)) {\n\
-      staticPath = p;\n\
-      break;\n\
-    }\n\
-  } catch (err) {}\n\
+// Detectar qual caminho existe no sistema\n\
+if (!fs.existsSync(staticPath)) {\n\
+  console.warn(`Aviso: ${staticPath} não encontrado.`);\n\
+\n\
+  // Listar o conteúdo do diretório dist para debug\n\
+  const distPath = "/app/dist";\n\
+  if (fs.existsSync(distPath)) {\n\
+    console.log(`Conteúdo do diretório ${distPath}:`);\n\
+    fs.readdirSync(distPath).forEach(file => {\n\
+      console.log(`- ${file}`);\n\
+    });\n\
+  }\n\
 }\n\
 \n\
+// Log de inicialização\n\
 console.log(`Servidor iniciando na porta ${PORT}`);\n\
-console.log(`Servindo arquivos estáticos de: ${staticPath}`);\n\
+console.log(`Servindo arquivos estáticos de ${staticPath}`);\n\
 \n\
 // Permitir CORS para facilitar acesso\n\
 app.use((req, res, next) => {\n\
@@ -87,79 +94,63 @@ app.use((req, res, next) => {\n\
   next();\n\
 });\n\
 \n\
-// Rota para verificar se o servidor está ativo\n\
+// Rota para verificar se o servidor está rodando\n\
 app.get("/ping", (req, res) => {\n\
   res.status(200).send("pong");\n\
 });\n\
 \n\
-// Verificar se index.html existe no caminho\n\
-let indexHtmlExists = false;\n\
-try {\n\
-  indexHtmlExists = fs.existsSync(path.join(staticPath, "index.html"));\n\
-  console.log(`index.html ${indexHtmlExists ? "encontrado" : "NÃO encontrado"} em ${path.join(staticPath, "index.html")}`);\n\
-} catch (err) {\n\
-  console.error(`Erro ao verificar index.html:`, err.message);\n\
-}\n\
-\n\
-// Servir arquivos estáticos\n\
-app.use(express.static(staticPath));\n\
-\n\
-// Rota para verificar diretamente o index.html\n\
-app.get("/checkindex", (req, res) => {\n\
-  res.send({\n\
-    staticPath: staticPath,\n\
-    indexExists: indexHtmlExists,\n\
-    envVars: {\n\
-      NODE_ENV: process.env.NODE_ENV,\n\
-      PORT: process.env.PORT,\n\
-      HOST: process.env.HOST\n\
-    }\n\
+// Rota para status interno\n\
+app.get("/status", (req, res) => {\n\
+  res.json({\n\
+    serverTime: new Date().toISOString(),\n\
+    staticPath,\n\
+    staticPathExists: fs.existsSync(staticPath),\n\
+    nodeEnv: process.env.NODE_ENV,\n\
+    port: PORT\n\
   });\n\
 });\n\
 \n\
+// Servir arquivos estáticos\n\
+app.use(express.static(staticPath));\n\
+app.use(express.static("/app/dist"));\n\
+\n\
 // Rota principal - enviar index.html para qualquer caminho\n\
 app.get("*", (req, res) => {\n\
-  if (!indexHtmlExists) {\n\
-    return res.status(404).send(`\n\
-      <html>\n\
-        <head><title>Erro - Arquivo não encontrado</title></head>\n\
-        <body>\n\
-          <h1>Erro: index.html não encontrado</h1>\n\
-          <p>O arquivo index.html não foi encontrado em ${path.join(staticPath, "index.html")}</p>\n\
-          <h2>Conteúdo do diretório:</h2>\n\
-          <pre>${JSON.stringify(fs.readdirSync(staticPath), null, 2)}</pre>\n\
-        </body>\n\
-      </html>\n\
-    `);\n\
+  // Tenta encontrar o index.html em diferentes locais\n\
+  const possiblePaths = [\n\
+    path.join(staticPath, "index.html"),\n\
+    "/app/dist/index.html",\n\
+    "/app/dist/public/index.html"\n\
+  ];\n\
+\n\
+  // Tenta cada caminho possível\n\
+  for (const htmlPath of possiblePaths) {\n\
+    if (fs.existsSync(htmlPath)) {\n\
+      return res.sendFile(htmlPath);\n\
+    }\n\
   }\n\
-  \n\
-  res.sendFile(path.join(staticPath, "index.html"));\n\
+\n\
+  // Se nenhum index.html for encontrado, mostra uma página de erro\n\
+  res.status(404).send(`\n\
+    <html>\n\
+      <head><title>Erro - Arquivo não encontrado</title></head>\n\
+      <body>\n\
+        <h1>Erro: index.html não encontrado</h1>\n\
+        <p>Não foi possível encontrar o arquivo index.html</p>\n\
+        <h2>Caminhos verificados:</h2>\n\
+        <pre>${JSON.stringify(possiblePaths, null, 2)}</pre>\n\
+        <h2>Conteúdo de /app/dist:</h2>\n\
+        <pre>${fs.existsSync("/app/dist") ? JSON.stringify(fs.readdirSync("/app/dist"), null, 2) : "Diretório não encontrado"}</pre>\n\
+      </body>\n\
+    </html>\n\
+  `);\n\
 });\n\
 \n\
 // Iniciar o servidor\n\
 app.listen(PORT, "0.0.0.0", () => {\n\
   console.log(`Servidor rodando em http://0.0.0.0:${PORT}`);\n\
-  try {\n\
-    const files = fs.readdirSync(staticPath);\n\
-    console.log(`Arquivos em ${staticPath}:`, files);\n\
-  } catch (err) {\n\
-    console.error(`Erro ao listar diretório ${staticPath}:`, err.message);\n\
-  }\n\
 });\n\
-' > docker-entrypoint-simple.js \
-&& chmod +x docker-entrypoint-simple.js
-
-# Assegurando que os arquivos estáticos estejam acessíveis em diversos caminhos
-# Copiando o index.html para possíveis diretórios
-COPY --from=builder /app/dist/index.html ./dist/index.html
-COPY --from=builder /app/dist/index.html ./dist/public/index.html
-COPY --from=builder /app/dist/client/index.html ./dist/client/index.html 2>/dev/null || true
-
-# Copiando as imagens para possíveis diretórios
-COPY --from=builder /app/client/public/images ./dist/images
-COPY --from=builder /app/client/public/images ./dist/assets/images
-COPY --from=builder /app/client/public/images ./dist/client/public/images
-COPY --from=builder /app/client/public/images ./dist/public/images
+' > server.js && chmod +x server.js
 
 # Definindo usuário não-root para segurança
 RUN addgroup --system --gid 1001 nodejs && \
@@ -167,15 +158,11 @@ RUN addgroup --system --gid 1001 nodejs && \
     chown -R expressjs:nodejs /app
 USER expressjs
 
-# Sem healthcheck para evitar problemas com EasyPanel
-# HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=5 \
-#   CMD wget --no-verbose --tries=1 --spider http://localhost:6000/health || exit 1
-
 # Expondo a porta para o aplicativo
 EXPOSE 6000
 
-# Comando para iniciar o aplicativo em produção usando script simplificado
-CMD ["node", "docker-entrypoint-simple.js"]
+# Comando para iniciar o aplicativo em produção
+CMD ["node", "server.js"]
 
 # Instruções para deploy EasyPanel:
 # 1. No EasyPanel, crie uma nova aplicação

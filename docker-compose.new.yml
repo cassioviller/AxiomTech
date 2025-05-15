@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  axiom-web:
+    build: 
+      context: .
+      dockerfile: Dockerfile.new
+    ports:
+      - "6000:6000"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=6000
+      - HOST=0.0.0.0
+    # Sem healthcheck para evitar problemas com EasyPanel
+    volumes:
+      # Montar a pasta de imagens para facilitar a substituição de imagens (se existir)
+      - ./client/public/images:/app/dist/public/assets/images:ro
+    
+# Instruções para uso:
+# 1. Desenvolvimento local: docker-compose -f docker-compose.new.yml up
+# 2. Deploy no EasyPanel: use o Dockerfile.new diretamente
