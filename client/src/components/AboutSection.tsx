@@ -16,9 +16,10 @@ const AboutSection: React.FC = () => {
               <div className="bg-primary bg-opacity-10 rounded-lg overflow-hidden">
                 {/* Using a professional business photo from stock images */}
                 <img 
-                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=800" 
+                  src="/images/profile-cassio.jpg" 
                   alt="Cássio Viller - CEO da Axiom Strategic Technologies" 
                   className="w-full h-full object-cover"
+                  /* Para trocar a imagem, substitua o arquivo profile-cassio.jpg na pasta client/public/images */
                 />
               </div>
               <div className="bg-primary-dark text-white text-center py-3 rounded-b-lg mt-1">
