@@ -31,9 +31,10 @@ const ResultsSection: React.FC = () => {
           <div className="md:flex">
             <div className="md:w-5/12">
               <img 
-                src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=1000" 
+                src="/images/case-success.jpg" 
                 alt="Case de Sucesso: Automação de Processos Corporativos" 
                 className="w-full h-full object-cover" 
+                /* Para trocar a imagem, substitua o arquivo case-success.jpg na pasta client/public/images */
               />
             </div>
             

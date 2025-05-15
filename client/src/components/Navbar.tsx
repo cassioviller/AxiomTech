@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { scrollToElement } from '@/lib/utils';
-import axiomLogo from '@assets/a-logo-design-showcasing-the-text-axiom-_3_1LiL1rT564AFHLfP5wlA_nsXscy4YRDO5r3k1oDu0Pg.png';
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -44,9 +43,10 @@ const Navbar: React.FC = () => {
             }}
           >
             <img 
-              src={axiomLogo} 
+              src="/images/axiom-logo.png" 
               alt="Axiom Strategic Technologies Logo" 
               className="h-20" 
+              /* Para trocar a logo, substitua o arquivo axiom-logo.png na pasta client/public/images */
             />
           </a>
           

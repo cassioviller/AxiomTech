@@ -1,5 +1,4 @@
 import React from 'react';
-import axiomLogo from '@assets/a-logo-design-showcasing-the-text-axiom-_3_1LiL1rT564AFHLfP5wlA_nsXscy4YRDO5r3k1oDu0Pg.png';
 
 const Footer: React.FC = () => {
   return (
@@ -8,9 +7,10 @@ const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-8 md:mb-0">
             <img 
-              src={axiomLogo} 
+              src="/images/axiom-logo.png" 
               alt="Axiom Strategic Technologies Logo" 
               className="h-12 mb-4"
+              /* Para trocar a logo, substitua o arquivo axiom-logo.png na pasta client/public/images */
             />
             <p className="text-gray-300 text-sm">
               Transformando negócios com engenharia inteligente<br />
