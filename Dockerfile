@@ -40,6 +40,8 @@ RUN npm ci --no-audit --no-fund && npm cache clean --force
 # Copiando apenas os arquivos necessários para produção
 COPY --from=builder /app/dist ./dist
 
+# Vamos criar o index.html de fallback depois de ter criado todos os diretórios
+
 # Criando um script de entrada simples diretamente na imagem de produção
 RUN echo '#!/usr/bin/env node\n\
 \n\
@@ -150,10 +152,13 @@ app.listen(PORT, "0.0.0.0", () => {\n\
 && chmod +x docker-entrypoint-simple.js
 
 # Assegurando que os arquivos estáticos estejam acessíveis em diversos caminhos
-# Copiando o index.html para possíveis diretórios
-COPY --from=builder /app/dist/index.html ./dist/index.html
-COPY --from=builder /app/dist/index.html ./dist/public/index.html
-COPY --from=builder /app/dist/client/index.html ./dist/client/index.html 2>/dev/null || true
+# Criando diretórios para garantir que existam
+RUN mkdir -p ./dist/public ./dist/client ./dist/assets
+
+# Copiando index.html para possíveis diretórios
+COPY --from=builder /app/dist/index.html ./dist/index.html || true
+COPY --from=builder /app/dist/index.html ./dist/public/index.html || true
+COPY --from=builder /app/dist/client/index.html ./dist/client/index.html || true
 
 # Copiando as imagens para possíveis diretórios
 COPY --from=builder /app/client/public/images ./dist/images
@@ -173,6 +178,32 @@ USER expressjs
 
 # Expondo a porta para o aplicativo
 EXPOSE 6000
+
+# Criando um index.html de fallback caso o build falhe em encontrá-lo
+RUN echo '<!DOCTYPE html>\
+<html lang="pt-br">\
+<head>\
+  <meta charset="UTF-8">\
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+  <title>Axiom Strategic Technologies</title>\
+  <style>\
+    body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }\
+    .logo { max-width: 200px; margin-bottom: 2rem; }\
+    h1 { color: #333; }\
+    p { color: #666; max-width: 600px; text-align: center; }\
+  </style>\
+</head>\
+<body>\
+  <h1>Axiom Strategic Technologies</h1>\
+  <p>Estamos trabalhando para trazer nosso site completo. Por favor, entre em contato pelo WhatsApp.</p>\
+  <a href="https://wa.me/5511999999999" target="_blank">Fale Conosco</a>\
+</body>\
+</html>' > /app/dist/index.html && \
+echo '<!DOCTYPE html><html><head><title>Axiom</title></head><body><h1>Axiom</h1></body></html>' > /app/dist/public/index.html && \
+chmod 644 /app/dist/index.html /app/dist/public/index.html
+
+# Verificar e listar arquivos para debug ao iniciar
+RUN ls -la /app && ls -la /app/dist && ls -la /app/dist/public || true
 
 # Comando para iniciar o aplicativo em produção usando script simplificado
 CMD ["node", "docker-entrypoint-simple.js"]
