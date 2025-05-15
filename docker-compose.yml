@@ -8,10 +8,7 @@ services:
     ports:
       - "6000:6000"
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - PORT=6000
-      - HOST=0.0.0.0
+    # Não precisamos de variáveis de ambiente para o Nginx
     
 # Instruções para uso:
 # 1. Desenvolvimento local: docker-compose up
