@@ -20,24 +20,27 @@ FROM nginx:alpine
 # Copiando os arquivos estáticos para o Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copiando configuração do Nginx
-RUN echo 'server {\n\
-    listen 6000;\n\
-    listen [::]:6000;\n\
-    \n\
-    location / {\n\
-        root /usr/share/nginx/html;\n\
-        try_files $uri $uri/ /index.html;\n\
-        index index.html;\n\
-        add_header Cache-Control "no-cache";\n\
-    }\n\
-    \n\
-    # Outras configurações\n\
-    gzip on;\n\
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;\n\
-}' > /etc/nginx/conf.d/default.conf
+# Arquivo de configuração nginx com HEREDOC para evitar problemas de formatação
+RUN cat > /etc/nginx/conf.d/default.conf << 'EOL'
+server {
+    listen 6000;
+    listen [::]:6000;
+    
+    root /usr/share/nginx/html;
+    index index.html;
+    
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache";
+    }
+    
+    # Habilitar gzip
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+}
+EOL
 
-# Criando um arquivo de fallback só para garantir
+# Criando arquivo de fallback
 RUN echo '<!DOCTYPE html><html><head><title>Axiom Technologies</title></head><body><h1>Axiom Technologies</h1><p>Site em construção</p></body></html>' > /usr/share/nginx/html/index.html
 
 # Expondo a porta
