@@ -179,28 +179,11 @@ USER expressjs
 # Expondo a porta para o aplicativo
 EXPOSE 6000
 
-# Criando um index.html de fallback caso o build falhe em encontrá-lo
-RUN echo '<!DOCTYPE html>\
-<html lang="pt-br">\
-<head>\
-  <meta charset="UTF-8">\
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">\
-  <title>Axiom Strategic Technologies</title>\
-  <style>\
-    body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }\
-    .logo { max-width: 200px; margin-bottom: 2rem; }\
-    h1 { color: #333; }\
-    p { color: #666; max-width: 600px; text-align: center; }\
-  </style>\
-</head>\
-<body>\
-  <h1>Axiom Strategic Technologies</h1>\
-  <p>Estamos trabalhando para trazer nosso site completo. Por favor, entre em contato pelo WhatsApp.</p>\
-  <a href="https://wa.me/5511999999999" target="_blank">Fale Conosco</a>\
-</body>\
-</html>' > /app/dist/index.html && \
-echo '<!DOCTYPE html><html><head><title>Axiom</title></head><body><h1>Axiom</h1></body></html>' > /app/dist/public/index.html && \
-chmod 644 /app/dist/index.html /app/dist/public/index.html
+# Criando um index.html de fallback mais simples para garantir compatibilidade
+RUN mkdir -p /app/dist/public && \
+    echo '<!DOCTYPE html><html><head><title>Axiom Strategic Technologies</title></head><body><h1>Axiom Strategic Technologies</h1><p>Site em construção. <a href="https://wa.me/5511999999999">Contato</a></p></body></html>' > /app/dist/index.html && \
+    cp /app/dist/index.html /app/dist/public/index.html && \
+    chmod 644 /app/dist/index.html /app/dist/public/index.html
 
 # Verificar e listar arquivos para debug ao iniciar
 RUN ls -la /app && ls -la /app/dist && ls -la /app/dist/public || true
