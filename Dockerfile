@@ -1,13 +1,20 @@
-FROM nginx:stable-alpine
+FROM nginx:alpine
 
-# Copiar site estático 
+# Copiar arquivos
 COPY client/public /usr/share/nginx/html
 
-# Configurar para usar porta 6000
-RUN sed -i 's/listen[[:space:]]*80;/listen 6000;/g' /etc/nginx/conf.d/default.conf
+# Configurar porta para 6000
+RUN echo 'server { \
+    listen 6000 default_server; \
+    listen [::]:6000 default_server; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
 # Expor porta
 EXPOSE 6000
 
-# Iniciar Nginx
+# Iniciar
 CMD ["nginx", "-g", "daemon off;"]
