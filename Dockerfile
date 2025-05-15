@@ -1,35 +1,21 @@
-FROM node:18-alpine AS builder
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Copiar arquivos do projeto
-COPY . .
+# Copiar package.json e package-lock.json primeiro para aproveitar o cache
+COPY package*.json ./
 
 # Instalar dependências
 RUN npm ci
 
-# Construir a aplicação
-RUN npm run build
+# Copiar o resto dos arquivos
+COPY . .
 
-# Segunda etapa - apenas para servir os arquivos compilados
-FROM nginx:alpine
+# Definir a porta do servidor
+ENV PORT=6000
 
-# Copiar os arquivos compilados da etapa de build
-COPY --from=builder /app/dist/public /usr/share/nginx/html
-
-# Criar configuração do Nginx para a porta 6000
-RUN echo 'server { \
-    listen 6000; \
-    server_name localhost; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    location / { \
-        try_files $uri $uri/ /index.html; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
-
-# Expor porta
+# Expor a porta
 EXPOSE 6000
 
-# Iniciar o Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Comando para iniciar a aplicação
+CMD ["npm", "run", "dev"]
