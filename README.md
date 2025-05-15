@@ -90,55 +90,8 @@ Para facilitar a atualização das imagens do site após o deploy sem precisar r
 
 1. Acesse o painel de controle do EasyPanel
 2. Encontre sua aplicação e abra o terminal/console
-3. Navegue até uma das pastas:
-   - `/app/dist/images/`
-   - `/app/dist/assets/images/`
-   - `/app/dist/client/public/images/`
+3. Navegue até a pasta `/app/dist/client/images/`
 4. Use o comando `cp` para substituir as imagens existentes ou faça upload de novas imagens
-
-## Solução de Problemas Comuns
-
-### Erro: "Cannot find module '/app/server/index.js'" ou "Cannot find package 'vite'"
-
-Se você encontrar um desses erros durante o deploy no EasyPanel:
-
-1. Verifique se a versão mais recente do código está sendo usada, com o script `docker-entrypoint.js` incluído
-2. Confirme se o comando no Dockerfile está apontando para: `CMD ["node", "docker-entrypoint.js"]`
-3. Se o problema persistir, verifique os logs do container Docker no EasyPanel:
-   ```
-   # No terminal do container
-   ls -la /app/dist          # Verificar se os arquivos foram copiados
-   ls -la /app               # Verificar se o docker-entrypoint.js existe
-   ```
-
-### Erro: "Service is not reachable"
-
-Se o site não estiver sendo carregado, mas o container está rodando:
-
-1. **Teste com páginas alternativas**:
-   - Tente acessar `https://[seu-domínio]/basic.html` - página básica apenas HTML
-   - Tente acessar `https://[seu-domínio]/test.html` - página de teste com CSS embutido
-   - Tente acessar `https://[seu-domínio]/health` - para diagnóstico avançado do servidor
-
-2. **Soluções específicas para EasyPanel**:
-   - **Problema 1**: Tente desabilitar HTTPS temporariamente 
-   - **Problema 2**: Verifique se o domínio tem DNS configurado corretamente
-   - **Problema 3**: Tente mudar o mapeamento de portas no EasyPanel:
-     - Ajuste para porta 80 externa → 6000 interna
-     - Ou experimente porta 443 externa → 6000 interna (para HTTPS)
-
-3. **Recursos avançados de diagnóstico**:
-   - Use as ferramentas de desenvolvedor do navegador (F12) para verificar erros no console
-   - Verifique os logs do container para garantir que ele está funcionando corretamente
-   - Tente acessar o site usando seu IP direto ao invés do nome de domínio
-
-4. **Solução alternativa**:
-   - Se nada funcionar, crie uma nova aplicação no EasyPanel com as mesmas configurações
-   - Às vezes, o problema pode ser com a configuração específica da aplicação atual
-
-### Explicação técnica:
-
-O site foi configurado com um servidor Express personalizado para o ambiente de produção, que não depende do Vite (que é uma ferramenta de desenvolvimento). Isso evita problemas de compatibilidade em produção.
 
 ### Se estiver usando Docker Compose:
 
