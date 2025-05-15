@@ -14,10 +14,21 @@ Esta pasta contém todas as imagens utilizadas no site da Axiom Strategic Techno
 
 ## Instruções para Substituição
 
+### Durante o desenvolvimento:
+
 1. Prepare sua nova imagem com dimensões próximas à imagem original para manter a proporção
 2. Renomeie sua nova imagem para corresponder exatamente ao nome do arquivo que deseja substituir
-3. Substitua o arquivo existente por sua nova imagem
+3. Substitua o arquivo existente nesta pasta por sua nova imagem
 4. Recarregue o site para ver as alterações
+
+### Após deploy no EasyPanel:
+
+1. Acesse o terminal da aplicação no EasyPanel
+2. Navegue até um dos seguintes diretórios:
+   - `/app/dist/images/`
+   - `/app/dist/assets/images/`
+   - `/app/dist/client/public/images/`
+3. Use o comando `cp /caminho/para/nova/imagem.jpg .` para substituir cada imagem
 
 ## Formatos Recomendados
 

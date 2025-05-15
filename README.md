@@ -90,8 +90,21 @@ Para facilitar a atualização das imagens do site após o deploy sem precisar r
 
 1. Acesse o painel de controle do EasyPanel
 2. Encontre sua aplicação e abra o terminal/console
-3. Navegue até a pasta `/app/dist/client/images/`
+3. Navegue até uma das pastas:
+   - `/app/dist/images/`
+   - `/app/dist/assets/images/`
+   - `/app/dist/client/public/images/`
 4. Use o comando `cp` para substituir as imagens existentes ou faça upload de novas imagens
+
+## Solução de Problemas Comuns
+
+### Erro: "Cannot find module '/app/server/index.js'"
+
+Se você encontrar este erro durante o deploy no EasyPanel:
+
+1. Verifique se o build está sendo realizado corretamente
+2. Confirme se o comando no Dockerfile está apontando para o local correto: `CMD ["node", "dist/index.js"]`
+3. Se necessário, reconstrua a imagem Docker ou contate o suporte
 
 ### Se estiver usando Docker Compose:
 
