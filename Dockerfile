@@ -13,8 +13,10 @@ RUN npm ci --production=false --no-audit --no-fund
 # Copiando os arquivos do projeto (usando .dockerignore para ignorar arquivos desnecessários)
 COPY . .
 
-# Compilando o aplicativo
-RUN npm run build
+# Compilando o aplicativo e garantindo estrutura correta
+RUN npm run build && \
+    mkdir -p dist/public/images && \
+    cp -r client/public/images/* dist/public/images/ || true
 
 # Imagem de produção - mínima
 FROM node:20-alpine AS runner
@@ -32,9 +34,13 @@ ENV NODE_ENV=production
 ENV PORT=6000
 ENV HOST=0.0.0.0
 
-# Instalando apenas pacotes mínimos necessários para produção
+# Importante: Isso é necessário para garantir que o processo 
+# node encontre corretamente todos os módulos
+ENV NODE_PATH=/app/node_modules
+
+# Copiando todas as dependências para evitar problemas com imports
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json /app/package-lock.json ./
-RUN npm ci --production --no-audit --no-fund && npm cache clean --force
 
 # Copiando apenas os arquivos necessários para produção
 COPY --from=builder /app/dist ./dist

@@ -1,0 +1,89 @@
+Commit: Streamline image handling and deployment within the Docker environment
+
+Updates the Dockerfile and docker-compose.yml to correctly handle image building and access within the 'dist/public/images' directory, removing redundant copying.
+
+Replit-Commit-Author: Agent
+Replit-Commit-Session-Id: d671b2fe-e266-4a97-bed3-4e76fe855754
+Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/e9d356b6-15b1-4d3d-bcd8-21a1eac68fa6/624ecffe-fe9c-4320-b282-4c9285f59d39.jpg 
+##########################################
+### Download Github Archive Started...
+### Thu, 15 May 2025 22:14:14 GMT
+##########################################
+
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.03kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:20-alpine
+#2 DONE 0.9s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 636B 0.0s done
+#3 DONE 0.0s
+
+#4 [builder 1/6] FROM docker.io/library/node:20-alpine@sha256:68c17dc2396596b0142849c1ee987b1c4e6a7c5226130d40f1d6d87e524cc22a
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 3.83MB 0.2s done
+#5 DONE 0.2s
+
+#6 [builder 3/6] COPY package.json package-lock.json ./
+#6 CACHED
+
+#7 [builder 2/6] WORKDIR /app
+#7 CACHED
+
+#8 [builder 4/6] RUN npm ci --production=false --no-audit --no-fund
+#8 CACHED
+
+#9 [builder 5/6] COPY . .
+#9 DONE 0.0s
+
+#10 [builder 6/6] RUN npm run build
+#10 0.315 
+#10 0.315 > rest-express@1.0.0 build
+#10 0.315 > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+#10 0.315 
+#10 1.249 vite v5.4.14 building for production...
+#10 1.354 transforming...
+#10 2.402 Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+#10 2.402   npx update-browserslist-db@latest
+#10 2.402   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+#10 12.86 ✓ 1669 modules transformed.
+#10 13.60 rendering chunks...
+#10 13.62 computing gzip size...
+#10 13.66 ../dist/public/index.html                   1.67 kB │ gzip:  0.81 kB
+#10 13.66 ../dist/public/assets/index-JT4Nfn8v.css   65.45 kB │ gzip: 11.84 kB
+#10 13.66 ../dist/public/assets/index-C2I5CA8H.js   279.90 kB │ gzip: 90.19 kB
+#10 13.66 ✓ built in 12.35s
+#10 13.78 
+#10 13.78   dist/index.js  4.5kb
+#10 13.78 
+#10 13.78 ⚡ Done in 6ms
+#10 DONE 13.8s
+
+#11 [runner 3/6] COPY --from=builder /app/package.json /app/package-lock.json ./
+#11 CACHED
+
+#12 [runner 4/6] RUN npm ci --production --no-audit --no-fund && npm cache clean --force
+#12 CACHED
+
+#13 [runner 5/6] COPY --from=builder /app/dist ./dist
+#13 DONE 0.1s
+
+#14 [runner 6/6] RUN addgroup --system --gid 1001 nodejs &&     adduser --system --uid 1001 expressjs &&     chown -R expressjs:nodejs /app
+#14 DONE 121.7s
+
+#15 exporting to image
+#15 exporting layers
+#15 exporting layers 9.5s done
+#15 writing image sha256:ccd84be6aa473bef2ba9b4fbb6c53e379e4caca0cae9aed40d587eb5989e7133 done
+#15 naming to docker.io/easypanel/viajey/axiom done
+#15 DONE 9.5s
+##########################################
+### Success
+### Thu, 15 May 2025 22:16:43 GMT
+##########################################

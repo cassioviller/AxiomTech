@@ -56,17 +56,44 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Serve o app na porta definida pelo ambiente:
-  // - Em desenvolvimento (Replit): usa porta 5000 para compatibilidade com o workflow
-  // - Em produção: usa PORT do ambiente ou 6000 por padrão
-  const port = app.get("env") === "development" 
-    ? 5000 
-    : (process.env.PORT ? parseInt(process.env.PORT) : 6000);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  // Configuração para produção (Docker/EasyPanel): Porta 6000
+  // Configuração para desenvolvimento (Replit): Portas 5000 e 6000
+  const prodPort = 6000;
+  const devPort = 5000;
+
+  // Em produção, escuta apenas na porta 6000
+  if (app.get("env") === "production") {
+    server.listen({
+      port: prodPort,
+      host: "0.0.0.0",
+      reusePort: true,
+    }, () => {
+      log(`serving on port ${prodPort} (production)`);
+    });
+  } 
+  // Em desenvolvimento, escuta em ambas as portas para compatibilidade
+  else {
+    // Criamos um segundo servidor para a porta 5000 (compatibilidade com Replit)
+    import('http').then(({ createServer }) => {
+      const devServer = createServer(app);
+      
+      // Inicia na porta 6000 (nossa porta padrão)
+      server.listen({
+        port: prodPort,
+        host: "0.0.0.0",
+        reusePort: true,
+      }, () => {
+        log(`serving on port ${prodPort} (development)`);
+      });
+      
+      // Também inicia na porta 5000 (para workflow Replit)
+      devServer.listen({
+        port: devPort,
+        host: "0.0.0.0",
+        reusePort: true,
+      }, () => {
+        log(`serving on port ${devPort} (for Replit workflow)`);
+      });
+    });
+  }
 })();
