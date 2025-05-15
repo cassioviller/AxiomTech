@@ -32,12 +32,14 @@ ENV NODE_ENV=production
 ENV PORT=6000
 ENV HOST=0.0.0.0
 
-# Instalando apenas pacotes mínimos necessários para produção
+# Instalando todos os pacotes incluindo dependências de desenvolvimento
+# para garantir que o Vite esteja disponível
 COPY --from=builder /app/package.json /app/package-lock.json ./
-RUN npm ci --production --no-audit --no-fund && npm cache clean --force
+RUN npm ci --no-audit --no-fund && npm cache clean --force
 
 # Copiando apenas os arquivos necessários para produção
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/docker-entrypoint.js ./docker-entrypoint.js
 
 # Assegurando que as imagens estejam acessíveis em todos os possíveis caminhos
 COPY --from=builder /app/client/public/images ./dist/images
@@ -57,8 +59,8 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 # Expondo a porta para o aplicativo
 EXPOSE 6000
 
-# Comando para iniciar o aplicativo em produção
-CMD ["node", "dist/index.js"]
+# Comando para iniciar o aplicativo em produção usando nosso script personalizado
+CMD ["node", "docker-entrypoint.js"]
 
 # Instruções para deploy EasyPanel:
 # 1. No EasyPanel, crie uma nova aplicação

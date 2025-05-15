@@ -98,13 +98,22 @@ Para facilitar a atualização das imagens do site após o deploy sem precisar r
 
 ## Solução de Problemas Comuns
 
-### Erro: "Cannot find module '/app/server/index.js'"
+### Erro: "Cannot find module '/app/server/index.js'" ou "Cannot find package 'vite'"
 
-Se você encontrar este erro durante o deploy no EasyPanel:
+Se você encontrar um desses erros durante o deploy no EasyPanel:
 
-1. Verifique se o build está sendo realizado corretamente
-2. Confirme se o comando no Dockerfile está apontando para o local correto: `CMD ["node", "dist/index.js"]`
-3. Se necessário, reconstrua a imagem Docker ou contate o suporte
+1. Verifique se a versão mais recente do código está sendo usada, com o script `docker-entrypoint.js` incluído
+2. Confirme se o comando no Dockerfile está apontando para: `CMD ["node", "docker-entrypoint.js"]`
+3. Se o problema persistir, verifique os logs do container Docker no EasyPanel:
+   ```
+   # No terminal do container
+   ls -la /app/dist          # Verificar se os arquivos foram copiados
+   ls -la /app               # Verificar se o docker-entrypoint.js existe
+   ```
+
+### Explicação técnica:
+
+O site foi configurado com um servidor Express personalizado para o ambiente de produção, que não depende do Vite (que é uma ferramenta de desenvolvimento). Isso evita problemas de compatibilidade em produção.
 
 ### Se estiver usando Docker Compose:
 

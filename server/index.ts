@@ -47,13 +47,23 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+  // Em desenvolvimento: usa Vite em modo middlewareMode
+  // Em produção: serve arquivos estáticos da pasta dist
+  try {
+    if (app.get("env") === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
+  } catch (error) {
+    console.error("Erro ao configurar o servidor:", error);
+    // Em caso de erro com Vite, tenta servir estaticamente
+    try {
+      serveStatic(app);
+    } catch (fallbackError) {
+      console.error("Erro crítico ao servir conteúdo estático:", fallbackError);
+      process.exit(1);
+    }
   }
 
   // Serve o app na porta definida pelo ambiente:
