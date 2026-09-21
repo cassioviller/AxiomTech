@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>36 minutos — do pacote de projeto à proposta assinável · Cássio Viller</title>
+<link rel="stylesheet" href="caso.css">
+<style>
+.linha{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
+.linha figure{position:relative}
+.linha .tela{border:1px solid var(--rule);background:var(--surface);padding:2px;aspect-ratio:16/10;overflow:hidden}
+.linha .tela img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.lupa{position:absolute;right:-5px;top:calc(100% * .38);width:17mm;height:17mm;border-radius:50%;overflow:hidden;border:2px solid var(--accent);background:#ddd}
+.lupa img{width:100%;height:100%;object-fit:cover;display:block}
+.linha b{display:block;font-family:var(--display);font-weight:700;font-size:19pt;line-height:1;margin-top:9px;font-variant-numeric:tabular-nums}
+.linha span{display:block;font-size:7.7pt;color:var(--ink-2);line-height:1.35;margin-top:2px}
+.regras{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5mm 5mm;margin-top:5mm}
+.regras div{font-size:8.2pt;color:var(--ink-2);line-height:1.35;border-top:1px solid var(--rule);padding-top:4px}
+.regras i{font-family:var(--mono);font-style:normal;color:var(--accent);font-size:7pt;margin-right:5px}
+.regras b{color:var(--ink);font-weight:600}
+.barras{margin-top:6mm;display:grid;gap:4px;font-size:8.2pt}
+.barras div{display:grid;grid-template-columns:62mm 1fr 27mm;gap:8px;align-items:center}
+.barras u{display:block;height:9px;background:var(--steel);text-decoration:none}
+.barras .hot u{background:var(--accent);width:4%;min-width:5px}
+.barras em{font-family:var(--mono);font-style:normal;text-align:right;font-size:8pt;white-space:nowrap}
+.barras .hot em{color:var(--accent);font-weight:500}
+</style>
+</head>
+<body>
+<div class="folha">
+
+  <div class="carimbo"><span class="hot">Folha 01/03</span><span>Orçamento por leitura de projeto</span><span>Set/2026</span><span>Cássio Viller</span></div>
+
+  <h1>Do pacote de projeto à proposta assinável em <em>36 minutos</em></h1>
+  <p class="lede">Um orçamento real, com o relógio na tela. Entrou um zip com as pranchas; saíram o levantamento medido no desenho, o orçamento e a proposta no modelo da empresa.</p>
+
+  <div class="cota"><span>11:35</span><i></i><span>36 min medidos</span><i></i><span>12:11</span></div>
+
+  <div class="linha">
+    <figure><div class="tela"><img src="../site/img/t1.webp" alt=""></div><span class="lupa"><img src="../site/img/t1c.webp" alt="Relógio: 11:35"></span><b>11:35</b><span>Pacote enviado: 3 pranchas de arquitetura, 3 de estrutura e a proposta de material.</span></figure>
+    <figure><div class="tela"><img src="../site/img/t2.webp" alt=""></div><span class="lupa"><img src="../site/img/t2c.webp" alt="Relógio: 11:53"></span><b>11:53</b><span>Nove perguntas de escopo respondidas; paredes extraídas direto do vetor da planta.</span></figure>
+    <figure><div class="tela"><img src="../site/img/t3.webp" alt=""></div><span class="lupa"><img src="../site/img/t3c.webp" alt="Relógio: 12:11"></span><b>12:11</b><span>Três entregáveis prontos: proposta em PDF, registro de engenharia e motor de cálculo.</span></figure>
+    <figure><div class="tela"><img src="../site/img/t4.webp" alt=""></div><span class="lupa"><img src="../site/img/t4c.webp" alt="Relógio: 12:13"></span><b>12:13</b><span>Proposta aberta para revisão. O que ainda depende do cliente aparece em laranja.</span></figure>
+  </div>
+
+  <div class="tres" style="margin-top:7mm">
+    <div><h2>O problema</h2><p>Proposta de mão de obra em Light Steel Frame para a ampliação de uma unidade de saúde: <b>26 ambientes, 328 m²</b>. À mão — abrir pranchas, medir, transcrever, montar o PDF — leva cerca de dois dias úteis, e no fim ninguém explica de onde saiu cada número.</p></div>
+    <div><h2>O que fiz</h2><p>Escrevi um método que inventaria o pacote, aponta o que falta (os cortes, que fecham o pé-direito), confere a escala contra as cotas, mede as paredes no desenho e roda a <b>mesma planilha que o diretor usa</b>.</p></div>
+    <div class="r"><h2>Resultado</h2><p><b>Proposta assinável em 36 minutos</b>, fechando ao centavo, com a origem e o grau de confiança de cada número. Se o cliente muda o pé-direito, roda de novo e a proposta sai revisada.</p></div>
+  </div>
+
+  <div class="barras">
+    <div><span>Rotina manual, proposta desse porte</span><u></u><em>~2 dias úteis*</em></div>
+    <div class="hot"><span>Este método — pacote entra, proposta sai</span><u></u><em>36 min</em></div>
+  </div>
+  <figcaption>* Estimativa para 26 ambientes e 328 m² na planilha padrão. Os 36 minutos são medidos: 11h35 → 12h11.</figcaption>
+
+  <h2 style="margin-top:6mm">Por que dá para confiar — as seis regras que o método obedece</h2>
+  <div class="regras" style="margin-top:0">
+    <div><i>01</i><b>Todo número tem origem.</b> Medido, derivado, paramétrico ou ditado — sempre marcado.</div>
+    <div><i>02</i><b>A confiança se propaga pela pior.</b> Medido × estimado = estimado.</div>
+    <div><i>03</i><b>Baixa confiança vira faixa.</b> Nunca número seco.</div>
+    <div><i>04</i><b>Dado ausente é ausente.</b> Nunca zero: vira pendência declarada.</div>
+    <div><i>05</i><b>Meça antes de concluir.</b> E antes de consertar.</div>
+    <div><i>06</i><b>O que muda gasto, venda ou promessa volta ao humano.</b> Quem assina decide.</div>
+  </div>
+
+  <div class="rodape">
+    <div>
+      <span class="eyebrow">Quer ver com uma obra sua?</span>
+      <h3>Me mande um pacote de projeto.</h3>
+      <p>Devolvo três documentos: levantamento, orçamento com faixa e proposta no seu modelo. Depois a gente conversa sobre o resto.</p>
+    </div>
+    <div class="quem"><b>Cássio Viller</b>Engenharia Civil · 7º semestre<br><a href="https://wa.me/5512982071116">(12) 98207-1116 · WhatsApp</a><br><a href="mailto:cassiovillers@gmail.com">cassiovillers@gmail.com</a><br>São José dos Campos/SP</div>
+  </div>
+</div>
+</body>
+</html>

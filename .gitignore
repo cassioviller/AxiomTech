@@ -4,3 +4,7 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+# pacote de handoff do portfólio (contém documentos pessoais)
+handoff-portfolio-cassio.zip
+docs-pessoais/
+BRIEF.md

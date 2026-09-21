@@ -1,0 +1,791 @@
+<title>Cassio Viller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#ECEBE6; --surface:#FFFFFF; --surface-2:#F5F4F0; --ink:#171F29; --ink-2:#3C4652; --muted:#66707C;
+  --accent:#D4551B; --accent-ink:#FFFFFF; --steel:#2E4763; --steel-soft:#DCE4EC; --rule:#D3D1CA; --rule-soft:#E4E2DC;
+  --ok:#2F7A4A; --warn:#B7791F;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#12171D; --surface:#1A2129; --surface-2:#202932; --ink:#E9E7E1; --ink-2:#C4C8CC; --muted:#93A0AD;
+    --accent:#F07A3E; --accent-ink:#161616; --steel:#9DBBD8; --steel-soft:#243342; --rule:#2E3A47; --rule-soft:#26313C;
+    --ok:#6BC28A; --warn:#E0A54A;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#12171D; --surface:#1A2129; --surface-2:#202932; --ink:#E9E7E1; --ink-2:#C4C8CC; --muted:#93A0AD;
+  --accent:#F07A3E; --accent-ink:#161616; --steel:#9DBBD8; --steel-soft:#243342; --rule:#2E3A47; --rule-soft:#26313C;
+  --ok:#6BC28A; --warn:#E0A54A;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--steel);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+img{max-width:100%;height:auto;display:block}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.05;margin:0;text-wrap:balance;letter-spacing:.005em}
+h1{font-size:clamp(3rem,9vw,5.6rem);font-weight:700;text-transform:uppercase;line-height:.92}
+h2{font-size:clamp(2rem,4.5vw,2.9rem);font-weight:600}
+h3{font-size:1.55rem;font-weight:600}
+h4{font-size:1.2rem;font-weight:600;font-family:var(--body);line-height:1.3}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:0}
+.layout{display:grid;grid-template-columns:200px minmax(0,1fr);gap:56px}
+@media (max-width:959px){.layout{grid-template-columns:minmax(0,1fr)}}
+/* rail */
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 28px);align-self:start;padding-block:40px 0}
+@media (max-width:959px){.rail{display:none}}
+.rail .who{font-family:var(--display);font-weight:700;font-size:1.35rem;text-transform:uppercase;line-height:1;margin-bottom:22px}
+.rail nav{display:flex;flex-direction:column;gap:2px;border-left:2px solid var(--rule)}
+.rail nav a{font-family:var(--mono);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:6px 0 6px 14px;margin-left:-2px;border-left:2px solid transparent}
+.rail nav a:hover,.rail nav a.on{color:var(--ink);border-left-color:var(--accent)}
+.rail .cv{margin-top:26px;display:inline-block;font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:var(--accent-ink);background:var(--accent);padding:9px 12px;border-radius:2px}
+.rail .cv:hover{filter:brightness(1.08);color:var(--accent-ink)}
+/* main */
+main{min-width:0;max-width:820px}
+section{padding-block:56px;border-top:1px solid var(--rule)}
+section:first-child{border-top:0}
+.sec-head{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.lede{font-size:1.12rem;color:var(--ink-2);max-width:62ch}
+.prose{max-width:66ch;display:flex;flex-direction:column;gap:14px;color:var(--ink-2)}
+.prose strong{color:var(--ink)}
+/* hero */
+.hero{padding-block:44px 52px}
+.hero .top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.hero .thesis{font-size:clamp(1.15rem,2.2vw,1.45rem);line-height:1.4;max-width:34ch;margin-top:22px;color:var(--ink);font-weight:500}
+.hero .sub{margin-top:14px;max-width:60ch;color:var(--ink-2)}
+.contacts{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px;font-family:var(--mono);font-size:.82rem}
+.contacts a{text-decoration:none;color:var(--ink);border-bottom:1px solid var(--rule)}
+.contacts a:hover{color:var(--accent);border-color:var(--accent)}
+.contacts .ph{color:var(--muted);border-bottom:1px dashed var(--rule)}
+.tag{display:inline-block;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border:1px solid var(--rule);border-radius:2px;color:var(--ink-2);background:var(--surface)}
+.tag.hot{border-color:var(--accent);color:var(--accent)}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--rule);background:var(--surface);margin-top:34px}
+.stats div{padding:16px 18px;border-right:1px solid var(--rule-soft)}
+.stats div:last-child{border-right:0}
+.stats b{display:block;font-family:var(--display);font-size:2.3rem;font-weight:600;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.stats span{font-size:.8rem;color:var(--muted);line-height:1.35;display:block;margin-top:6px}
+@media (max-width:720px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stats div:nth-child(2){border-right:0}.stats div:nth-child(-n+2){border-bottom:1px solid var(--rule-soft)}}
+/* case SIGE */
+.case-banner{background:var(--steel);color:#fff;padding:26px 28px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 28px;align-items:end;margin-bottom:28px}
+.case-banner .eyebrow{color:#F2B896}
+.case-banner h3{font-size:2.2rem;color:#fff;margin-top:6px}
+.case-banner p{color:#D7E1EC;max-width:56ch;margin-top:8px}
+.case-banner .meta{font-family:var(--mono);font-size:.76rem;color:#C9D6E3;text-align:right;line-height:1.7}
+.case-banner .meta a{color:#fff}
+@media (max-width:720px){.case-banner{grid-template-columns:minmax(0,1fr)}.case-banner .meta{text-align:left}}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:.78rem;margin:18px 0 6px}
+.flow span{padding:5px 9px;background:var(--surface);border:1px solid var(--rule);border-radius:2px}
+.flow i{color:var(--accent);font-style:normal}
+.ba{list-style:none;padding:0;margin:0;display:grid;gap:0;border-top:1px solid var(--rule)}
+.ba li{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1fr);gap:18px;padding:14px 0;border-bottom:1px solid var(--rule-soft);font-size:.93rem}
+.ba li.h{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 0}
+.ba .t{font-weight:600;color:var(--ink)}
+.ba .a{color:var(--muted)}
+.ba .d{color:var(--ink-2)}
+@media (max-width:720px){.ba li{grid-template-columns:minmax(0,1fr);gap:4px}.ba li.h{display:none}.ba .a::before{content:"Antes — ";font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase}.ba .d::before{content:"Depois — ";font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}}
+.stories{display:grid;gap:14px;margin-top:8px}
+details{background:var(--surface);border:1px solid var(--rule);border-radius:2px}
+details summary{cursor:pointer;list-style:none;padding:16px 20px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:baseline}
+details summary::-webkit-details-marker{display:none}
+details summary .n{font-family:var(--mono);font-size:.74rem;color:var(--accent)}
+details summary h4{font-family:var(--display);font-size:1.45rem;font-weight:600}
+details summary .x{font-family:var(--mono);color:var(--muted);font-size:.9rem}
+details[open] summary .x{transform:rotate(45deg)}
+details .body{padding:4px 20px 22px;display:grid;gap:18px}
+details .body p{color:var(--ink-2);max-width:66ch}
+details .body h5{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+details ol{margin:0;padding-left:20px;color:var(--ink-2);display:grid;gap:4px}
+.shot{border:1px solid var(--rule);background:var(--surface-2);padding:8px}
+.shot figcaption{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:8px}
+.learn{border-left:3px solid var(--accent);padding:4px 0 4px 16px;font-style:italic;color:var(--ink-2)}
+.areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:8px}
+@media (max-width:720px){.areas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:460px){.areas{grid-template-columns:minmax(0,1fr)}}
+.areas div{padding:14px 16px;background:var(--surface);border:1px solid var(--rule)}
+.areas b{display:block;font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:6px}
+.areas p{font-size:.86rem;color:var(--ink-2)}
+/* project list */
+.projects{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.projects li{display:grid;grid-template-columns:170px minmax(0,1fr);gap:8px 24px;padding:22px 0;border-bottom:1px solid var(--rule-soft)}
+@media (max-width:720px){.projects li{grid-template-columns:minmax(0,1fr)}}
+.projects .k{font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);line-height:1.6}
+.projects h4{margin-bottom:6px}
+.projects p{color:var(--ink-2);max-width:64ch;font-size:.95rem}
+.projects .did{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.did span{font-family:var(--mono);font-size:.7rem;padding:3px 7px;border:1px solid var(--rule);background:var(--surface);border-radius:2px;color:var(--ink-2)}
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.gallery figure{margin:0;background:var(--surface);border:1px solid var(--rule);padding:6px}
+.gallery figure img{width:100%;aspect-ratio:16/10;object-fit:cover}
+.gallery .g-wide{grid-column:span 2}
+.gallery .g-wide img{aspect-ratio:auto}
+.gallery figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);padding:8px 4px 2px;line-height:1.4}
+@media (max-width:720px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.gallery .g-wide{grid-column:span 2}}
+/* timeline */
+.timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;position:relative;counter-reset:tl}
+.timeline::before{content:"";position:absolute;left:0;right:0;top:-14px;height:2px;background:var(--rule)}
+.timeline li{display:grid;gap:8px;position:relative;padding-top:6px}
+.timeline li::before{content:"";position:absolute;top:-19px;left:0;width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.timeline figure{margin:0;position:relative;border:1px solid var(--rule);background:var(--surface);padding:4px;aspect-ratio:16/10;max-width:100%}
+.timeline figure>img{position:absolute;inset:4px;width:calc(100% - 8px);height:calc(100% - 8px);object-fit:cover;object-position:top}
+.lupa{position:absolute;right:-8px;bottom:-14px;width:96px;height:96px;border-radius:50%;overflow:hidden;border:3px solid var(--accent);box-shadow:0 6px 18px rgba(0,0,0,.28);background:#dcdcdc}
+.lupa img{width:100%;height:100%;object-fit:cover}
+.timeline b{font-family:var(--display);font-size:2rem;font-weight:700;line-height:1;color:var(--ink);margin-top:14px;font-variant-numeric:tabular-nums}
+.timeline span{font-size:.84rem;color:var(--ink-2);line-height:1.45}
+@media (max-width:820px){.timeline{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:34px}.timeline::before{display:none}.timeline li::before{display:none}}
+/* savings */
+.savings{margin-top:44px;background:var(--steel);color:#fff;padding:24px 26px;display:grid;gap:14px}
+.savings .eyebrow{color:#F2B896}
+.sv-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.sv-head b{font-family:var(--display);font-size:2.6rem;font-weight:700;line-height:1}
+.bar{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.bar .lbl{font-size:.84rem;color:#D7E1EC}
+.bar .track{height:14px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:#9DBBD8}
+.bar.hot .track i{background:var(--accent);min-width:8px}
+.bar .val{font-family:var(--mono);font-size:.9rem;color:#fff}
+.bar.hot .val{color:#F2B896;font-weight:500}
+.savings .note{color:#B9C8D6;font-size:.72rem;font-family:var(--mono);line-height:1.5}
+@media (min-width:721px){.bar{grid-template-columns:260px minmax(0,1fr) 110px;align-items:center}.bar .val{text-align:right}}
+/* deliverables */
+.deliver{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
+@media (max-width:720px){.deliver{grid-template-columns:minmax(0,1fr)}}
+.deliver div{background:var(--surface);border:1px solid var(--rule);padding:16px 18px;display:grid;gap:6px;align-content:start}
+.deliver b{font-family:var(--display);font-size:1.35rem;font-weight:600}
+.deliver p{font-size:.86rem;color:var(--ink-2)}
+/* laws */
+.laws{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:820px){.laws{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.laws{grid-template-columns:minmax(0,1fr)}}
+.laws div{border-top:3px solid var(--accent);background:var(--surface);padding:14px 16px 16px;display:grid;gap:6px;align-content:start}
+.laws i{font-family:var(--mono);font-style:normal;font-size:.74rem;color:var(--accent);letter-spacing:.1em}
+.laws b{font-family:var(--display);font-size:1.3rem;font-weight:600;line-height:1.1}
+.laws p{font-size:.86rem;color:var(--ink-2)}
+/* calc + honest */
+.calc{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px}
+@media (max-width:720px){.calc{grid-template-columns:minmax(0,1fr)}}
+.calc h5,.honest h5{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.calc table{width:100%;border-collapse:collapse;font-size:.88rem;background:var(--surface);border:1px solid var(--rule)}
+.calc td{padding:7px 10px;border-bottom:1px solid var(--rule-soft);color:var(--ink-2);vertical-align:top}
+.calc td:nth-child(2){font-family:var(--mono);font-size:.78rem;color:var(--muted);white-space:nowrap}
+.calc td:last-child{text-align:right;font-family:var(--mono);font-size:.82rem;white-space:nowrap;color:var(--ink);font-variant-numeric:tabular-nums}
+.calc tr.sum td{font-weight:600;color:var(--ink);background:var(--surface-2);border-bottom:0}
+.calc-col{display:grid;gap:14px;align-content:start}
+.calc-box{background:var(--surface);border:1px solid var(--rule);padding:14px 16px;display:grid;gap:8px}
+.calc-box p{font-size:.9rem;color:var(--ink-2)}
+.calc-box p b{color:var(--ink)}
+.calc-box table{border:0}
+.honest{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:720px){.honest{grid-template-columns:minmax(0,1fr)}}
+.honest>div{padding:16px 18px;background:var(--surface);border:1px solid var(--rule);border-top:3px solid var(--ok)}
+.honest>div:last-child{border-top-color:var(--warn)}
+.honest ul{margin:0;padding-left:18px;display:grid;gap:8px;font-size:.9rem;color:var(--ink-2)}
+/* placeholder block */
+.pending{border:1px dashed var(--accent);background:var(--surface);padding:22px 24px;display:grid;gap:8px}
+.pending .eyebrow{color:var(--warn)}
+/* CV */
+.cv-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px}
+@media (max-width:720px){.cv-grid{grid-template-columns:minmax(0,1fr)}}
+.tl{list-style:none;margin:0;padding:0;display:grid;gap:18px}
+.tl li{display:grid;gap:3px;padding-left:16px;border-left:2px solid var(--rule)}
+.tl .when{font-family:var(--mono);font-size:.74rem;color:var(--muted);letter-spacing:.04em}
+.tl b{font-weight:600}
+.tl p{font-size:.9rem;color:var(--ink-2)}
+.skills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+/* contact */
+.contact-box{background:var(--surface);border:1px solid var(--rule);padding:26px 28px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center}
+@media (max-width:720px){.contact-box{grid-template-columns:minmax(0,1fr)}}
+.contact-box h3{font-size:1.9rem}
+.contact-box p{color:var(--ink-2);margin-top:6px;max-width:48ch}
+.btn{display:inline-block;font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;padding:12px 16px;border-radius:2px;background:var(--accent);color:var(--accent-ink)}
+.btn:hover{filter:brightness(1.08);color:var(--accent-ink)}
+footer{padding-block:28px 40px;font-family:var(--mono);font-size:.72rem;color:var(--muted);border-top:1px solid var(--rule);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.note{font-size:.8rem;color:var(--muted);font-family:var(--mono)}
+</style>
+
+<div class="wrap">
+<div class="layout">
+
+<aside class="rail" aria-label="Navegação">
+  <div class="who">Cassio<br>Viller</div>
+  <nav>
+    <a href="#inicio">Início</a>
+    <a href="#sige">SIGE</a>
+    <a href="#modular">Casas modulares</a>
+    <a href="#orcamento">Orçamento em 36 min</a>
+    <a href="#sistema">Sistema de orçamento</a>
+    <a href="#obra">Obra e projetos</a>
+    <a href="#ferramentas">Ferramentas</a>
+    <a href="#curriculo">Currículo</a>
+    <a href="#contato">Contato</a>
+  </nav>
+  <a class="cv" href="#contato">Falar comigo</a>
+</aside>
+
+<main>
+
+<section class="hero" id="inicio">
+  <div class="top">
+    <span class="eyebrow">Engenharia civil · gestão de obra · sistemas</span>
+    <span class="tag hot">Disponível para novos projetos</span>
+  </div>
+  <h1>Cassio<br>Viller</h1>
+  <p class="thesis">Entendo a obra por dentro o bastante para construir o sistema que a gerencia.</p>
+  <p class="sub">Engenharia Civil no 7º semestre, com um ano e meio dentro de construtoras de São José dos Campos — duas ao mesmo tempo, meio período em cada, e depois uma de Light Steel Frame: propostas, orçamento, compras, cronograma, diário de obra e controle financeiro. No caminho, criei o SIGE, um sistema de gestão para construtoras que hoje roda sob licença numa empresa real. Antes disso, oito anos de rotina contábil no escritório da família.</p>
+  <div class="contacts">
+    <a href="mailto:cassiovillers@gmail.com">cassiovillers@gmail.com</a>
+    <a href="https://wa.me/5512982071116" target="_blank" rel="noopener">(12) 98207-1116</a>
+    <a href="https://github.com/cassioviller" target="_blank" rel="noopener">github.com/cassioviller</a>
+    <span class="ph">[LinkedIn]</span>
+    <span class="ph">São José dos Campos · SP</span>
+  </div>
+
+  <div class="stats" aria-label="Em números">
+    <div><b>50</b><span>módulos do SIGE, em 6 áreas — do funil de vendas ao financeiro</span></div>
+    <div><b>36 min</b><span>do pacote do projeto à proposta de mão de obra assinável, num orçamento real</span></div>
+    <div><b>R$ 24,5 mi</b><span>a maior das 13 obras orçadas com o sistema de orçamento que idealizei</span></div>
+    <div><b>37</b><span>decisões registradas no lançamento de uma linha de casas modulares em LSF</span></div>
+  </div>
+</section>
+
+<section id="sige">
+  <div class="sec-head">
+    <span class="eyebrow">Caso principal</span>
+    <h2>Um sistema para a vida inteira da obra</h2>
+    <p class="lede">O SIGE reúne tudo o que acontece numa construtora, da primeira conversa com o cliente ao último pagamento. Nasceu de uma pergunta prática: por que a mesma informação é digitada cinco vezes, em cinco planilhas, e ainda assim ninguém confia no número?</p>
+  </div>
+
+  <div class="case-banner">
+    <div>
+      <span class="eyebrow">SIGE · Sistema de gestão para construtoras</span>
+      <h3>Concebido, construído, implantado — e licenciado</h3>
+      <p>Nasceu dentro de uma empresa de estruturas, durante o estágio comercial, para resolver a operação dela; hoje é usado sob contrato de licença por uma empresa de Light Steel Frame. Manual de 17 capítulos e 4 guias ilustrados para a equipe.</p>
+    </div>
+    <div class="meta">
+      2025–2026 · projeto próprio<br>
+      <a href="https://github.com/cassioviller/EnterpriseSync-1" target="_blank" rel="noopener">ver o repositório público ↗</a>
+    </div>
+  </div>
+
+  <div class="prose">
+    <p><strong>O problema que resolve.</strong> Numa obra, a informação vive espalhada: orçamento numa planilha, cronograma num programa à parte, diário no grupo de WhatsApp, compras combinadas por mensagem, fluxo de caixa classificado à mão todo mês. Cada cópia é uma chance de erro, e o erro só aparece quando a cobrança não bate com o contrato.</p>
+    <p><strong>A ideia central.</strong> A informação entra uma vez, no lugar onde o fato acontece, e alimenta o resto. Aprovar a proposta abre a obra. O avanço lançado no diário movimenta o cronograma e calcula a medição. O material conferido no canteiro gera a conta a pagar.</p>
+  </div>
+
+  <div class="flow" aria-label="Fluxo único">
+    <span>Proposta</span><i>→</i><span>Obra</span><i>→</i><span>Cronograma</span><i>→</i><span>Diário</span><i>→</i><span>Medição</span><i>→</i><span>Cobrança</span><i>→</i><span>Caixa</span>
+  </div>
+
+  <div class="areas">
+    <div><b>Comercial</b><p>Funil de vendas em 8 etapas, catálogo de materiais com histórico de preços, orçamento com regra única de margem, proposta em PDF com versões e aprovação por link.</p></div>
+    <div><b>Obra</b><p>Abertura automática ao aprovar a proposta, cronograma interativo com linha de base, diário de obra com fotos e assinatura, medição a partir do avanço, portal do cliente.</p></div>
+    <div><b>Compras e estoque</b><p>Pedido → cotação comparativa → aprovação por faixa de valor → recebimento conferido → nota → pagamento. Nove etapas, cada uma visível.</p></div>
+    <div><b>Pessoas</b><p>Escala semanal de equipes, ponto (inclusive por reconhecimento facial), folha processada a partir do ponto, alimentação e reembolsos por obra.</p></div>
+    <div><b>Financeiro</b><p>Contas a pagar e receber, fluxo de caixa com classificação por regras que o usuário ensina, custo previsto × realizado por obra, contabilidade com balancete e DRE.</p></div>
+    <div><b>Administração</b><p>Várias empresas no mesmo sistema, 5 perfis de acesso, painel de indicadores, manual embutido e avisos automáticos para 10 tipos de evento.</p></div>
+  </div>
+
+  <div class="sec-head" style="margin-top:44px">
+    <span class="eyebrow">Antes e depois</span>
+    <h3>O que mudou na operação</h3>
+  </div>
+  <ul class="ba">
+    <li class="h"><span>Tema</span><span>Antes</span><span>Depois, com o sistema</span></li>
+    <li><span class="t">Venda → obra</span><span class="a">Cliente, itens e cronograma recadastrados em outros controles a cada venda fechada.</span><span class="d">Aprovar a proposta cria a obra com cliente, itens a medir e custos previstos, numa só ação.</span></li>
+    <li><span class="t">Diário de obra</span><span class="a">Texto e fotos no grupo de WhatsApp, sem ligação com o cronograma e sem valor de documento.</span><span class="d">Diário no sistema com clima, equipe, ocorrências e fotos; passa por envio, assinatura, aprovação e ciência do cliente; vira PDF.</span></li>
+    <li><span class="t">Compras</span><span class="a">Combinadas por mensagem, sem registro de quem aprovou nem comparação formal de preços.</span><span class="d">Pedido, mapa comparativo de fornecedores e aprovador definido pelo valor. Trava contra compra fatiada para fugir da alçada.</span></li>
+    <li><span class="t">Conta a pagar</span><span class="a">Nascia no pedido, mesmo sem o material ter chegado.</span><span class="d">Nasce do que foi recebido e conferido no canteiro.</span></li>
+    <li><span class="t">Fluxo de caixa</span><span class="a">Cada lançamento da planilha classificado à mão, todo mês.</span><span class="d">Classificação por regras que o usuário ensina; só os casos duvidosos vão para uma fila, agrupados por fornecedor.</span></li>
+    <li><span class="t">Medição</span><span class="a">Calculada à mão em planilha, com levantamento à parte.</span><span class="d">Calculada a partir do avanço já lançado nos diários, com fechamento, aprovação, PDF e cobrança gerada.</span></li>
+    <li><span class="t">Cliente</span><span class="a">Pede notícias por telefone.</span><span class="d">Portal com andamento, diários, medições e aprovações — inclusive de compras.</span></li>
+    <li><span class="t">Conhecimento</span><span class="a">Regras "de cabeça", diferentes para cada pessoa.</span><span class="d">Manual embutido e normas escritas de preenchimento do diário e de revisão do cronograma.</span></li>
+  </ul>
+
+  <div class="sec-head" style="margin-top:44px">
+    <span class="eyebrow">Três histórias</span>
+    <h3>Como isso se traduziu no dia a dia</h3>
+  </div>
+  <div class="stories">
+    <details open>
+      <summary><span class="n">01</span><h4>Da venda à obra</h4><span class="x">+</span></summary>
+      <div class="body">
+        <div><h5>O problema</h5><p>A venda fechada costumava ser o começo de um retrabalho: cliente, itens do contrato e cronograma que já estavam na proposta precisavam ser cadastrados de novo em outros controles. Um item esquecido ou um valor trocado só aparecia meses depois, quando a cobrança não batia com o contrato.</p></div>
+        <div><h5>O que fiz</h5><p>Aprovar a proposta passou a abrir a obra numa só ação. O cliente não é cadastrado de novo — o sistema reaproveita o que já existe. Os itens a medir e os custos previstos nascem prontos. Se o cronograma ainda não foi revisado, a obra abre pedindo conferência ao gestor em vez de nascer com um plano em que ninguém confia. Em seguida, a obra é entregue formalmente a quem vai executar, com dossiê.</p></div>
+        <div><h5>Como ficou para quem usa</h5><ol><li>O cliente aprova a proposta pelo link que recebeu.</li><li>A obra aparece aberta, com cliente, itens a medir e custos previstos.</li><li>O gestor confere o cronograma na primeira abertura, se necessário.</li><li>A obra é entregue ao responsável pela execução, com o dossiê do que foi vendido.</li></ol></div>
+        <p class="learn">A informação deve nascer uma vez, no lugar onde o fato acontece. E automatizar não é empurrar dado incerto adiante.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="n">02</span><h4>Compras com governança</h4><span class="x">+</span></summary>
+      <div class="body">
+        <div><h5>O problema</h5><p>Compras de obra combinadas por mensagem, sem registro de quem aprovou nem comparação de preços. Ficava difícil responder três perguntas simples sobre qualquer gasto: quem pediu, quem autorizou e o que realmente chegou ao canteiro.</p></div>
+        <div><h5>O que fiz</h5><p>Cada compra passou a seguir um ciclo de 9 etapas, do pedido ao pagamento, e mostra em que etapa está. Quem aprova depende do valor: o sistema avalia 4 condições para definir quantas aprovações o pedido precisa. As regras mais rígidas — trava contra compra fatiada, número mínimo de cotações por faixa e rito de emergência com 48 h para regularizar — são ligadas empresa por empresa. O recebimento conferido é o que dá entrada no estoque e gera a conta a pagar. A equipe ganhou um manual ilustrado de 22 passos.</p></div>
+        <figure class="shot"><img src="img/s-000.webp" alt="Tela de nova requisição de compra do SIGE, com campos numerados para obra, data de necessidade, justificativa, rito de emergência, mapa de concorrência e itens" loading="lazy"><figcaption>Requisição de compra — a tela como aparece no manual de 22 passos.</figcaption></figure>
+        <div><h5>Quatro papéis, um ciclo</h5><ol><li><strong>Quem precisa, pede</strong> — obra, itens e justificativa; se urgente, usa o rito de emergência.</li><li><strong>Quem responde pela obra, decide</strong> — aprova ou devolve para correção.</li><li><strong>Quem compra, negocia</strong> — compara fornecedores no mapa e emite o pedido.</li><li><strong>Quem paga, confere</strong> — recebimento e nota; o pagamento só libera quando os três batem.</li></ol></div>
+        <p class="learn">Mudança que mexe com dinheiro não entra de uma vez para todo mundo: entrega-se por fases, com roteiro de volta atrás.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="n">03</span><h4>O diário que estava no WhatsApp</h4><span class="x">+</span></summary>
+      <div class="body">
+        <div><h5>O problema</h5><p>Numa obra de galpões, o sistema tinha 42 diários lançados até 11/08. Dali em diante, nada. O encarregado garantia que os diários estavam "devidamente atualizados" — e estavam, mas no grupo de WhatsApp, não no sistema. Resultado: 28 atividades já concluídas apareciam como atrasadas. Quem olhasse o sistema veria uma obra parada; quem estivesse no canteiro via o serviço avançando.</p></div>
+        <div><h5>O que fiz</h5><p>Li as mensagens e fotos do grupo dia a dia e montei uma carga de recuperação: 23 diários, 185 fotos e 72 registros de avanço em 23 atividades. Cada percentual ganhou uma justificativa escrita, apoiada no que a mensagem do dia dizia, num relatório que o gestor pode conferir. A carga passa por um ensaio que mostra tudo o que seria criado sem gravar nada — e se recusa a desfazer um avanço já lançado.</p></div>
+        <figure class="shot"><img src="img/s-002.webp" alt="Apontamento de produção no diário de obra: atividades do cronograma com avanço planejado × realizado e campos de quantidade, percentual e marco concluído" loading="lazy"><figcaption>Avanço informado no diário por quantidade, percentual ou marco — e o cronograma se move.</figcaption></figure>
+        <div><h5>Resultado</h5><p>Uma lacuna que, espalhada nas mensagens, não aparecia, ficou visível e recuperável. E o sistema ganhou uma ferramenta permanente: importar de uma vez diários e fotos que ficaram de fora, sempre com ensaio antes de gravar.</p></div>
+        <p class="learn">Sistema não muda hábito sozinho. Recuperar o passado corrige o número de hoje; só o acordo com quem preenche evita o próximo buraco. Daí a norma escrita do diário.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="sec-head" style="margin-top:44px">
+    <span class="eyebrow">Rigor</span>
+    <h3>O que sustenta os números</h3>
+  </div>
+  <div class="prose">
+    <p>Mais de <strong>3.300 verificações automáticas</strong> rodam antes de cada entrega importante — cada uma simula um uso e confere o resultado. Numa revisão geral, <strong>114 problemas</strong> foram catalogados e as seis frentes de correção concluídas, entre eles erros de dinheiro que passariam despercebidos: um campo que multiplicava o valor de um contrato por 100, uma folha que dobraria o valor a pagar se reprocessada, relatórios contábeis que não fechavam entre si.</p>
+    <p>Toda mudança arriscada é ligada empresa por empresa, com roteiro de volta atrás. Foram <strong>755 entregas registradas</strong> em cerca de oito semanas e <strong>121 planos de trabalho escritos</strong> e conferidos.</p>
+  </div>
+</section>
+
+<section id="modular">
+  <div class="sec-head">
+    <span class="eyebrow">Segundo caso · Desenvolvimento de produto</span>
+    <h2>Casas que saem prontas da fábrica</h2>
+    <p class="lede">Na VEKS, conduzi o estudo de uma linha de construções modulares off-site em Light Steel Frame: módulos fabricados no galpão, transportados de caminhão e instalados prontos no terreno. Do gabarito de transporte ao contrato de fornecimento.</p>
+  </div>
+
+  <div class="gallery">
+    <figure class="g-wide"><img src="img/configurador-b36.webp" alt="Configurador do B-36: barra lateral com escopo de entrega, cobertura, junta entre as caixas e configuração; no topo, preço, área, R$/m², aço e peso por caixa mudando conforme a escolha; ao lado, o modelo 3D" loading="lazy"><figcaption>Configurador do B-36 · cada opção da barra lateral recalcula preço, aço e peso da caixa na hora — e a vista de transporte mostra as duas caixas</figcaption></figure>
+    <figure><img src="img/m1.webp" alt="Render externo do celeiro B-36 em LSF, com portão de correr aberto, deck e sótão" loading="lazy"><figcaption>B-36 · celeiro 6 × 6 m com sótão, entregue em duas caixas</figcaption></figure>
+    <figure><img src="img/m2.webp" alt="Render da cabana FL-30 sobre pilotis, com deck e fachada em madeira e placa cimentícia" loading="lazy"><figcaption>FL-30 · módulo pronto de 29 m² sobre chassi</figcaption></figure>
+    <figure><img src="img/m7.webp" alt="Render interno do B-36: bancada dupla face sob a viga da junta, pendentes e escada em L" loading="lazy"><figcaption>B-36 · interior com bancada sob a viga da junção</figcaption></figure>
+    <figure><img src="img/m3.webp" alt="Diagrama: como cada caixa do B-36 viaja e como fica a planta depois de unida" loading="lazy"><figcaption>Como cada caixa viaja e como fica depois de unida</figcaption></figure>
+    <figure><img src="img/m5.webp" alt="Implantação de 3 unidades do módulo A-21 num lote trapezoidal de 9,50 × 14,50 m" loading="lazy"><figcaption>A-21 · implantação no lote de 9,50 m — cabem 3, não 4</figcaption></figure>
+    <figure><img src="img/m6.webp" alt="Quatro estudos de layout interno validados para kitnet modular de 30 m²" loading="lazy"><figcaption>Kitnet modular 30 m² · layouts validados por código</figcaption></figure>
+  </div>
+
+  <div class="prose" style="margin-top:28px">
+    <p><strong>O ponto de partida.</strong> A empresa já construía em LSF no local. A pergunta era se dava para fabricar o máximo no galpão e entregar a casa pronta — e o que isso exigia em transporte, estrutura, junções e preço. Tratei como estudo de possibilidades: faixas e cenários, sem travar dimensões antes de fazer a conta.</p>
+    <p><strong>A regra do trabalho.</strong> Nunca declarar que algo cabe ou está conforme sem ter feito a conta e mostrado o número. Limites de transporte (4,40 m de altura, 3,20 m de largura sem escolta), pé-direito e circulações mínimas de norma, inclinação mínima de cada telha, içamento — tudo virou verificação antes do desenho. Cada layout interno passou por um validador de colisões, envelope e altura livre antes de ser desenhado.</p>
+  </div>
+
+  <div class="areas" style="margin-top:24px">
+    <div><b>Cabanas A-frame</b><p>Catálogo triangular em LSF com configurador de orçamento em 3D: grupos de serviço, referência de custo pública, modos turn key, kit e personalizado, escala humana no modelo.</p></div>
+    <div><b>Módulos P1–P4 e FL-30</b><p>Família de módulos prontos sobre chassi. Manual de fabricação, transporte e montagem, roteiro do pedido à entrega e caderno de junções em 3 vistas + perspectiva.</p></div>
+    <div><b>Celeiros B-36 · B-96 · B-120</b><p>Linha barndominium com telhado gambrel. B-36 aprofundado até pré-dimensionamento estrutural completo, ficha técnica comercial e protocolo de ensaios do protótipo.</p></div>
+  </div>
+
+  <div class="sec-head" style="margin-top:44px">
+    <span class="eyebrow">Três decisões que a conta revelou</span>
+    <h3>Onde o número mudou o projeto</h3>
+  </div>
+  <div class="stories">
+    <details open>
+      <summary><span class="n">01</span><h4>O celeiro não cabe inteiro no caminhão</h4><span class="x">+</span></summary>
+      <div class="body">
+        <p>O B-36 montado estoura 2,73 m em altura e 2,80 m em largura para o transporte. Bipartido mantendo o telhado gambrel, nenhuma combinação atende transporte e inclinação mínima da telha ao mesmo tempo. A rota adotada: <strong>duas caixas volumétricas com o térreo completo mais o telhado como kit</strong>, em três viagens — a terceira em carreta comum com autorização simples, não em prancha.</p>
+        <p>A junção entre as caixas virou um estudo à parte: comparei vão livre de 6 m, dois vãos com pilar e junta fechada. O vão livre com viga aparente saiu <strong>mais barato</strong> — fechar não economiza e o pilar não paga a viga. Girei o partido em 90° quando percebi que a junta atravessava o meio do portão.</p>
+        <p class="learn">Itens que sempre faltam no orçamento e passaram a ser regra: balancim de içamento, guindaste da classe certa, viga da junção e o mobiliário que aparece no render.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="n">02</span><h4>Empilhar encarece, geminar barateia</h4><span class="x">+</span></summary>
+      <div class="body">
+        <p>Para uma kitnet modular de 30 m², rodei os cenários isolado, em fita de 2 a 6 unidades e em 1 a 3 pavimentos. A fachada por unidade cai 56% ao geminar quatro; o custo por unidade cai cerca de <strong>28%</strong>. Empilhar sozinho encarece — só densifica. Isso definiu como o produto seria oferecido a investidores.</p>
+        <p>A escada coletiva levou quatro iterações: a escada reta empilhada simplesmente não conecta os pavimentos a partir do 7º degrau, e a torre em frente às portas mata a privacidade. Ficou uma torre lateral na empena cega entrando pela ponta da varanda.</p>
+        <p class="learn">No estudo de retorno para investidor, o rendimento líquido ficou abaixo da taxa básica. Registrei que o argumento de venda é prazo de obra, não retorno — e que divulgar projeção como garantia é risco jurídico.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="n">03</span><h4>A planta do cliente não cabia no terreno dele</h4><span class="x">+</span></summary>
+      <div class="body">
+        <p>Um cliente trouxe planta com quatro kitnets de 7 × 3 m para um lote de 9,50 m de frente. Pelo gabarito, o módulo com paredes em LSF passa de 3,20 m e exigiria escolta; o nosso módulo padrão de 9,40 m não cabe na frente útil. Desenhei o <strong>A-21</strong> (3,20 × 7,30 m) para esse lote — que é um tamanho muito comum.</p>
+        <p>Ao implantar, o fundo do lote é inclinado: quatro módulos não cabem em nenhuma posição, e <strong>a própria planta recebida estoura 1,97 m</strong>. Cabem três. O configurador passou a avisar em vermelho quando alguém tenta quatro.</p>
+        <p class="learn">Ver o problema antes do cliente ver é o que a conta feita em código compra. Numa obra, isso é uma fundação a menos para refazer.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="prose" style="margin-top:34px">
+    <p><strong>Governança do lançamento.</strong> Conduzi 10 rodadas de análise crítica do B-36 — cálculo, fabricação, compras, logística, comercial, marketing, jurídico, qualidade, financeiro e riscos — consolidadas em 37 decisões registradas e um plano de ações de 8 semanas, com o protótipo-vitrine como evento central e critério go/no-go de quatro condições para abrir vendas.</p>
+    <p><strong>Papelada pronta para operar.</strong> Guia geral do programa, ficha técnica comercial, minutas de contrato de fornecimento de kit e de empreitada, termo de responsabilidade do terreno, termo de entrega com checklist e garantias, protocolo de ensaios do protótipo, termo de escopo do projeto estrutural e carta-convite de cotação para fornecedores de perfis.</p>
+  </div>
+</section>
+
+
+<section id="orcamento">
+  <div class="sec-head">
+    <span class="eyebrow">Terceiro caso · Orçamento por leitura de projeto</span>
+    <h2>36 minutos. Do zip à proposta assinável.</h2>
+    <p class="lede">Um método em que eu entrego só o pacote do projeto — plantas, cortes, estrutural, planilha do cliente — e recebo de volta o levantamento medido no desenho, o orçamento com faixa e os documentos prontos no modelo da empresa. Abaixo, um orçamento real, com o relógio na tela.</p>
+  </div>
+
+  <ol class="timeline">
+    <li>
+      <figure><img src="img/t1.webp" alt="Tela do início: o pacote do projeto enviado como zip e a primeira etapa do método começando" loading="lazy"><span class="lupa"><img src="img/t1c.webp" alt="Relógio marcando 11:35"></span></figure>
+      <b>11:35</b><span>Pacote enviado. Um zip com 8 arquivos: 3 pranchas de arquitetura, 3 de estrutura e a proposta de material da loja.</span>
+    </li>
+    <li>
+      <figure><img src="img/t2.webp" alt="Tela do passo 3 de 7: lendo o vetor da planta para extrair paredes, áreas e vãos" loading="lazy"><span class="lupa"><img src="img/t2c.webp" alt="Relógio marcando 11:53"></span></figure>
+      <b>11:53</b><span>Passo 3 de 7. Nove perguntas de escopo feitas e respondidas; as paredes a construir estão sendo extraídas direto do vetor da planta.</span>
+    </li>
+    <li>
+      <figure><img src="img/t3.webp" alt="Tela com os três entregáveis prontos: motor de cálculo, proposta em PDF e registro de engenharia" loading="lazy"><span class="lupa"><img src="img/t3c.webp" alt="Relógio marcando 12:11"></span></figure>
+      <b>12:11</b><span>Três entregáveis na tela: proposta comercial em PDF, registro de engenharia e o motor de cálculo. Fecha ao centavo.</span>
+    </li>
+    <li>
+      <figure><img src="img/t4.webp" alt="Página 1 da proposta gerada, com quadro de áreas e a planta do cliente" loading="lazy"><span class="lupa"><img src="img/t4c.webp" alt="Relógio marcando 12:13"></span></figure>
+      <b>12:13</b><span>Proposta aberta para revisão: quadro de áreas, parâmetros e a planta do cliente. O que ainda depende dele aparece em laranja.</span>
+    </li>
+  </ol>
+
+  <div class="savings">
+    <div class="sv-head"><span class="eyebrow">Tempo até a proposta</span><b>≈ 27× mais rápido</b></div>
+    <div class="bar"><span class="lbl">Rotina manual — abrir pranchas, medir, transcrever, montar o PDF</span><div class="track"><i style="width:100%"></i></div><span class="val">~2 dias úteis*</span></div>
+    <div class="bar hot"><span class="lbl">Este método — pacote entra, proposta sai</span><div class="track"><i style="width:4%"></i></div><span class="val">36 min</span></div>
+    <p class="note">* Estimativa para uma proposta desse porte (26 ambientes, 328 m²) feita à mão na planilha padrão. Os 36 minutos são medidos: 11h35 → 12h11.</p>
+  </div>
+
+  <div class="deliver">
+    <div><span class="eyebrow">Para o cliente</span><b>Proposta comercial</b><p>PDF no modelo da empresa: serviço, quantidade, preço, o que está incluso e o que é por conta dele. Sem custo, sem margem. Pendências destacadas em cor.</p></div>
+    <div><span class="eyebrow">Para a empresa</span><b>Registro de engenharia</b><p>De onde veio cada número, com que confiança, a faixa medida, o custo, a margem e cada decisão numerada com "quanto custa se estiver errada".</p></div>
+    <div><span class="eyebrow">Para a próxima rodada</span><b>Motor de cálculo</b><p>O cliente mudou o pé-direito ou tirou a casa de máquinas? Roda de novo e a proposta sai revisada, com a mesma procedência.</p></div>
+  </div>
+
+  <div class="sec-head" style="margin-top:44px">
+    <span class="eyebrow">Por que dá para confiar num orçamento de 36 minutos</span>
+    <h3>Seis regras que eu escrevi e o método obedece</h3>
+  </div>
+  <div class="laws">
+    <div><i>01</i><b>Todo número tem origem.</b><p>Medido no desenho, derivado por conta, paramétrico por índice ou ditado por alguém — sempre marcado, sempre com grau de confiança.</p></div>
+    <div><i>02</i><b>A confiança se propaga pela pior.</b><p>Um total herda a pior confiança das parcelas. Medido × estimado = estimado.</p></div>
+    <div><i>03</i><b>Baixa confiança vira faixa.</b><p>Nunca número seco. E a faixa se mede, recalculando com o extremo de cada premissa.</p></div>
+    <div><i>04</i><b>Dado ausente é ausente.</b><p>Nunca zero. Um total com buraco dentro não é total — vira pendência declarada.</p></div>
+    <div><i>05</i><b>Meça antes de concluir.</b><p>E meça antes de consertar. Se a conferência der efeito zero, escreve-se o zero.</p></div>
+    <div><i>06</i><b>O que muda o que a empresa gasta, vende ou promete volta para o humano.</b><p>Com o número das duas alternativas na mão. O método recomenda; quem assina decide.</p></div>
+  </div>
+
+  <div class="prose" style="margin-top:34px">
+    <p><strong>O caso.</strong> Ampliação de uma unidade de saúde no litoral paulista: bloco novo com 26 ambientes e 328 m² de projeção, proposta de mão de obra em Light Steel Frame. O método inventariou o pacote, apontou o que faltava (os cortes, que fecham o pé-direito), mediu a escala contra as cotas, extraiu as paredes do vetor e rodou os motores da planilha padrão da empresa — a mesma que o diretor usa.</p>
+    <p class="learn">Uma proposta rápida só vale se der para defender cada número. Por isso o método gasta mais esforço em dizer de onde o número veio do que em chegar nele.</p>
+  </div>
+</section>
+
+
+<section id="sistema">
+  <div class="sec-head">
+    <span class="eyebrow">Quarto caso · Sistema de orçamento e gestão de obras</span>
+    <h2>Do desenho do cliente à proposta pronta para assinatura</h2>
+    <p class="lede">Na VEKS, idealizei um sistema que recebe o que o cliente tem — prancha em PDF, modelo 3D de outro escritório, planilha ou um croqui à mão fotografado pelo WhatsApp —, mede a obra no próprio desenho, calcula a estrutura, monta o orçamento, programa o prazo e gera a proposta. Defini as regras de engenharia e de negócio e dirigi o desenvolvimento, feito com assistentes de inteligência artificial sob minha revisão. E orcei as obras com ele.</p>
+  </div>
+
+  <div class="stats" style="margin-top:0">
+    <div><b>13</b><span>obras orçadas, de R$ 29 mil a R$ 24,5 milhões, com o mesmo sistema</span></div>
+    <div><b>0,25%</b><span>desvio máximo contra os custos oficiais publicados pela Caixa (SINAPI)</span></div>
+    <div><b>71 → 0</b><span>menções a informação interna numa proposta de cliente, por verificação automática</span></div>
+    <div><b>11 sem.</b><span>do primeiro registro ao estado atual, com cerca de 2.500 conferências automáticas</span></div>
+  </div>
+
+  <div class="gallery" style="margin-top:24px">
+    <figure class="g-wide"><img src="img/s1.webp" alt="Restaurante de rodovia desenhado pelo sistema a partir do arquivo do cliente, com a cobertura em corte mostrando o interior" loading="lazy"><figcaption>Rede de restaurantes de rodovia · o prédio medido e desenhado pelo sistema a partir do arquivo do cliente, cobertura em corte</figcaption></figure>
+    <figure><img src="img/s2.webp" alt="Ponto de venda em planta curva, em forma de feijão, desenhado pelo sistema a partir das pranchas do arquiteto" loading="lazy"><figcaption>Ponto de venda em planta curva — a primeira obra sem uma parede reta</figcaption></figure>
+    <figure><img src="img/s3.webp" alt="Tela do cronograma: duração de cada etapa, horas previstas e quais etapas estão no caminho crítico" loading="lazy"><figcaption>Cronograma: cada etapa com horas previstas e a marcação de quais atrasam a obra inteira</figcaption></figure>
+    <figure><img src="img/s4.webp" alt="Portal do cliente no celular: avanço da obra em 70,99% e o executado por etapa" loading="lazy"><figcaption>O que o cliente vê no celular: avanço por etapa, sem custo nem fornecedor</figcaption></figure>
+  </div>
+
+  <div class="sec-head" style="margin-top:44px">
+    <span class="eyebrow">Três obras, do desenho à proposta</span>
+    <h3>O que aconteceu quando o sistema encontrou obra de verdade</h3>
+  </div>
+  <div class="stories">
+    <details open>
+      <summary><span class="n">01</span><h4>R$ 24,5 milhões — e nenhuma quantidade no pacote do cliente</h4><span class="x">+</span></summary>
+      <div class="body">
+        <p><strong>Desafio.</strong> Restaurante, plataforma de ônibus e posto de estrada para uma rede de rodovia. O cliente entregou um desenho de 756 MB e documentos de referência, sem uma única quantidade e sem um único preço. O documento mais completo do pacote era a proposta de um concorrente.</p>
+        <p><strong>O que o sistema fez.</strong> Mediu no próprio desenho as paredes e as coberturas da obra inteira. Onde o desenho não bastava — o posto, que não vinha desenhado —, o projeto foi montado a partir da implantação do memorial e entrou pelo mesmo caminho, declarado como estimativa. Saíram orçamento, prazo e três propostas de tamanhos diferentes.</p>
+        <p><strong>Resultado.</strong> Uma proposta de obra completa de R$ 24,5 milhões. Quando a direção mudou o papel da empresa, de construtora para subempreiteira, o sistema gerou <strong>em horas</strong> uma segunda revisão, de R$ 9,6 milhões, e manteve a primeira intacta para comparação.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="n">02</span><h4>O cliente impôs um teto — e a resposta foi outra casa</h4><span class="x">+</span></summary>
+      <div class="body">
+        <p><strong>Desafio.</strong> A casa chegou como croqui à mão, fotografado pelo WhatsApp. Orçada, fechou em R$ 1,18 milhão. O cliente pôs um teto de R$ 500 mil.</p>
+        <p><strong>O que o sistema fez.</strong> Mostrou, com números, que trocar materiais por opções mais baratas tirava só 15% — não bastava. Então redesenhou a casa que cabia no teto, com 93,5 m² fechados, e recalculou tudo pelas mesmas regras. Cada acréscimo que o cliente poderia querer de volta (varanda, garagem, pé-direito maior) foi precificado um a um, para ele escolher com o valor à vista.</p>
+        <p><strong>Resultado.</strong> R$ 452.865 e 54 dias de obra, com folga de R$ 47 mil abaixo do teto.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="n">03</span><h4>As regras do cliente viraram regra do sistema</h4><span class="x">+</span></summary>
+      <div class="body">
+        <p><strong>Desafio.</strong> Fechamentos internos de cinco prédios de um centro logístico, com um documento de contratação cheio de regras sobre o que devia estar dentro do preço por metro quadrado.</p>
+        <p><strong>O que o sistema fez.</strong> Leu as regras do documento do cliente, guardando a frase exata de cada uma, e pôs dentro do preço o que ele mandava incluir. Por decisão da direção, trouxe também os 12 itens que o documento deixava por conta do cliente, cada um medido. A proposta passou por cinco refinamentos — uma página por prédio, retirada de dado sensível, vistas 3D, versão compacta e versão curta — e em nenhum deles o preço se moveu um centavo sem decisão.</p>
+        <p><strong>Resultado.</strong> Uma proposta de R$ 964.917 em três versões, de 4, 11 e 18 páginas, geradas do mesmo dado. A verificação automática levou as menções a informação interna de 71 para 0.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="sec-head" style="margin-top:44px">
+    <span class="eyebrow">Como o sistema chega ao preço</span>
+    <h3>Um exemplo do começo ao fim: 1 m² de parede de drywall</h3>
+    <p class="lede">Todos os números abaixo foram calculados pelo sistema, não digitados. O serviço vem da tabela oficial da Caixa, com preços de junho de 2026 em São Paulo.</p>
+  </div>
+  <div class="calc">
+    <div class="calc-col">
+      <h5>Material, por m²</h5>
+      <table><tbody>
+        <tr><td>Placa de gesso, nas duas faces</td><td>2,11 m²</td><td>R$ 43,55</td></tr>
+        <tr><td>Montante (perfil vertical de aço)</td><td>2,91 m</td><td>R$ 19,20</td></tr>
+        <tr><td>Guia (perfil no piso e no teto)</td><td>0,91 m</td><td>R$ 5,30</td></tr>
+        <tr><td>Fita e massa para as juntas</td><td>3,30 m · 1,10 kg</td><td>R$ 7,00</td></tr>
+        <tr><td>Parafusos e pinos de fixação</td><td>20,7 + 3,0 un</td><td>R$ 3,53</td></tr>
+        <tr class="sum"><td>Subtotal de material</td><td></td><td>R$ 78,58</td></tr>
+      </tbody></table>
+      <h5 style="margin-top:14px">Mão de obra, por m²</h5>
+      <table><tbody>
+        <tr><td>Montador</td><td>0,595 h × R$ 35,62</td><td>R$ 21,20</td></tr>
+        <tr><td>Ajudante</td><td>0,195 h × R$ 32,19</td><td>R$ 6,28</td></tr>
+        <tr class="sum"><td>Subtotal de mão de obra</td><td></td><td>R$ 27,47</td></tr>
+      </tbody></table>
+    </div>
+    <div class="calc-col">
+      <div class="calc-box">
+        <span class="eyebrow">Conferência</span>
+        <p><b>R$ 106,05</b> de custo por m². A mesma parede vale <b>R$ 106,00</b> na tabela publicada pela Caixa: cinco centavos de diferença — e é essa conferência que o sistema faz serviço a serviço, recusando a importação acima de 1% de desvio.</p>
+      </div>
+      <div class="calc-box">
+        <span class="eyebrow">Do custo ao preço</span>
+        <p>Material e mão de obra têm margens diferentes, porque imposto e risco são diferentes. Para que a margem seja mesmo a fração prometida do preço final, o sistema <b>divide o custo</b> pelo que sobra depois da margem, em vez de somar percentual em cima.</p>
+        <table><tbody>
+          <tr><td>Material</td><td>R$ 78,58</td><td>→ R$ 126,74</td></tr>
+          <tr><td>Mão de obra</td><td>R$ 27,47</td><td>→ R$ 52,83</td></tr>
+          <tr class="sum"><td>Preço de venda por m²</td><td></td><td>R$ 179,57</td></tr>
+        </tbody></table>
+      </div>
+      <div class="calc-box">
+        <span class="eyebrow">E o prazo</span>
+        <p>Uma parede de 100 m² pede 80,1 horas de equipe. Com um montador e um ajudante em jornada de 8 h, o sistema programa <b>6 dias</b> — a conta dá 5,01 e ele arredonda para cima. Número sem fonte firme sai com faixa; item sem preço impede a proposta de sair.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-head" style="margin-top:44px">
+    <span class="eyebrow">Sem maquiagem</span>
+    <h3>O que está medido — e o que ainda falta</h3>
+  </div>
+  <div class="honest">
+    <div>
+      <h5>Medido</h5>
+      <ul>
+        <li>Precisão de 0,25% contra a tabela oficial; reprodução com 0,00% de desvio da calculadora que a empresa usava antes.</li>
+        <li>Mesma obra em três tamanhos de proposta, do mesmo dado, sem mover nenhum número.</li>
+        <li>Toda obra passa pelo mesmo caminho — ler, medir, orçar, programar, propor — com guia escrito para um colega repetir.</li>
+        <li>O sistema confere a si mesmo: foi assim que apareceram e foram corrigidos um serviço 25,9% abaixo do oficial e um prazo lido ao pé da letra que dava 234 dias para uma obra de 49.</li>
+      </ul>
+    </div>
+    <div>
+      <h5>Ainda falta</h5>
+      <ul>
+        <li>Publicar no servidor definitivo — a hospedagem foi ensaiada duas vezes com sucesso.</li>
+        <li>Usar a parte de gestão de obra (diário, compras, financeiro) numa obra real; está construída e testada, mas o uso no dia a dia foi orçamento e proposta.</li>
+        <li>Confrontar um orçamento com o custo final de uma obra concluída — a empresa ainda não tem esse histórico.</li>
+        <li>Os valores são propostas, não contratos assinados.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="obra">
+  <div class="sec-head">
+    <span class="eyebrow">VEKS Engenharia · 2026 · contrato PJ</span>
+    <h2>Da planilha ao canteiro</h2>
+    <p class="lede">Seis meses numa empresa de Light Steel Frame em São José dos Campos, atuando ao mesmo tempo em orçamento, compras, acompanhamento de obra e controle financeiro. Além dos casos acima, uma seleção do que passou pelas minhas mãos.</p>
+  </div>
+  <ul class="projects">
+    <li>
+      <div class="k">Obra · Itu/SP<br>Baias para bovinos</div>
+      <div>
+        <h4>Dois galpões e 22 baias numa fazenda</h4>
+        <p>Suporte à obra do início ao fim: requisições de material para caixaria, concretagem de brocas, vigas e calçadas; especificação de concreto conforme norma; cotações e quadro de concorrência para argamassa, bombeamento e pisos; projeto 3D dos portões em madeira, com manual de montagem e lista de materiais para o carpinteiro; contrato de locação da casa da equipe revisado; aditivos de escopo (reforço de fundação e acabamentos hidráulicos).</p>
+        <div class="did"><span>requisições</span><span>cotações</span><span>quadro de concorrência</span><span>aditivos</span><span>detalhamento 3D</span><span>especificação de concreto</span></div>
+      </div>
+    </li>
+    <li>
+      <div class="k">Produto · Conversão</div>
+      <div>
+        <h4>Mercado autônomo 24 h como módulo LSF</h4>
+        <p>Conversão de um mercadinho autônomo em contêiner (3 × 3 × 2,50 m) para módulo LSF off-site. Configurador 3D com orçamento editável em duas versões para o cliente comparar — só a casca, comparável ao contêiner, ou a loja pronta. Repreçamento com a base real da loja de materiais, cotação dos itens sem preço, levantamento de concorrência e ajuste de margem para o produto caber no mercado.</p>
+        <div class="did"><span>orçamento</span><span>precificação</span><span>concorrência</span><span>configurador 3D</span></div>
+      </div>
+    </li>
+    <li>
+      <div class="k">Projeto · Orçamento</div>
+      <div>
+        <h4>Galpão comercial 15 × 20 m em São José dos Campos</h4>
+        <p>Proposta de 14 seções na planilha padrão da empresa, com correção de fórmulas e um cenário rebalanceado que recuperou a margem da mão de obra. Cotação e acompanhamento da sondagem SPT; com o laudo em mãos, estudo estrutural e de fundação otimizado (pórticos em perfil W, estacas escavadas apoiadas na argila rija) entregue em caderno de 7 pranchas: fundações, estrutura, vistas, isométrico, lista de materiais, plano de execução e renders.</p>
+        <div class="did"><span>proposta comercial</span><span>sondagem SPT</span><span>estudo estrutural</span><span>fundações</span><span>pranchas</span></div>
+      </div>
+    </li>
+    <li>
+      <div class="k">Projeto · Proposta</div>
+      <div>
+        <h4>Bunker de blindagem para fonte radioativa</h4>
+        <p>Para um cliente do setor de defesa: duas paredes em L de concreto de alta resistência revestidas em chapa de aço. Cálculo estrutural, memorial em Excel separando material e mão de obra, e proposta comercial com fase de engenharia (sondagem + projeto executivo) e marcos de pagamento dimensionados para o caixa da obra nunca ficar negativo. Quatro cenários internos de escopo e margem para sustentar a negociação — incluindo uma proposta alternativa econômica quando o cliente trouxe concorrentes.</p>
+        <div class="did"><span>cálculo estrutural</span><span>memorial</span><span>cronograma físico-financeiro</span><span>negociação</span></div>
+      </div>
+    </li>
+    <li>
+      <div class="k">Orçamento · Suíte</div>
+      <div>
+        <h4>Suíte de 38 m² em LSF, Campos do Jordão</h4>
+        <p>Orçamento montado na arquitetura da planilha padrão, reproduzindo a memória de cálculo de cada item (medida → insumos → embalagens → R$/m²). Identifiquei e corrigi premissas erradas de paredes internas e de fundação que distorciam o custo.</p>
+        <div class="did"><span>orçamento</span><span>memória de cálculo</span><span>revisão de premissas</span></div>
+      </div>
+    </li>
+    <li>
+      <div class="k">Contratos</div>
+      <div>
+        <h4>Contratos de empreitada e de mão de obra</h4>
+        <p>Revisão de contrato de empreitada global para ampliação em LSF; redação de contrato de mão de obra para base coat e telhado shingle (1.800 m²), com entrada de mobilização, medição mensal e divisão clara de responsabilidades; revisão de cláusulas de locação.</p>
+        <div class="did"><span>contratos</span><span>condições de pagamento</span><span>responsabilidades</span></div>
+      </div>
+    </li>
+    <li>
+      <div class="k">Obra · Reforma</div>
+      <div>
+        <h4>Auditório de instituto de pesquisa</h4>
+        <p>Levantamento de escopo para orçamento de reforma de 75 m² em parceria com outras duas empresas: parede acústica, demolições, porta corta-fogo, forro e iluminação dimerizável.</p>
+        <div class="did"><span>levantamento de escopo</span><span>parcerias</span></div>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<section id="ferramentas">
+  <div class="sec-head">
+    <span class="eyebrow">Ferramentas que criei no caminho</span>
+    <h2>Problemas repetidos viram ferramenta</h2>
+    <p class="lede">Quando a mesma conta aparecia pela terceira vez, eu transformava em algo que o time inteiro pudesse usar.</p>
+  </div>
+  <ul class="projects">
+    <li>
+      <div class="k">Vendas · Loja</div>
+      <div>
+        <h4>Calculadora de parede em LSF e drywall</h4>
+        <p>Ferramenta usada pelo vendedor da loja de materiais e pela engenharia: desenha a parede, mostra em 3D, gera plano de corte dos perfis e quantitativo com preços da loja. Escolhe escopo (material, mão de obra ou ambos), calcula a diária de equipe conforme o tamanho do serviço, decide se compensa comprar parafuso por milheiro ou por centena e exporta o orçamento em PDF com a marca da loja. Os perfis aparecem como "guia" e "montante", porque vendedor e comprador não entendem código de perfil.</p>
+        <div class="did"><span>quantitativo</span><span>plano de corte</span><span>precificação</span><span>PDF para cliente</span></div>
+      </div>
+    </li>
+    <li>
+      <div class="k">Controladoria</div>
+      <div>
+        <h4>Classificador do fluxo de caixa e painéis de controladoria</h4>
+        <p>Motor que lê a planilha de entradas e saídas, exclui transferências internas, classifica cada lançamento por regras, separa o que é obra do que é empresa e rateia o custo indireto do escritório. Gera painéis mensais e por centro de custo, com todos os lançamentos pesquisáveis. Revelou problemas de cadastro na origem — receita sem obra vinculada, centro de custo trocado — que passaram a ser corrigidos na fonte.</p>
+        <div class="did"><span>fluxo de caixa</span><span>centros de custo</span><span>rateio</span><span>painéis</span></div>
+      </div>
+    </li>
+    <li>
+      <div class="k">Documentos</div>
+      <div>
+        <h4>Padrão de documentos PDF da empresa</h4>
+        <p>Kit de layout para propostas, cronogramas físicos e relatórios saírem sempre com a mesma identidade — inclusive versão com a marca do cliente quando o documento é emitido em nome dele. Manual ilustrado da planilha padrão de orçamento, aba por aba, a partir do treinamento gravado com o diretor.</p>
+        <div class="did"><span>padronização</span><span>manuais</span><span>identidade visual</span></div>
+      </div>
+    </li>
+    <li>
+      <div class="k">Processo</div>
+      <div>
+        <h4>Fluxo de compras da construtora</h4>
+        <p>Desenho do ciclo ideal de compras — campo solicita, compras monta o mapa de concorrência, gestor aprova, financeiro paga e lança — que virou a espinha dorsal do módulo de compras do SIGE.</p>
+        <div class="did"><span>mapeamento de processo</span><span>aprovações</span></div>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<section id="curriculo">
+  <div class="sec-head">
+    <span class="eyebrow">Currículo</span>
+    <h2>Em resumo</h2>
+  </div>
+  <div class="cv-grid">
+    <div>
+      <h3 style="margin-bottom:16px">Experiência</h3>
+      <ul class="tl">
+        <li><span class="when">mar/2026 – set/2026 · prestador de serviços (PJ)</span><b>VEKS Engenharia — São José dos Campos/SP</b><p>Contratado para processos, dados, automação e implantação do SIGE (licenciado à empresa); na prática, também orçamentos e propostas, compras e cotações de obra, acompanhamento de canteiro, contratos, fluxo de caixa e o desenvolvimento da linha de casas modulares.</p></li>
+        <li><span class="when">fev/2025 – jul/2026 · CLT, meio período</span><b>V Alves Construção — São José dos Campos/SP</b><p>Gerente de produção e operações da construção civil: acompanhamento das obras, compras e rotina de produção, em paralelo com o estágio abaixo.</p></li>
+        <li><span class="when">abr/2025 – mar/2026 · estágio comercial, meio período</span><b>Estruturas do Vale — São José dos Campos/SP</b><p>Orçamentos e propostas comerciais a partir do projeto e vendas internas. Foi aqui que o SIGE nasceu: mais de 10 módulos, de ponto facial a diário de obra e almoxarifado, construídos sobre a rotina real da empresa.</p></li>
+        <li><span class="when">2017 – hoje</span><b>Analista contábil — escritório da família</b><p>Folha de pagamento, emissão de notas e balancete fiscal. É de onde vem a intimidade com custo, imposto e fluxo de caixa que aparece nos orçamentos.</p></li>
+        <li><span class="when">mar/2023 – dez/2024</span><b>Diretor de Vendas — InLoco Jr. (empresa júnior da UNIFEI)</b><p>Prospecção de clientes, orçamento e gestão de equipe.</p></li>
+        <li><span class="when">2022</span><b>Fiscal financeiro — DCE UNIFEI</b><p>Gestão de documentos fiscais da entidade estudantil.</p></li>
+        <li><span class="when">empresa própria</span><b>Axiom — sistemas personalizados e chatbots</b><p>Site institucional e desenvolvimento sob demanda para pequenas empresas.</p></li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="margin-bottom:16px">Formação</h3>
+      <ul class="tl">
+        <li><span class="when">7º semestre · faltam 3</span><b>Engenharia Civil</b><p>Cruzeiro do Sul (EAD), após 6 semestres na UNIFEI, em Itajubá/MG.</p></li>
+        <li><span class="when">3º semestre · em curso</span><b>Sistemas de Informação — PUC (EAD)</b><p>Segunda graduação, em paralelo.</p></li>
+      </ul>
+      <h3 style="margin:28px 0 10px">O que sei fazer</h3>
+      <div class="skills">
+        <span class="tag">Orçamento de obra</span><span class="tag">Compras e cotações</span><span class="tag">Cronograma físico-financeiro</span><span class="tag">Diário de obra e medição</span><span class="tag">Fluxo de caixa</span><span class="tag">Light Steel Frame</span><span class="tag">Pré-dimensionamento estrutural</span><span class="tag">Contratos de obra</span><span class="tag">Mapeamento de processos</span><span class="tag">Sistemas de gestão</span><span class="tag">Manuais e documentação</span>
+      </div>
+      <h3 style="margin:28px 0 10px">Ferramentas</h3>
+      <div class="skills">
+        <span class="tag">Excel avançado</span><span class="tag">AutoCAD</span><span class="tag">Revit</span><span class="tag">Civil 3D</span><span class="tag">SketchUp</span><span class="tag">OrçaFascio</span><span class="tag">Python</span><span class="tag">Inglês intermediário</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contato">
+  <div class="contact-box">
+    <div>
+      <span class="eyebrow">Contato</span>
+      <h3>Vamos conversar sobre a sua obra?</h3>
+      <p>Procuro uma posição em gestão de obras, orçamento e controle de custos — ou em melhoria de processos numa construtora que queira parar de viver de planilha.</p>
+      <div class="contacts" style="margin-top:16px">
+        <a href="mailto:cassiovillers@gmail.com">cassiovillers@gmail.com</a>
+        <a href="https://wa.me/5512982071116" target="_blank" rel="noopener">(12) 98207-1116 · WhatsApp</a>
+        <span class="ph">[LinkedIn]</span>
+      </div>
+    </div>
+    <a class="btn" href="https://github.com/cassioviller/EnterpriseSync-1" target="_blank" rel="noopener">Ver o SIGE ↗</a>
+  </div>
+</section>
+
+<footer>
+  <span>Cassio Viller · São José dos Campos/SP</span>
+  <span>Números do SIGE conforme registros do projeto em set/2026.</span>
+</footer>
+
+</main>
+</div>
+</div>
+
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.rail nav a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  if(!('IntersectionObserver' in window))return;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){
+        var i=secs.indexOf(e.target);
+        links.forEach(function(l,j){l.classList.toggle('on',j===i);});
+      }
+    });
+  },{rootMargin:'-30% 0px -60% 0px'});
+  secs.forEach(function(s){if(s)io.observe(s);});
+})();
+</script>
