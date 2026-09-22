@@ -122,7 +122,7 @@ function cenaCasa(fig){
   var truck=new THREE.Group();S.add(truck);
   box(7.4,.5,2.6,M.truck,-.6,1.05,0,truck);box(2.0,2.2,2.5,M.cab,3.9,1.9,0,truck);box(1.9,.9,2.3,M.win,3.95,2.7,0,truck);
   [[-3.2,-1.2],[-3.2,1.2],[-1.6,-1.2],[-1.6,1.2],[3.5,-1.2],[3.5,1.2]].forEach(function(w){cyl(.55,.5,M.tire,w[0],.55,w[1],truck,Math.PI/2);});
-  truck.rotation.y=Math.PI/2;
+  truck.rotation.y=-Math.PI/2; // cabine para +z: o caminhão entra de frente e sai de frente
   var crane=new THREE.Group();crane.position.set(5.5,0,-6.5);S.add(crane);
   box(4.6,.9,2.4,M.crane,0,.95,0,crane);[[-1.5,-1.3],[-1.5,1.3],[1.5,-1.3],[1.5,1.3]].forEach(function(w){cyl(.6,.6,M.tire,w[0],.6,w[1],crane,Math.PI/2);});
   [[-2.2,-1.5],[-2.2,1.5],[2.2,-1.5],[2.2,1.5]].forEach(function(o){box(.3,.3,1.3,M.craneD,o[0],.55,o[1]*.8,crane);cyl(.12,.7,M.steel,o[0],.35,o[1]*1.2,crane);});
@@ -137,16 +137,16 @@ function cenaCasa(fig){
   var cur=new THREE.Vector3(9,0,0),wp=new THREE.Vector3(),tipW=new THREE.Vector3(),from=new THREE.Vector3(9,1.3,-.6);
   function aimBoom(target){S.updateMatrixWorld();boomPivot.getWorldPosition(wp);var dx=target.x-wp.x,dz=target.z-wp.z,d=Math.hypot(dx,dz);turret.rotation.y=Math.atan2(-dz,dx);boomPivot.rotation.z=Math.acos(Math.min(.98,d/L));}
   function liftPath(t,t0,t1,bx,to,restY){var a=seg(t,t0,t0+(t1-t0)*.3),b=seg(t,t0+(t1-t0)*.3,t0+(t1-t0)*.7),c=seg(t,t0+(t1-t0)*.7,t1);
-    var x=lerp(from.x,to.x,b),z=lerp(from.z,to.z,b),y=lerp(lerp(from.y,7.2,a),restY,c);if(c<=0)y=lerp(from.y,7.2,a);bx.position.set(x,y,z);cur.set(x,0,z);return true;}
+    var x=lerp(from.x,to.x,b),z=lerp(from.z,to.z,b),y=lerp(lerp(from.y,7.2,a),restY,c);if(c<=0)y=lerp(from.y,7.2,a);bx.position.set(x,y,z);bx.rotation.y=lerp(Math.PI/2,0,b);cur.set(x,0,z);return true;}
   var CAM=[[0,[20,10,22],[1,2,0]],[6,[16,7,14],[4,2,0]],[9.5,[14,9.5,13],[3,4.5,0]],[12,[10.5,6,10],[1,3,.5]],[16,[13,8,-11],[1,2.5,0]],[19,[15,9.5,-10],[1,4.5,0]],[21.5,[11,6.5,9.5],[0,3.5,0]],[26,[14,6.5,13],[0,3,0]]];
   var SUBS=[[0,'A conta veio antes do desenho: casas que saem prontas da fábrica.',''],[3,'Caixa 1 chega. Três metros de largura — sem escolta.',''],[8.5,'Guindaste da classe certa: 3,8 t por caixa.','3,8 t'],[13.5,'A segunda viagem. A face de junção viaja fechada.','4,12 m'],[17.5,'Vão livre de seis metros: a viga, não o pilar.','6,00 m'],[20.5,'O telhado chega em painéis. Terceira viagem.','3 viagens'],[23.5,'Uma casa que sai pronta da fábrica.','59,5 m²']];
   var api={dur:DUR,update:function(t,wide){
     var tz;if(t<6)tz=lerp(-30,0,seg(t,1.5,6));else if(t<11.8)tz=0;else if(t<13.2)tz=lerp(0,30,seg(t,11.8,13.2));else if(t<15)tz=lerp(-30,0,seg(t,13.2,15));else if(t<20)tz=0;else tz=lerp(0,30,seg(t,20,21.5));
     truck.position.set(9,0,tz);
     var a1=false,a2=false;
-    if(t<7.2)c1.position.set(9,1.3,tz-.6);else if(t<12)a1=liftPath(t,7.2,11.6,c1,TG.site1,PIL);else c1.position.set(0,PIL,1.5);
+    if(t<7.2){c1.position.set(9,1.3,tz-.6);c1.rotation.y=Math.PI/2;}else if(t<12)a1=liftPath(t,7.2,11.6,c1,TG.site1,PIL);else{c1.position.set(0,PIL,1.5);c1.rotation.y=0;}
     c2.visible=t>=13.2;
-    if(c2.visible){if(t<16.2)c2.position.set(9,1.3,tz-.6);else if(t<20.6)a2=liftPath(t,16.2,20.4,c2,TG.site2,PIL);else c2.position.set(0,PIL,-1.5);}
+    if(c2.visible){if(t<16.2){c2.position.set(9,1.3,tz-.6);c2.rotation.y=Math.PI/2;}else if(t<20.6)a2=liftPath(t,16.2,20.4,c2,TG.site2,PIL);else{c2.position.set(0,PIL,-1.5);c2.rotation.y=0;}}
     var rt=seg(t,20.6,23.2);roof.visible=t>20.2;roof.position.set(0,PIL+.27+2.85+(1-rt)*7,0);
     var att=a1||a2,roofing=t>20.4&&t<23.4;
     aimBoom(roofing?TG.mid:att?cur:(t<7.2?TG.truck:(t<13.2?TG.site1:TG.truck)));
