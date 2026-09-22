@@ -1,10 +1,10 @@
-node_modules
-dist
-.DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz
+# site da Axiom: fica no disco, fora do git
+axiom/
+
 # pacote de handoff do portfólio (contém documentos pessoais)
 handoff-portfolio-cassio.zip
 docs-pessoais/
 BRIEF.md
+
+.DS_Store
+*.tar.gz

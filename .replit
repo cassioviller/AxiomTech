@@ -1,22 +1,17 @@
-modules = ["nodejs-20", "web"]
-run = "npm run dev"
-hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
+modules = ["python-3.12", "web"]
+run = "python3 -m http.server 5000 --bind 0.0.0.0 --directory portfolio/site"
+hidden = [".config", ".git", "axiom"]
 
 [nix]
 channel = "stable-25_05"
 
 [deployment]
-deploymentTarget = "autoscale"
-build = ["npm", "run", "build"]
-run = ["npm", "run", "start"]
+deploymentTarget = "static"
+publicDir = "portfolio/site"
 
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 5123
-externalPort = 3001
 
 [workflows]
 runButton = "Project"
@@ -28,13 +23,13 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Start application"
+args = "Site do portfólio"
 
 [[workflows.workflow]]
-name = "Start application"
+name = "Site do portfólio"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "python3 -m http.server 5000 --bind 0.0.0.0 --directory portfolio/site"
 waitForPort = 5000
