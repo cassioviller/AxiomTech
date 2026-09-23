@@ -21,6 +21,10 @@ CASOS_MINTO = [
     "O cliente impôs um teto — e a resposta foi outra casa",
     "R$ 24,5 milhões — e nenhuma quantidade no pacote do cliente",
     "As regras do cliente viraram regra do sistema",
+    "O diário que estava no WhatsApp",
+    "O cliente confirma que leu",
+    "Da venda à obra",
+    "Compras com governança",
 ]
 
 RESSALVAS = [
