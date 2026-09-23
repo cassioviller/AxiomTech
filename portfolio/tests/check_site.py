@@ -112,7 +112,10 @@ def checar_invariantes(atual, base):
     check(na == nb, f"números mudaram — novos: {sorted(na - nb)}; sumiram: {sorted(nb - na)}")
     t = texto(atual)
     for r in RESSALVAS:
-        check(r in t, f"ressalva sumiu: {r!r}")
+        check(
+            t.count(r) >= texto(base).count(r) and r in t,
+            f"ressalva {r!r}: {t.count(r)} ocorrências, base tinha {texto(base).count(r)}",
+        )
     b = Balanco()
     b.feed(atual)
     check(not b.erros and not b.pilha, f"tags desbalanceadas: {b.erros[:3]} abertas: {b.pilha[:3]}")
@@ -130,6 +133,9 @@ def checar_minto(atual):
             corpo.startswith("<p><strong>Resultado.</strong>") or corpo.startswith("<div><h5>Resultado</h5>"),
             f"caso não abre pelo resultado: {titulo!r}",
         )
+        n = corpo.count("<strong>Resultado.</strong>") + corpo.count("<h5>Resultado</h5>")
+        check(n == 1, f"caso com {n} blocos Resultado: {titulo!r}")
+        check("Resultado:" not in corpo, f"'Resultado:' solto no corpo: {titulo!r}")
     check("O que o sistema fez" not in atual, "ainda há 'O que o sistema fez' — a autoria deve ser 'O que fiz'")
     for titulo in CASOS_MINTO[:3]:
         corpo = cs.get(titulo, "")
