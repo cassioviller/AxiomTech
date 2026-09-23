@@ -49,6 +49,11 @@ function sincronizar(){
   var r=document.querySelector('.cena[data-passo="'+H.ativa+'"]').getBoundingClientRect();
   api.seek(progresso(r.top,r.height,innerHeight)*api.dur*0.999);
 }
+// "mai → set/2026" vira "mai/2026": o início do intervalo, com o ano do fim quando o início é só o mês
+function inicioDaData(texto){
+  var inicio=texto.split('→')[0].trim();
+  return /\d/.test(inicio)?inicio:inicio+'/'+texto.split('/').pop().trim();
+}
 // régua: exatamente um marco com aria-current="step"; a data do capítulo aparece à direita
 function marcarRegua(passo){
   if(!regua)return;
@@ -58,7 +63,7 @@ function marcarRegua(passo){
   if(!a)return;
   a.setAttribute('aria-current','step');
   var t=a.querySelector('time');
-  if(reguaData)reguaData.textContent=t?t.textContent.split('→')[0].trim():reguaData.getAttribute('data-padrao'); // só o início: cabe no celular
+  if(reguaData)reguaData.textContent=t?inicioDaData(t.textContent):reguaData.getAttribute('data-padrao'); // só o início: cabe no celular
   var li=a.parentNode;
   reguaOl.scrollLeft=li.offsetLeft-(reguaOl.clientWidth-li.offsetWidth)/2; // centraliza o marco: rola só a régua, nunca a página
 }

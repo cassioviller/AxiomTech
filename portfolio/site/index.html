@@ -94,7 +94,8 @@ footer a{color:var(--ink)}
 .js-historia .palco .fundo.viva canvas{opacity:1}
 .js-historia .palco .fundo.viva img{visibility:hidden}
 .js-historia .palco .hud{display:block;position:absolute;right:16px;bottom:14px}
-.js-historia .palco .hud b{font-family:var(--display);font-weight:700;font-size:clamp(1.8rem,5vw,3rem);line-height:1;color:var(--relogio);font-variant-numeric:tabular-nums}
+.js-historia .palco .hud b{font-family:var(--display);font-weight:700;font-size:clamp(1.8rem,5vw,3rem);line-height:1;color:var(--relogio);font-variant-numeric:tabular-nums;background:var(--scrim);padding:4px 10px;display:inline-block}
+.js-historia .palco .hud b:empty{display:none}
 .js-historia .palco .hud [data-legenda]{display:none}
 .js-historia .cena{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:96px 16px;border:0}
 .js-historia .cena.longa{min-height:200vh;min-height:200svh;align-items:flex-start}

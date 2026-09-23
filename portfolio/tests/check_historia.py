@@ -299,6 +299,11 @@ def checar_css(pagina):
             rgb = tuple(int(cor.group(1)[i:i + 2], 16) for i in (0, 2, 4))
             cr = contraste(rgb, fundo)
             check(cr >= 4.5, f"{var} sobre a faixa: {cr:.2f}:1 no pior caso (mín. 4,5)")
+    relogio = re.search(r"--relogio:\s*#([0-9A-Fa-f]{6})", css)
+    check(relogio is not None and contraste(tuple(int(relogio.group(1)[i:i + 2], 16) for i in (0, 2, 4)), fundo) >= 3.0,
+          "relógio da maquete (texto grande, negrito) sobre a faixa: mínimo 3:1 no pior caso")
+    check(re.search(r"\.hud b\{[^}]*background:var\(--scrim\)", css) is not None, "o relógio da maquete fica sobre a faixa escura")
+    check(".js-historia .palco .hud b:empty{display:none}" in css, "sem número no relógio (içamento), a faixa do relógio some")
 
 
 def checar_scripts(pagina):
@@ -493,7 +498,8 @@ def checar_navegador():
         maq = passo if passo in maquetes else "-"
         esperado = f"cena {passo} ativa={passo} fundo={fundo} maquetes={maq}"
         check(esperado in normal, f"390 px: esperava {esperado!r}")
-        rotulo = c["data"][0].split("→")[0].strip() if c["data"] else "2017–2026"
+        inicio = c["data"][0].split("→")[0].strip() if c["data"] else ""
+        rotulo = (inicio if re.search(r"\d", inicio) else inicio + "/" + c["data"][0].split("/")[-1].strip()) if c["data"] else "2017–2026"
         check(f"regua {passo}=#{passo} n=1 data={rotulo}" in normal,
               f"390 px: na cena {passo}, o marco ativo da régua deve ser #{passo} (e só ele), com a data {rotulo!r} à direita")
         if passo in maquetes:

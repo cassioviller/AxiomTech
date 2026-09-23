@@ -154,3 +154,15 @@ Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO
 - `site/maquetes.js`: a API `fig.__maquete` passa a expor `dur`.
 - `tests/check_historia.py` (+ `tests/historia_teste.html` no Chromium headless): roteiro exato, números que o index sustenta, ressalvas, contraste da faixa no pior caso, `aria-hidden`, `svh`, 320 px sem rolagem horizontal, movimento reduzido.
 - O `index.html` não mudou. Em aberto (do Cássio): estágio/júnior, link a partir do portfólio, foto `p-fotos.webp`, imagem de prévia própria.
+
+---
+
+# Rodada 6 — a história na linha do tempo, 23/09/2026
+
+- Pesquisa com as 5 personas (rodada 2) em `docs/superpowers/research/2026-09-23-historia-v2/`; spec em `docs/superpowers/specs/2026-09-23-historia-linha-do-tempo-design.md`.
+- `site/index.html`: 17 capítulos em ordem cronológica, de 2017 a set/2026, cada um com data (`<time>`), frase, ressalva e link "Ver…" para a seção do portfólio; vínculos simultâneos ditos com o tipo de contrato; fundos tipográficos nos capítulos sem imagem; barra com o status atual.
+- Régua de tempo no cabeçalho (`nav` + `ol`, um `aria-current="step"`, foco no título ao saltar).
+- `site/maquetes.js`: cena `icamento` (o módulo sobe pelo balancim, cabos verticais), ligada ao scroll.
+- Relógio da maquete sobre faixa escura (contraste ≥ 3:1).
+- `tests/check_historia.py`: cronologia, datas contra o currículo, links únicos, régua, WebGL real do içamento.
+- Para o Cássio conferir: iPhone real, zoom 200%, leitor de tela e memória das três maquetes. Em aberto: estágio/júnior; UNIFEI 2020–2024 (currículo) ou 2022–2024 (conversa) — a página não mostra o ano de entrada.
