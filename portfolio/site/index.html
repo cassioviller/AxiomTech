@@ -85,8 +85,18 @@ img{max-width:100%;height:auto;display:block}
 .ficha p{color:var(--ink-2);max-width:66ch;margin:0 0 10px}
 footer{max-width:880px;margin:0 auto;padding:20px 16px 40px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:.74rem;color:var(--muted);border-top:1px solid var(--rule)}
 footer a{color:var(--ink)}
+/* o filme: toca só por clique; a transcrição repete as legendas */
+.filme{max-width:880px;margin:0 auto;padding:48px 16px 8px;scroll-margin-top:9rem}
+.filme h2{font-family:var(--display);font-weight:600;font-size:2rem;line-height:1.05;margin:0 0 14px}
+.filme video{display:block;width:100%;height:auto;background:var(--tinta);border:1px solid var(--rule)}
+.transcricao{margin:14px 0 0;font-size:.92rem;color:var(--ink-2)}
+.transcricao summary{cursor:pointer;font-family:var(--mono);font-size:.8rem;color:var(--ink)}
+.transcricao ol{margin:10px 0 0;padding-left:20px;display:grid;gap:8px}
+.transcricao b{color:var(--ink)}
+
 /* modo cenas: historia.js liga .js-historia no <html> e leva cada .fundo para o .palco */
-.js-historia .historia{max-width:none;padding:0;position:relative;background:var(--tinta)}
+/* overflow:clip corta o palco (sticky, margin-bottom:-100vh) no fim da história: sem ele, o palco cobre o filme e a ficha */
+.js-historia .historia{max-width:none;padding:0;position:relative;background:var(--tinta);overflow:clip}
 .js-historia .palco{display:block;position:sticky;top:0;height:100vh;height:100svh;margin-bottom:-100vh;margin-bottom:-100svh;overflow:hidden;background:var(--tinta)}
 .js-historia .palco .fundo{position:absolute;inset:0;margin:0;opacity:0;transition:opacity .6s ease}
 .js-historia .palco .fundo.ativo{opacity:1}
@@ -324,12 +334,34 @@ footer a{color:var(--ink)}
       <p class="ressalva">Você me manda o pacote do projeto; eu devolvo levantamento, orçamento com faixa e proposta no seu modelo.</p>
       <p class="cta">
         <a class="btn" href="https://wa.me/5512982071116?text=Ol%C3%A1%2C%20C%C3%A1ssio.%20Vi%20seu%20portf%C3%B3lio%20e%20quero%20te%20mandar%20uma%20obra%20para%20or%C3%A7ar." target="_blank" rel="noopener">Me mande uma obra ↗</a>
+        <a class="btn fantasma" href="#filme">Assistir ao filme ↓</a>
         <a class="btn fantasma" href="portfolio.html">Ver o portfólio completo</a>
         <a class="btn fantasma" href="curriculo-cassio-viller.pdf" target="_blank" rel="noopener">Baixar currículo (PDF)</a>
       </p>
     </div>
   </section>
 </main>
+
+<section class="filme" id="filme" aria-labelledby="filme-titulo">
+  <h2 id="filme-titulo">A história em 85 segundos</h2>
+  <video controls preload="none" playsinline poster="video/historia.jpg" width="960" height="540">
+    <source src="video/historia.mp4" type="video/mp4">
+  </video>
+  <details class="transcricao">
+    <summary>Transcrição do filme (o vídeo não tem áudio)</summary>
+    <ol>
+      <li><b>Cássio Viller · portfólio — Número sem origem custa caro na obra.</b> Nove capítulos, de 2017 a 2026. Cada número tem origem: medido, derivado ou a confirmar.</li>
+      <li><b>2017 → 2024 — Comecei pela contabilidade, não pela obra.</b> Escritório contábil da família desde 2017. Na UNIFEI, fiscal do DCE (2022) e diretor de vendas da InLoco Jr.</li>
+      <li><b>fev/2025 → mar/2026 — Mas vi o dado digitado cinco vezes.</b> Meio período, em paralelo: produção na V Alves (CLT) e estágio na Estruturas do Vale, onde nasceu o SIGE.</li>
+      <li><b>mar → set/2026 — Na VEKS, toda conta repetida virou ferramenta.</b> PJ, 6 meses, cumprido até o fim, com a V Alves até julho. Calculadora de parede e classificador de caixa.</li>
+      <li><b>mai → set/2026 — O SIGE ganhou versão nova.</b> Cerca de 50 módulos em 6 áreas; entregas de 22/07 a 14/09/2026. Portal e diário em uso nos galpões.</li>
+      <li><b>jul → set/2026 — 13 obras no sistema, 11 com proposta.</b> Lê o desenho, mede e orça. Nos 19 serviços SINAPI conferidos, desvio máximo de 0,25%. Código com assistentes de IA. <em>A gestão de obra deste sistema ainda não rodou em obra real.</em></li>
+      <li><b>ago/2026 — O celeiro não cabe no caminhão.</b> B-36: duas caixas, três viagens, 37 decisões registradas. No estudo, o módulo sobe pelo balancim, cabos na vertical. <em>Pré-dimensionado, sujeito à revisão do engenheiro responsável.</em></li>
+      <li><b>ago → set/2026 — 23 dias de diário só no WhatsApp.</b> Depois de 11/08, o diário saiu do sistema; 28 atividades prontas apareciam atrasadas nos dois galpões. <em>Recuperação lida numa cópia; no sistema em uso, a carga ainda não foi aplicada.</em></li>
+      <li><b>set/2026 — Proposta assinável em 36 minutos.</b> Medidos: 11:35 → 12:11, ampliação de unidade de saúde, 26 ambientes, 328 m². À mão, cerca de 2 dias úteis (estimativa).</li>
+    </ol>
+  </details>
+</section>
 
 <section class="ficha" aria-labelledby="ficha-titulo">
   <h2 id="ficha-titulo">O que faço numa construtora</h2>
