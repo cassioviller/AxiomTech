@@ -372,6 +372,7 @@ def checar_js():
 def checar_maquetes_js():
     js = (SITE / "maquetes.js").read_text(encoding="utf-8")
     check("dur:sc.dur" in js, "maquetes.js precisa expor a duração da cena em fig.__maquete.dur")
+    check("'icamento':cenaIcamento" in js, "maquetes.js precisa registrar a cena 3D do içamento em CENAS")
 
 
 class WS:
@@ -518,6 +519,33 @@ def checar_navegador():
                   f"{chave} {passo}: esperava ≈{alvo} (dur 1000), achei {m.group(1) if m else 'nada'}")
 
 
+def checar_maquete_real():
+    """Com WebGL de verdade (SwiftShader): a cena do içamento monta sem erro, expõe a API e segue o scroll."""
+    espiao = ("window.__erros=[];addEventListener('error',function(e){__erros.push(String(e.message));});"
+              "var avisar=console.warn;console.warn=function(){var m=String(arguments[0]);"
+              "if(/^maquete|three\\.js/.test(m))__erros.push(m+' '+String(arguments[1]));return avisar.apply(console,arguments);};")
+    ler = ("JSON.stringify((function(){var f=document.querySelector('figure[data-cena=\"icamento\"]'),a=f&&f.__maquete;"
+           "return {api:!!a&&typeof a.frozen==='boolean',dur:a?a.dur:null,congelada:!!a&&a.frozen===true,erros:window.__erros};})())")
+    estado = {}
+    with chromium(390, ("--enable-unsafe-swiftshader",)) as ws:
+        ws.comando("Page.enable")
+        ws.comando("Page.addScriptToEvaluateOnNewDocument", source=espiao)
+        ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/site/index.html")
+        time.sleep(2)
+        ws.avaliar("(function(){var r=document.getElementById('icamento').getBoundingClientRect();"
+                   "window.scrollTo(0,scrollY+r.top+r.height*.4-innerHeight/2);})()")
+        prazo = time.time() + 25
+        while time.time() < prazo:
+            estado = json.loads(ws.avaliar(ler) or "{}")
+            if estado.get("congelada") or estado.get("erros"):
+                break
+            time.sleep(0.5)
+    check(estado.get("api") is True, f"com WebGL, a maquete do içamento precisa montar e expor a API (estado: {estado})")
+    check(estado.get("dur") == 16, f"a cena do içamento dura 16 s (achei {estado.get('dur')})")
+    check(estado.get("congelada") is True, "a maquete do içamento segue o scroll (seek congela o tempo)")
+    check(not estado.get("erros"), f"erros ao montar a maquete: {estado.get('erros')}")
+
+
 def main():
     check(PAGINA.exists(), "portfolio/site/index.html (a história) não existe")
     if PAGINA.exists():
@@ -533,6 +561,7 @@ def main():
         checar_maquetes_js()
         if "--navegador" in sys.argv:
             checar_navegador()
+            checar_maquete_real()
     if FALHAS:
         print("FALHOU:")
         for f in FALHAS:
