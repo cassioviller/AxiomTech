@@ -50,17 +50,17 @@ f.addEventListener('load',function(){
         log('seek25 '+p+'='+tempo(m));
       }
     }
-    // borda entre precisao (c6) e sige (c7): a 48% o meio da tela está em sige; voltando a borda para 95%, está em precisao
-    var c7=d.getElementById('c7');
-    posicionarTopo(w,c7,.48);await espera(500);
+    // borda entre precisao e a cena seguinte (casa): a 48% o meio da tela está em casa; voltando a borda para 95%, está em precisao
+    var seguinte=d.getElementById('precisao').nextElementSibling;
+    posicionarTopo(w,seguinte,.48);await espera(500);
     log('reversao-48 ativa='+H.ativa);
-    posicionarTopo(w,c7,.95);await espera(500);
+    posicionarTopo(w,seguinte,.95);await espera(500);
     log('reversao-95 ativa='+H.ativa);
     // three.js que só chega depois de 1 s de rolagem contínua: a maquete ainda precisa ser sincronizada (e congelada)
     var mz=d.querySelector('figure.maquete[data-passo="zip"]');
     if(mz){
       delete mz.__maquete;
-      centralizar(w,d.getElementById('c4'),.3);await espera(300);
+      centralizar(w,d.getElementById('zip'),.3);await espera(300);
       for(var k=0;k<30;k++){w.scrollBy(0,2);await espera(33);}
       await espera(300);
       mz.__maquete={dur:1000,t:null,seek:function(x){this.t=x;}};

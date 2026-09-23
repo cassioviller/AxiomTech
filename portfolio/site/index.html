@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cássio Viller — a história</title>
-<meta name="description" content="Cássio Viller — orçamento, planejamento e custos. A história em cenas: da contabilidade à obra e aos sistemas que dão origem a cada número.">
+<meta name="description" content="Cássio Viller — orçamento, planejamento e custos. A história na linha do tempo, de 2017 a 2026: contabilidade, obra e os sistemas que dão origem a cada número.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:title" content="Cássio Viller — um número sem origem custa caro na obra">
@@ -19,7 +19,7 @@
 :root{
   --ground:#ECEBE6; --surface:#FFFFFF; --ink:#171F29; --ink-2:#3C4652; --muted:#5B6672;
   --accent:#B5440E; --accent-ink:#FFFFFF; --rule:#D3D1CA;
-  --tinta:#12171D; --scrim:rgba(12,16,21,.78); --texto-cena:#FFFFFF; --ressalva-cena:#D7E1EC; --relogio:#F07A3E;
+  --tinta:#12171D; --scrim:rgba(12,16,21,.78); --texto-cena:#FFFFFF; --ressalva-cena:#D7E1EC; --data-cena:#F2B896; --relogio:#F07A3E;
   --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
   --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -55,6 +55,12 @@ img{max-width:100%;height:auto;display:block}
 .fundo img{width:100%;max-height:60vh;object-fit:cover;border:1px solid var(--rule)}
 .fundo canvas,.fundo .hud{display:none}
 .fundo .pausa{display:none!important}
+.cena{scroll-margin-top:9rem}
+.data{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+.caso{margin:14px 0 0;font-family:var(--mono);font-size:.8rem}
+.caso a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--accent);padding:4px 0}
+.fundo.tipo{display:flex;align-items:center;justify-content:center;min-height:28vh;background:var(--surface);border:1px solid var(--rule);overflow:hidden}
+.fundo.tipo .ano{font-family:var(--display);font-weight:700;font-size:clamp(4rem,18vw,9rem);line-height:1;color:var(--accent);opacity:.3;white-space:nowrap}
 .frase{font-family:var(--display);font-weight:700;font-size:clamp(2rem,6vw,3.6rem);line-height:1.02;letter-spacing:.005em;margin:0;text-wrap:balance}
 .ressalva{font-family:var(--mono);font-size:.86rem;line-height:1.55;color:var(--ink-2);margin:12px 0 0;max-width:62ch}
 .cta{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
@@ -85,14 +91,18 @@ footer a{color:var(--ink)}
 .js-historia .ressalva{color:var(--ressalva-cena);margin:14px auto 0}
 .js-historia .cta{justify-content:center}
 .js-historia .btn.fantasma{color:var(--texto-cena);box-shadow:inset 0 0 0 1.5px var(--texto-cena)}
+.js-historia .data{color:var(--data-cena)}
+.js-historia .caso a{color:var(--texto-cena);border-bottom-color:var(--data-cena)}
+.js-historia .palco .fundo.tipo{min-height:0;background:var(--tinta);border:0;align-items:flex-end;justify-content:flex-start;padding:0 0 3vh 4vw}
+.js-historia .palco .fundo.tipo .ano{font-size:clamp(6rem,26vw,20rem);opacity:.22;color:var(--relogio)}
 @media (prefers-reduced-motion: reduce){.js-historia .palco .fundo,.js-historia .palco .fundo canvas{transition:none}}
 </style>
 </head>
 <body>
-<a class="pular" href="#c1">Pular para o texto</a>
+<a class="pular" href="#tese">Pular para o texto</a>
 <header class="barra">
   <a class="nome" href="portfolio.html">Cássio Viller</a>
-  <span class="cargo">Orçamento, planejamento e custos</span>
+  <span class="cargo">7º semestre de Eng. Civil · orçamento, planejamento e custos · CLT ou PJ</span>
   <nav class="acoes" aria-label="Contato">
     <a href="curriculo-cassio-viller.pdf" target="_blank" rel="noopener">Currículo (PDF)</a>
     <a class="zap" href="https://wa.me/5512982071116?text=Ol%C3%A1%2C%20C%C3%A1ssio.%20Vi%20seu%20portf%C3%B3lio%20e%20quero%20te%20mandar%20uma%20obra%20para%20or%C3%A7ar." target="_blank" rel="noopener">WhatsApp</a>
@@ -102,88 +112,177 @@ footer a{color:var(--ink)}
 <main id="historia" class="historia">
   <div class="palco" aria-hidden="true"></div>
 
-  <section class="cena" id="c1" data-passo="tese">
+  <section class="cena" id="tese" data-passo="tese">
     <figure class="fundo" data-passo="tese" aria-hidden="true"><img src="img/o-quantitativos.webp" alt="" width="1040" height="1000" fetchpriority="high"></figure>
     <div class="texto">
-      <h1 class="frase">Um número sem origem custa caro na obra.</h1>
+      <h1 class="frase" tabindex="-1">Um número sem origem custa caro na obra.</h1>
       <p class="ressalva">Cássio Viller, estudante de Engenharia Civil (7º semestre), mira orçamento, planejamento e custos.</p>
     </div>
   </section>
 
-  <section class="cena" id="c2" data-passo="origem">
+  <section class="cena" id="origem" data-passo="origem">
+    <figure class="fundo tipo" data-passo="origem" aria-hidden="true"><span class="ano">2017</span></figure>
     <div class="texto">
-      <h2 class="frase">Comecei no centavo, não na parede.</h2>
-      <p class="ressalva">Folha, notas e balancete no escritório da família, desde 2017.</p>
+      <p class="data"><time datetime="2017">2017</time> → <time datetime="2024">2024</time></p>
+      <h2 class="frase" tabindex="-1">Comecei no centavo, não na parede.</h2>
+      <p class="ressalva">Escritório contábil da família desde 2017; na UNIFEI, fiscal do DCE em 2022 e diretor de vendas da InLoco Jr. de 2023 a 2024.</p>
+      <p class="caso"><a href="portfolio.html#curriculo">Ver no currículo: contabilidade e UNIFEI →</a></p>
     </div>
   </section>
 
-  <section class="cena" id="c3" data-passo="obra">
-    <figure class="fundo" data-passo="obra" aria-hidden="true"><img src="img/p-fotos.webp" alt="" width="1600" height="1353" loading="lazy"></figure>
+  <section class="cena" id="mudanca" data-passo="mudanca">
+    <figure class="fundo tipo" data-passo="mudanca" aria-hidden="true"><span class="ano">2025</span></figure>
     <div class="texto">
-      <h2 class="frase">Mas na obra, vi a mesma informação digitada cinco vezes.</h2>
-      <p class="ressalva">VEKS Engenharia, V Alves e Estruturas do Vale, entre 2025 e 2026.</p>
+      <p class="data"><time datetime="2025">2025</time></p>
+      <h2 class="frase" tabindex="-1">Em 2025, mudei de cidade e de curso.</h2>
+      <p class="ressalva">Cruzeiro do Sul (EAD), morando em São José dos Campos: hoje no 7º semestre, faltam 3. Sistemas de Informação na PUC, em paralelo.</p>
+      <p class="caso"><a href="portfolio.html#curriculo">Ver no currículo: formação →</a></p>
     </div>
   </section>
 
-  <section class="cena longa" id="c4" data-passo="zip">
-    <figure class="fundo maquete" data-passo="zip" data-cena="36min" aria-hidden="true">
-      <canvas></canvas>
-      <img src="img/upa-plan-grey.webp" alt="" width="1400" height="440" loading="lazy">
-      <div class="hud"><b data-relogio></b><span data-legenda></span></div>
-    </figure>
+  <section class="cena" id="obra" data-passo="obra">
+    <figure class="fundo tipo" data-passo="obra" aria-hidden="true"><span class="ano">5×</span></figure>
     <div class="texto">
-      <h2 class="frase">Do zip à proposta assinável em 36 minutos.</h2>
-      <p class="ressalva">Medidos: 11:35 → 12:11, numa ampliação de unidade de saúde com 26 ambientes e 328 m². À mão, cerca de 2 dias úteis (estimativa).</p>
+      <p class="data"><time datetime="2025-02">fev/2025</time> → <time datetime="2026-03">mar/2026</time></p>
+      <h2 class="frase" tabindex="-1">Mas na obra, vi a mesma informação digitada cinco vezes.</h2>
+      <p class="ressalva">V Alves (gerente de produção, CLT meio período) e Estruturas do Vale (estágio, meio período), em paralelo. No estágio nasceu o SIGE.</p>
+      <p class="caso"><a href="portfolio.html#curriculo">Ver no currículo: V Alves e Estruturas do Vale →</a></p>
     </div>
   </section>
 
-  <section class="cena" id="c5" data-passo="escala">
+  <section class="cena" id="veks" data-passo="veks">
+    <figure class="fundo tipo" data-passo="veks" aria-hidden="true"><span class="ano">2026</span></figure>
+    <div class="texto">
+      <p class="data"><time datetime="2026-03">mar/2026</time> → <time datetime="2026-09">set/2026</time></p>
+      <h2 class="frase" tabindex="-1">Em março de 2026, entrei na VEKS Engenharia.</h2>
+      <p class="ressalva">PJ, contrato de 6 meses cumprido até o fim; a V Alves, em meio período, seguiu até julho.</p>
+      <p class="caso"><a href="portfolio.html#obra">Ver o caso completo: obras na VEKS →</a></p>
+    </div>
+  </section>
+
+  <section class="cena" id="ferramentas" data-passo="ferramentas">
+    <figure class="fundo tipo" data-passo="ferramentas" aria-hidden="true"><span class="ano">3ª</span></figure>
+    <div class="texto">
+      <p class="data"><time datetime="2026-03">mar</time> → <time datetime="2026-04">abr/2026</time></p>
+      <h2 class="frase" tabindex="-1">Toda conta repetida virou ferramenta.</h2>
+      <p class="ressalva">Nos primeiros meses na VEKS: a calculadora de parede em LSF e drywall e o classificador do fluxo de caixa.</p>
+      <p class="caso"><a href="portfolio.html#ferramentas">Ver as ferramentas: calculadora e classificador →</a></p>
+    </div>
+  </section>
+
+  <section class="cena" id="sige" data-passo="sige">
+    <figure class="fundo" data-passo="sige" aria-hidden="true"><img src="img/c-aprovacao.webp" alt="" width="1100" height="467" loading="lazy"></figure>
+    <div class="texto">
+      <p class="data"><time datetime="2026-05">mai</time> → <time datetime="2026-09">set/2026</time></p>
+      <h2 class="frase" tabindex="-1">De maio a setembro, o SIGE ganhou versão nova.</h2>
+      <p class="ressalva">Cerca de 50 módulos em 6 áreas, entregas registradas de 22/07 a 14/09/2026; código escrito com assistente de IA, sob a minha direção.</p>
+      <p class="caso"><a href="portfolio.html#sige">Ver o caso completo: SIGE →</a></p>
+    </div>
+  </section>
+
+  <section class="cena" id="galpoes" data-passo="galpoes">
+    <figure class="fundo tipo" data-passo="galpoes" aria-hidden="true"><span class="ano">22 baias</span></figure>
+    <div class="texto">
+      <p class="data"><time datetime="2026-06-08">jun/2026</time></p>
+      <h2 class="frase" tabindex="-1">Em junho, começou a obra que testaria o SIGE.</h2>
+      <p class="ressalva">Dois galpões e 22 baias numa fazenda, em Light Steel Frame: a obra real do portal do cliente e do diário.</p>
+      <p class="caso"><a href="portfolio.html#obra">Ver o caso completo: galpões e baias →</a></p>
+    </div>
+  </section>
+
+  <section class="cena" id="escala" data-passo="escala">
     <figure class="fundo" data-passo="escala" aria-hidden="true"><img src="img/s1.webp" alt="" width="1000" height="728" loading="lazy"></figure>
     <div class="texto">
-      <h2 class="frase">13 obras no sistema, até R$ 24,5 milhões.</h2>
+      <p class="data"><time datetime="2026-07-09">jul</time> → <time datetime="2026-09-21">set/2026</time></p>
+      <h2 class="frase" tabindex="-1">13 obras no sistema, até R$ 24,5 milhões.</h2>
       <p class="ressalva">11 com proposta; a menor, R$ 29 mil. A gestão de obra deste sistema ainda não rodou numa obra real.</p>
+      <p class="caso"><a href="portfolio.html#sistema">Ver o caso completo: sistema de orçamento →</a></p>
     </div>
   </section>
 
-  <section class="cena" id="c6" data-passo="precisao">
+  <section class="cena" id="precisao" data-passo="precisao">
     <figure class="fundo" data-passo="precisao" aria-hidden="true"><img src="img/o-orcamento.webp" alt="" width="1040" height="1080" loading="lazy"></figure>
     <div class="texto">
-      <h2 class="frase">Desvio máximo de 0,25% nos 19 serviços conferidos.</h2>
+      <p class="data"><time datetime="2026-07-09">jul</time> → <time datetime="2026-09-21">set/2026</time></p>
+      <h2 class="frase" tabindex="-1">Desvio máximo de 0,25% nos 19 serviços conferidos.</h2>
       <p class="ressalva">Serviço a serviço, contra a tabela SINAPI da Caixa; acima de 1% de desvio, a importação é recusada.</p>
+      <p class="caso"><a href="portfolio.html#sistema">Ver o caso completo: conferência SINAPI →</a></p>
     </div>
   </section>
 
-  <section class="cena" id="c7" data-passo="sige">
-    <figure class="fundo" data-passo="sige" aria-hidden="true"><img src="img/p-diario-portal.webp" alt="" width="1600" height="1193" loading="lazy"></figure>
-    <div class="texto">
-      <h2 class="frase">Numa obra real, 23 diários estavam só no WhatsApp.</h2>
-      <p class="ressalva">No SIGE: com eles, a obra vai de 27,6% a 44,7% (60,8% planejado) — lido numa cópia do sistema; no sistema em uso, a carga ainda não foi aplicada.</p>
-    </div>
-  </section>
-
-  <section class="cena longa" id="c8" data-passo="casa">
+  <section class="cena longa" id="casa" data-passo="casa">
     <figure class="fundo maquete" data-passo="casa" data-cena="casa-viaja" aria-hidden="true">
       <canvas></canvas>
       <img src="img/m1.webp" alt="" width="900" height="562" loading="lazy">
       <div class="hud"><b data-relogio></b><span data-legenda></span></div>
     </figure>
     <div class="texto">
-      <h2 class="frase">O celeiro não cabe inteiro no caminhão.</h2>
-      <p class="ressalva">B-36: vai em duas caixas, em três viagens, com 37 decisões registradas.</p>
+      <p class="data"><time datetime="2026-08">ago/2026</time></p>
+      <h2 class="frase" tabindex="-1">O celeiro não cabe inteiro no caminhão.</h2>
+      <p class="ressalva">B-36, pré-dimensionado e sujeito à revisão do engenheiro responsável: duas caixas, três viagens, 37 decisões registradas.</p>
+      <p class="caso"><a href="portfolio.html#modular">Ver o caso completo: celeiro B-36 →</a></p>
     </div>
   </section>
 
-  <section class="cena" id="c9" data-passo="metodo">
+  <section class="cena longa" id="icamento" data-passo="icamento">
+    <figure class="fundo maquete" data-passo="icamento" data-cena="icamento" aria-hidden="true">
+      <canvas></canvas>
+      <img src="img/m2.webp" alt="" width="900" height="562" loading="lazy">
+      <div class="hud"><b data-relogio></b><span data-legenda></span></div>
+    </figure>
+    <div class="texto">
+      <p class="data"><time datetime="2026-08">ago/2026</time></p>
+      <h2 class="frase" tabindex="-1">O módulo sobe pelo balancim, com os cabos na vertical.</h2>
+      <p class="ressalva">Assim a parede não é comprimida; balancim de içamento e guindaste da classe certa viraram itens de regra no orçamento.</p>
+      <p class="caso"><a href="portfolio.html#modular">Ver o caso completo: casas modulares →</a></p>
+    </div>
+  </section>
+
+  <section class="cena" id="whatsapp" data-passo="whatsapp">
+    <figure class="fundo" data-passo="whatsapp" aria-hidden="true"><img src="img/p-fotos.webp" alt="" width="1600" height="1353" loading="lazy"></figure>
+    <div class="texto">
+      <p class="data"><time datetime="2026-08-11">ago/2026</time></p>
+      <h2 class="frase" tabindex="-1">Depois de 11/08, o diário saiu do sistema.</h2>
+      <p class="ressalva">42 diários lançados até ali; os 23 dias seguintes ficaram só no grupo de WhatsApp, e 28 atividades prontas apareciam como atrasadas.</p>
+      <p class="caso"><a href="portfolio.html#sige">Ver o caso completo: o diário no WhatsApp →</a></p>
+    </div>
+  </section>
+
+  <section class="cena" id="recuperado" data-passo="recuperado">
+    <figure class="fundo" data-passo="recuperado" aria-hidden="true"><img src="img/p-diario-portal.webp" alt="" width="1600" height="1193" loading="lazy"></figure>
+    <div class="texto">
+      <p class="data"><time datetime="2026-09">set/2026</time></p>
+      <h2 class="frase" tabindex="-1">Recuperado, o diário mostrou 44,7% de avanço.</h2>
+      <p class="ressalva">Antes, 27,6%; planejado para 07/09, 60,8%. Lido numa cópia do sistema; no sistema em uso, a carga ainda não foi aplicada.</p>
+      <p class="caso"><a href="portfolio.html#sige">Ver o caso completo: diários recuperados →</a></p>
+    </div>
+  </section>
+
+  <section class="cena longa" id="zip" data-passo="zip">
+    <figure class="fundo maquete" data-passo="zip" data-cena="36min" aria-hidden="true">
+      <canvas></canvas>
+      <img src="img/upa-plan-grey.webp" alt="" width="1400" height="440" loading="lazy">
+      <div class="hud"><b data-relogio></b><span data-legenda></span></div>
+    </figure>
+    <div class="texto">
+      <p class="data"><time datetime="2026-09">set/2026</time></p>
+      <h2 class="frase" tabindex="-1">Em setembro, uma proposta assinável em 36 minutos.</h2>
+      <p class="ressalva">Medidos: 11:35 → 12:11, numa ampliação de unidade de saúde com 26 ambientes e 328 m². À mão, cerca de 2 dias úteis (estimativa).</p>
+      <p class="caso"><a href="portfolio.html#orcamento">Ver o caso completo: 36 minutos →</a></p>
+    </div>
+  </section>
+
+  <section class="cena" id="metodo" data-passo="metodo">
     <figure class="fundo" data-passo="metodo" aria-hidden="true"><img src="img/o-proposta.webp" alt="" width="885" height="1060" loading="lazy"></figure>
     <div class="texto">
-      <h2 class="frase">Construí o jeito de o número não sumir.</h2>
-      <p class="ressalva">Idealizei e dirigi os sistemas; o código foi escrito com assistentes de IA, e as regras, os testes e a revisão são meus.</p>
+      <h2 class="frase" tabindex="-1">Construí o jeito de o número não sumir.</h2>
+      <p class="ressalva">De 2017 a 2026: contabilidade, obra e sistemas. Idealizei e dirigi; o código foi escrito com assistentes de IA, e as regras e a revisão são meus.</p>
     </div>
   </section>
 
-  <section class="cena" id="c10" data-passo="convite">
+  <section class="cena" id="convite" data-passo="convite">
     <div class="texto">
-      <h2 class="frase">Faltam 3 semestres para o diploma. Não falta obra feita.</h2>
+      <h2 class="frase" tabindex="-1">Faltam 3 semestres para o diploma. Não falta obra feita.</h2>
       <p class="ressalva">Você me manda o pacote do projeto; eu devolvo levantamento, orçamento com faixa e proposta no seu modelo.</p>
       <p class="cta">
         <a class="btn" href="https://wa.me/5512982071116?text=Ol%C3%A1%2C%20C%C3%A1ssio.%20Vi%20seu%20portf%C3%B3lio%20e%20quero%20te%20mandar%20uma%20obra%20para%20or%C3%A7ar." target="_blank" rel="noopener">Me mande uma obra ↗</a>

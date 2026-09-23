@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Checagens da página principal, site/index.html (a história em cenas).
+"""Checagens da página principal, site/index.html (a história na linha do tempo).
 
-Estático: roteiro exato, ressalvas, números (só os que o portfólio, site/portfolio.html, já sustenta),
-marcação acessível e CSS. Com --navegador (a partir da Task 2): o Chromium headless
-abre tests/historia_teste.html e confere a troca de cenas.
+Estático: roteiro exato dos 17 capítulos, datas e ordem cronológica, ressalvas,
+números (só os que o portfólio, site/portfolio.html, já sustenta), links para o
+caso completo, marcação acessível e CSS. Com --navegador: o Chromium headless
+abre tests/historia_teste.html em tempo real e confere a troca de cenas.
 Uso: python3 portfolio/tests/check_historia.py [--navegador]
 """
 import base64
@@ -24,43 +25,91 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]  # portfolio/
 SITE = ROOT / "site"
 PAGINA = SITE / "index.html"
+PORTFOLIO = SITE / "portfolio.html"
 FALHAS = []
 
-# (passo, tag da frase, frase, ressalva, imagem de fundo, largura, altura, cena 3D do maquetes.js)
+
+def cap(passo, tag, data, frase, ressalva, fundo, caso):
+    """data: None ou (texto visível, [datetime, ...]); fundo: None, ("img", arquivo, largura, altura),
+    ("ano", texto) ou ("maquete", cena 3D, arquivo reserva, largura, altura); caso: None ou (âncora, texto do link)."""
+    return {"passo": passo, "tag": tag, "data": data, "frase": frase, "ressalva": ressalva, "fundo": fundo, "caso": caso}
+
+
 ROTEIRO = [
-    ("tese", "h1", "Um número sem origem custa caro na obra.",
-     "Cássio Viller, estudante de Engenharia Civil (7º semestre), mira orçamento, planejamento e custos.",
-     "o-quantitativos.webp", 1040, 1000, None),
-    ("origem", "h2", "Comecei no centavo, não na parede.",
-     "Folha, notas e balancete no escritório da família, desde 2017.",
-     None, 0, 0, None),
-    ("obra", "h2", "Mas na obra, vi a mesma informação digitada cinco vezes.",
-     "VEKS Engenharia, V Alves e Estruturas do Vale, entre 2025 e 2026.",
-     "p-fotos.webp", 1600, 1353, None),
-    ("zip", "h2", "Do zip à proposta assinável em 36 minutos.",
-     "Medidos: 11:35 → 12:11, numa ampliação de unidade de saúde com 26 ambientes e 328 m². À mão, cerca de 2 dias úteis (estimativa).",
-     "upa-plan-grey.webp", 1400, 440, "36min"),
-    ("escala", "h2", "13 obras no sistema, até R$ 24,5 milhões.",
-     "11 com proposta; a menor, R$ 29 mil. A gestão de obra deste sistema ainda não rodou numa obra real.",
-     "s1.webp", 1000, 728, None),
-    ("precisao", "h2", "Desvio máximo de 0,25% nos 19 serviços conferidos.",
-     "Serviço a serviço, contra a tabela SINAPI da Caixa; acima de 1% de desvio, a importação é recusada.",
-     "o-orcamento.webp", 1040, 1080, None),
-    ("sige", "h2", "Numa obra real, 23 diários estavam só no WhatsApp.",
-     "No SIGE: com eles, a obra vai de 27,6% a 44,7% (60,8% planejado) — lido numa cópia do sistema; no sistema em uso, a carga ainda não foi aplicada.",
-     "p-diario-portal.webp", 1600, 1193, None),
-    ("casa", "h2", "O celeiro não cabe inteiro no caminhão.",
-     "B-36: vai em duas caixas, em três viagens, com 37 decisões registradas.",
-     "m1.webp", 900, 562, "casa-viaja"),
-    ("metodo", "h2", "Construí o jeito de o número não sumir.",
-     "Idealizei e dirigi os sistemas; o código foi escrito com assistentes de IA, e as regras, os testes e a revisão são meus.",
-     "o-proposta.webp", 885, 1060, None),
-    ("convite", "h2", "Faltam 3 semestres para o diploma. Não falta obra feita.",
-     "Você me manda o pacote do projeto; eu devolvo levantamento, orçamento com faixa e proposta no seu modelo.",
-     None, 0, 0, None),
+    cap("tese", "h1", None,
+        "Um número sem origem custa caro na obra.",
+        "Cássio Viller, estudante de Engenharia Civil (7º semestre), mira orçamento, planejamento e custos.",
+        ("img", "o-quantitativos.webp", 1040, 1000), None),
+    cap("origem", "h2", ("2017 → 2024", ["2017", "2024"]),
+        "Comecei no centavo, não na parede.",
+        "Escritório contábil da família desde 2017; na UNIFEI, fiscal do DCE em 2022 e diretor de vendas da InLoco Jr. de 2023 a 2024.",
+        ("ano", "2017"), ("curriculo", "Ver no currículo: contabilidade e UNIFEI →")),
+    cap("mudanca", "h2", ("2025", ["2025"]),
+        "Em 2025, mudei de cidade e de curso.",
+        "Cruzeiro do Sul (EAD), morando em São José dos Campos: hoje no 7º semestre, faltam 3. Sistemas de Informação na PUC, em paralelo.",
+        ("ano", "2025"), ("curriculo", "Ver no currículo: formação →")),
+    cap("obra", "h2", ("fev/2025 → mar/2026", ["2025-02", "2026-03"]),
+        "Mas na obra, vi a mesma informação digitada cinco vezes.",
+        "V Alves (gerente de produção, CLT meio período) e Estruturas do Vale (estágio, meio período), em paralelo. No estágio nasceu o SIGE.",
+        ("ano", "5×"), ("curriculo", "Ver no currículo: V Alves e Estruturas do Vale →")),
+    cap("veks", "h2", ("mar/2026 → set/2026", ["2026-03", "2026-09"]),
+        "Em março de 2026, entrei na VEKS Engenharia.",
+        "PJ, contrato de 6 meses cumprido até o fim; a V Alves, em meio período, seguiu até julho.",
+        ("ano", "2026"), ("obra", "Ver o caso completo: obras na VEKS →")),
+    cap("ferramentas", "h2", ("mar → abr/2026", ["2026-03", "2026-04"]),
+        "Toda conta repetida virou ferramenta.",
+        "Nos primeiros meses na VEKS: a calculadora de parede em LSF e drywall e o classificador do fluxo de caixa.",
+        ("ano", "3ª"), ("ferramentas", "Ver as ferramentas: calculadora e classificador →")),
+    cap("sige", "h2", ("mai → set/2026", ["2026-05", "2026-09"]),
+        "De maio a setembro, o SIGE ganhou versão nova.",
+        "Cerca de 50 módulos em 6 áreas, entregas registradas de 22/07 a 14/09/2026; código escrito com assistente de IA, sob a minha direção.",
+        ("img", "c-aprovacao.webp", 1100, 467), ("sige", "Ver o caso completo: SIGE →")),
+    cap("galpoes", "h2", ("jun/2026", ["2026-06-08"]),
+        "Em junho, começou a obra que testaria o SIGE.",
+        "Dois galpões e 22 baias numa fazenda, em Light Steel Frame: a obra real do portal do cliente e do diário.",
+        ("ano", "22 baias"), ("obra", "Ver o caso completo: galpões e baias →")),
+    cap("escala", "h2", ("jul → set/2026", ["2026-07-09", "2026-09-21"]),
+        "13 obras no sistema, até R$ 24,5 milhões.",
+        "11 com proposta; a menor, R$ 29 mil. A gestão de obra deste sistema ainda não rodou numa obra real.",
+        ("img", "s1.webp", 1000, 728), ("sistema", "Ver o caso completo: sistema de orçamento →")),
+    cap("precisao", "h2", ("jul → set/2026", ["2026-07-09", "2026-09-21"]),
+        "Desvio máximo de 0,25% nos 19 serviços conferidos.",
+        "Serviço a serviço, contra a tabela SINAPI da Caixa; acima de 1% de desvio, a importação é recusada.",
+        ("img", "o-orcamento.webp", 1040, 1080), ("sistema", "Ver o caso completo: conferência SINAPI →")),
+    cap("casa", "h2", ("ago/2026", ["2026-08"]),
+        "O celeiro não cabe inteiro no caminhão.",
+        "B-36, pré-dimensionado e sujeito à revisão do engenheiro responsável: duas caixas, três viagens, 37 decisões registradas.",
+        ("maquete", "casa-viaja", "m1.webp", 900, 562), ("modular", "Ver o caso completo: celeiro B-36 →")),
+    cap("icamento", "h2", ("ago/2026", ["2026-08"]),
+        "O módulo sobe pelo balancim, com os cabos na vertical.",
+        "Assim a parede não é comprimida; balancim de içamento e guindaste da classe certa viraram itens de regra no orçamento.",
+        ("maquete", "icamento", "m2.webp", 900, 562), ("modular", "Ver o caso completo: casas modulares →")),
+    cap("whatsapp", "h2", ("ago/2026", ["2026-08-11"]),
+        "Depois de 11/08, o diário saiu do sistema.",
+        "42 diários lançados até ali; os 23 dias seguintes ficaram só no grupo de WhatsApp, e 28 atividades prontas apareciam como atrasadas.",
+        ("img", "p-fotos.webp", 1600, 1353), ("sige", "Ver o caso completo: o diário no WhatsApp →")),
+    cap("recuperado", "h2", ("set/2026", ["2026-09"]),
+        "Recuperado, o diário mostrou 44,7% de avanço.",
+        "Antes, 27,6%; planejado para 07/09, 60,8%. Lido numa cópia do sistema; no sistema em uso, a carga ainda não foi aplicada.",
+        ("img", "p-diario-portal.webp", 1600, 1193), ("sige", "Ver o caso completo: diários recuperados →")),
+    cap("zip", "h2", ("set/2026", ["2026-09"]),
+        "Em setembro, uma proposta assinável em 36 minutos.",
+        "Medidos: 11:35 → 12:11, numa ampliação de unidade de saúde com 26 ambientes e 328 m². À mão, cerca de 2 dias úteis (estimativa).",
+        ("maquete", "36min", "upa-plan-grey.webp", 1400, 440), ("orcamento", "Ver o caso completo: 36 minutos →")),
+    cap("metodo", "h2", None,
+        "Construí o jeito de o número não sumir.",
+        "De 2017 a 2026: contabilidade, obra e sistemas. Idealizei e dirigi; o código foi escrito com assistentes de IA, e as regras e a revisão são meus.",
+        ("img", "o-proposta.webp", 885, 1060), None),
+    cap("convite", "h2", None,
+        "Faltam 3 semestres para o diploma. Não falta obra feita.",
+        "Você me manda o pacote do projeto; eu devolvo levantamento, orçamento com faixa e proposta no seu modelo.",
+        None, None),
 ]
 
-RESSALVAS = ["estimativa", "ainda não rodou", "nos 19 serviços conferidos", "cópia do sistema", "assistentes de IA"]
+RESSALVAS = ["estimativa", "ainda não rodou", "nos 19 serviços conferidos", "cópia do sistema", "assistentes de IA",
+             "em paralelo", "pré-dimensionado", "sujeito à revisão do engenheiro responsável",
+             "no sistema em uso, a carga ainda não foi aplicada"]
+PROIBIDOS = ["3,40"]
 PALAVRAS_CHAVE = ["quantitativos", "SINAPI", "BDI", "cronograma físico-financeiro", "curva S", "medição", "cotação"]
 WHATSAPP = "https://wa.me/5512982071116"
 CURRICULO = "curriculo-cassio-viller.pdf"
@@ -91,7 +140,13 @@ def atributos(tag):
 
 def cenas(pagina):
     """(classes, id, passo, html interno) de cada <section class="cena…">."""
-    return re.findall(r'<section class="(cena(?: longa)?)" id="(c\d+)" data-passo="([a-z0-9]+)">(.*?)</section>', pagina, flags=re.S)
+    return re.findall(r'<section class="(cena(?: longa)?)" id="([a-z0-9]+)" data-passo="([a-z0-9]+)">(.*?)</section>', pagina, flags=re.S)
+
+
+def data_iso(dt):
+    """'2025' → '2025-01-01'; '2026-08' → '2026-08-01' (para comparar datas de precisões diferentes)."""
+    partes = dt.split("-")
+    return "-".join(partes + ["01"] * (3 - len(partes)))
 
 
 def _lin(c):
@@ -104,63 +159,96 @@ def contraste(a, b):
     return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
 
 
-def checar_marcacao(pagina):
+def checar_fundo(passo, i, fundo, miolo):
+    figs = re.findall(r"<figure ([^>]*)>(.*?)</figure>", miolo, re.S)
+    if fundo is None:
+        check(not figs, f"cena {passo}: não deveria ter figura de fundo")
+        return
+    check(len(figs) == 1, f"cena {passo}: esperava 1 figura de fundo, achei {len(figs)}")
+    if not figs:
+        return
+    fa, fmiolo = atributos(figs[0][0]), figs[0][1]
+    tipo = fundo[0]
+    classe = {"img": "fundo", "ano": "fundo tipo", "maquete": "fundo maquete"}[tipo]
+    check(fa.get("class") == classe, f"cena {passo}: classe da figura {fa.get('class')!r}, esperava {classe!r}")
+    check(fa.get("aria-hidden") == "true", f"cena {passo}: figura de fundo sem aria-hidden=\"true\"")
+    check(fa.get("data-passo") == passo, f"cena {passo}: figura com data-passo {fa.get('data-passo')!r}")
+    check(fa.get("data-cena") == (fundo[1] if tipo == "maquete" else None), f"cena {passo}: data-cena {fa.get('data-cena')!r}")
+    check(not re.search(r"<(a|button|input|select|textarea)\b", fmiolo), f"cena {passo}: nada focável dentro da figura aria-hidden")
+    if tipo == "ano":
+        check(f'<span class="ano">{fundo[1]}</span>' in fmiolo and "<img" not in fmiolo,
+              f"cena {passo}: fundo tipográfico deve ser só <span class=\"ano\">{fundo[1]}</span>")
+        return
+    arquivo, largura, altura = (fundo[1], fundo[2], fundo[3]) if tipo == "img" else (fundo[2], fundo[3], fundo[4])
+    imgs = re.findall(r"<img ([^>]*)>", fmiolo)
+    check(len(imgs) == 1, f"cena {passo}: esperava 1 <img> na figura")
+    if imgs:
+        ia = atributos(imgs[0])
+        check(ia.get("src") == f"img/{arquivo}", f"cena {passo}: imagem {ia.get('src')!r}, esperava img/{arquivo}")
+        check((SITE / "img" / arquivo).exists(), f"cena {passo}: img/{arquivo} não existe")
+        check(ia.get("alt") == "", f"cena {passo}: imagem decorativa precisa de alt=\"\"")
+        check(ia.get("width") == str(largura) and ia.get("height") == str(altura), f"cena {passo}: width/height devem ser {largura}×{altura}")
+        if i == 1:
+            check(ia.get("fetchpriority") == "high" and "loading" not in ia, "cena 1: imagem com fetchpriority=\"high\" e sem loading")
+        else:
+            check(ia.get("loading") == "lazy" and "fetchpriority" not in ia, f"cena {passo}: imagem com loading=\"lazy\" e sem fetchpriority")
+    if tipo == "maquete":
+        check("<canvas></canvas>" in fmiolo, f"cena {passo}: maquete sem <canvas>")
+        check("<b data-relogio></b>" in fmiolo and "<span data-legenda></span>" in fmiolo, f"cena {passo}: maquete sem HUD")
+
+
+def checar_marcacao(pagina, portfolio):
     cs = cenas(pagina)
     check(len(cs) == len(ROTEIRO), f"esperava {len(ROTEIRO)} cenas, achei {len(cs)}")
-    for i, (esperado, achado) in enumerate(zip(ROTEIRO, cs), start=1):
-        passo, tag, frase, ressalva, imagem, largura, altura, maquete = esperado
+    ancoras = set(re.findall(r'\bid="([^"]+)"', portfolio))
+    nomes_caso = {}
+    for i, (c, achado) in enumerate(zip(ROTEIRO, cs), start=1):
         classes, ident, passo_html, miolo = achado
-        check(ident == f"c{i}", f"cena {i}: id {ident!r}, esperava 'c{i}'")
-        check(passo_html == passo, f"cena {i}: data-passo {passo_html!r}, esperava {passo!r}")
-        check((classes == "cena longa") == bool(maquete), f"cena {passo}: a classe 'longa' vai só nas cenas de maquete")
-        m = re.search(r'<(h[12]) class="frase">(.*?)</\1>', miolo, re.S)
-        check(m is not None and m.group(1) == tag, f"cena {passo}: a frase deve ser <{tag} class=\"frase\">")
+        passo = c["passo"]
+        check(ident == passo and passo_html == passo, f"cena {i}: id/data-passo {ident!r}/{passo_html!r}, esperava {passo!r}")
+        longa = c["fundo"] is not None and c["fundo"][0] == "maquete"
+        check((classes == "cena longa") == longa, f"cena {passo}: a classe 'longa' vai só nas cenas de maquete")
+        m = re.search(r'<(h[12]) class="frase" tabindex="-1">(.*?)</\1>', miolo, re.S)
+        check(m is not None and m.group(1) == c["tag"], f"cena {passo}: a frase deve ser <{c['tag']} class=\"frase\" tabindex=\"-1\">")
         if m:
-            check(limpo(m.group(2)) == frase, f"cena {passo}: frase {limpo(m.group(2))!r} ≠ roteiro {frase!r}")
+            check(limpo(m.group(2)) == c["frase"], f"cena {passo}: frase {limpo(m.group(2))!r} ≠ roteiro {c['frase']!r}")
         r = re.search(r'<p class="ressalva">(.*?)</p>', miolo, re.S)
-        check(r is not None and limpo(r.group(1)) == ressalva, f"cena {passo}: ressalva diferente do roteiro")
+        check(r is not None and limpo(r.group(1)) == c["ressalva"], f"cena {passo}: ressalva diferente do roteiro")
         tx = re.search(r'<div class="texto"([^>]*)>', miolo)
         check(tx is not None and "aria-hidden" not in tx.group(1), f"cena {passo}: <div class=\"texto\"> ausente ou com aria-hidden")
-        figs = re.findall(r"<figure ([^>]*)>(.*?)</figure>", miolo, re.S)
-        if imagem is None:
-            check(not figs, f"cena {passo}: não deveria ter figura de fundo")
-            continue
-        check(len(figs) == 1, f"cena {passo}: esperava 1 figura de fundo, achei {len(figs)}")
-        if not figs:
-            continue
-        fa, fmiolo = atributos(figs[0][0]), figs[0][1]
-        check(fa.get("aria-hidden") == "true", f"cena {passo}: figura de fundo sem aria-hidden=\"true\"")
-        check(fa.get("data-passo") == passo, f"cena {passo}: figura com data-passo {fa.get('data-passo')!r}")
-        check(fa.get("class") == ("fundo maquete" if maquete else "fundo"), f"cena {passo}: classe da figura {fa.get('class')!r}")
-        check(fa.get("data-cena") == maquete, f"cena {passo}: data-cena {fa.get('data-cena')!r}, esperava {maquete!r}")
-        check(not re.search(r"<(a|button|input|select|textarea)\b", fmiolo), f"cena {passo}: nada focável dentro da figura aria-hidden")
-        imgs = re.findall(r"<img ([^>]*)>", fmiolo)
-        check(len(imgs) == 1, f"cena {passo}: esperava 1 <img> na figura")
-        if imgs:
-            ia = atributos(imgs[0])
-            check(ia.get("src") == f"img/{imagem}", f"cena {passo}: imagem {ia.get('src')!r}, esperava img/{imagem}")
-            check((SITE / "img" / imagem).exists(), f"cena {passo}: img/{imagem} não existe")
-            check(ia.get("alt") == "", f"cena {passo}: imagem decorativa precisa de alt=\"\"")
-            check(ia.get("width") == str(largura) and ia.get("height") == str(altura),
-                  f"cena {passo}: width/height devem ser {largura}×{altura}")
-            if i == 1:
-                check(ia.get("fetchpriority") == "high" and "loading" not in ia, "cena 1: imagem com fetchpriority=\"high\" e sem loading")
-            else:
-                check(ia.get("loading") == "lazy" and "fetchpriority" not in ia, f"cena {passo}: imagem com loading=\"lazy\" e sem fetchpriority")
-        if maquete:
-            check("<canvas></canvas>" in fmiolo, f"cena {passo}: maquete sem <canvas>")
-            check("<b data-relogio></b>" in fmiolo and "<span data-legenda></span>" in fmiolo,
-                  f"cena {passo}: maquete sem HUD (data-relogio e data-legenda)")
+        d = re.search(r'<p class="data">(.*?)</p>', miolo, re.S)
+        if c["data"] is None:
+            check(d is None, f"cena {passo}: moldura não leva data")
+        else:
+            texto, datas = c["data"]
+            check(d is not None and limpo(d.group(1)) == texto, f"cena {passo}: data visível deve ser {texto!r}")
+            if d:
+                check(re.findall(r'<time datetime="([\d-]+)">', d.group(1)) == datas, f"cena {passo}: <time datetime> devem ser {datas}")
+        k = re.search(r'<p class="caso"><a href="portfolio\.html#([a-z]+)">(.*?)</a></p>', miolo, re.S)
+        if c["caso"] is None:
+            check('class="caso"' not in miolo, f"cena {passo}: moldura não leva link de caso")
+        else:
+            ancora, nome = c["caso"]
+            check(k is not None and k.group(1) == ancora and limpo(k.group(2)) == nome,
+                  f"cena {passo}: link do caso deve ser portfolio.html#{ancora} com o texto {nome!r}")
+            check(ancora in ancoras, f"cena {passo}: a âncora #{ancora} não existe no portfolio.html")
+            check(nome not in nomes_caso, f"cena {passo}: nome de link repetido {nome!r}")
+            nomes_caso[nome] = ancora
+        checar_fundo(passo, i, c["fundo"], miolo)
+    datadas = [data_iso(c["data"][1][0]) for c in ROTEIRO if c["data"]]
+    check(datadas == sorted(datadas), f"capítulos fora da ordem cronológica: {datadas}")
     check('<main id="historia" class="historia">' in pagina, "falta <main id=\"historia\" class=\"historia\">")
     check('<div class="palco" aria-hidden="true"></div>' in pagina, "falta o palco vazio com aria-hidden")
     primeiro = re.search(r"<a ([^>]*)>", corpo(pagina))
-    check(primeiro is not None and 'class="pular"' in primeiro.group(1), "o primeiro link da página deve ser o 'Pular para o texto'")
+    check(primeiro is not None and 'class="pular"' in primeiro.group(1) and 'href="#tese"' in primeiro.group(1),
+          "o primeiro link da página deve ser o 'Pular para o texto' (href=\"#tese\")")
     barra = re.search(r'<header class="barra">(.*?)</header>', pagina, re.S)
     check(barra is not None, "falta <header class=\"barra\">")
     if barra:
-        tb = barra.group(1)
-        check("Cássio Viller" in limpo(tb) and "Orçamento, planejamento e custos" in limpo(tb), "barra sem nome ou cargo-alvo")
-        check(f'href="{CURRICULO}"' in tb and f'href="{WHATSAPP}' in tb, "barra sem currículo ou WhatsApp")
+        tb = limpo(barra.group(1))
+        for trecho in ("Cássio Viller", "7º semestre de Eng. Civil", "orçamento, planejamento e custos", "CLT ou PJ"):
+            check(trecho in tb, f"barra sem {trecho!r}")
+        check(f'href="{CURRICULO}"' in barra.group(1) and f'href="{WHATSAPP}' in barra.group(1), "barra sem currículo ou WhatsApp")
     ultima = cs[-1][3] if cs else ""
     for alvo in (WHATSAPP, "portfolio.html", CURRICULO):
         check(f'href="{alvo}' in ultima, f"cena final sem link para {alvo}")
@@ -171,15 +259,19 @@ def checar_marcacao(pagina):
             check(p in limpo(ficha.group(1)), f"ficha sem a palavra-chave {p!r}")
 
 
-def checar_texto(pagina, index):
-    for passo, _tag, frase, ressalva, *_resto in ROTEIRO:
-        check(len(frase.split()) <= 10, f"cena {passo}: frase com {len(frase.split())} palavras (máx. 10)")
-        check(0 < len(ressalva.split()) <= 30, f"cena {passo}: ressalva com {len(ressalva.split())} palavras (1 a 30)")
+def checar_texto(pagina, portfolio):
+    for c in ROTEIRO:
+        check(len(c["frase"].split()) <= 10, f"cena {c['passo']}: frase com {len(c['frase'].split())} palavras (máx. 10)")
+        check(0 < len(c["ressalva"].split()) <= 30, f"cena {c['passo']}: ressalva com {len(c['ressalva'].split())} palavras (1 a 30)")
+    mas = sum(1 for c in ROTEIRO for w in re.findall(r"\w+", c["frase"].lower()) if w == "mas")
+    check(mas == 1, f"\"mas\" deve aparecer uma vez só entre as frases grandes (achei {mas})")
     t = limpo(corpo(pagina))
-    extras = numeros(t) - numeros(limpo(corpo(index)))
+    extras = numeros(t) - numeros(limpo(corpo(portfolio)))
     check(not extras, f"números que o portfólio não sustenta: {sorted(extras)}")
     for r in RESSALVAS:
         check(r in t, f"ressalva ausente: {r!r}")
+    for p in PROIBIDOS:
+        check(p not in t, f"texto proibido na página: {p!r}")
     check(t.lower().count("você") == 1, "\"você\" deve aparecer uma vez só, no convite final")
 
 
@@ -193,13 +285,14 @@ def checar_css(pagina):
     check(".js-historia .historia{max-width:none;padding:0;position:relative;background:var(--tinta)}" in css,
           "no modo cenas o fundo da história é tinta: sem faixa clara quando a barra do navegador recolhe (svh < lvh)")
     check(".fundo .pausa{display:none!important}" in css, "o botão de pausa da maquete não pode ficar focável dentro do fundo aria-hidden")
+    check(".cena{scroll-margin-top:9rem}" in css, "o título do capítulo não pode ficar atrás da barra ao chegar por salto")
     m = re.search(r"--scrim:\s*rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)", css)
     check(m is not None, "falta --scrim: rgba(...)")
     if not m:
         return
     r, g, b, a = int(m.group(1)), int(m.group(2)), int(m.group(3)), float(m.group(4))
     fundo = tuple(round(255 * (1 - a) + c * a) for c in (r, g, b))  # pior caso: pixel branco sob a faixa
-    for var in ("--texto-cena", "--ressalva-cena"):
+    for var in ("--texto-cena", "--ressalva-cena", "--data-cena"):
         cor = re.search(var + r":\s*#([0-9A-Fa-f]{6})", css)
         check(cor is not None, f"falta {var}")
         if cor:
@@ -216,6 +309,23 @@ def checar_scripts(pagina):
     check("<script>" not in pagina, "sem script inline")
 
 
+CURRICULO_TXT = ROOT / "curriculo" / "curriculo-cassio-viller.txt"
+# (trecho da história, trecho do currículo em PDF): as datas precisam bater nos dois
+DATAS_CV = [("fev/2025 → mar/2026", "02/2025 – 07/2026"), ("fev/2025 → mar/2026", "04/2025 – 03/2026"),
+            ("mar/2026 → set/2026", "03/2026 – 09/2026"), ("de 2023 a 2024", "03/2023 – 12/2024"),
+            ("DCE em 2022", "DCE UNIFEI (2022)")]
+
+
+def checar_curriculo(pagina):
+    check(CURRICULO_TXT.exists(), "portfolio/curriculo/curriculo-cassio-viller.txt não existe (gerado pelo build.sh)")
+    if not CURRICULO_TXT.exists():
+        return
+    cv = " ".join(CURRICULO_TXT.read_text(encoding="utf-8").split())
+    t = limpo(corpo(pagina))
+    for na_pagina, no_cv in DATAS_CV:
+        check(na_pagina in t and no_cv in cv, f"datas da história e do currículo divergem: {na_pagina!r} × {no_cv!r}")
+
+
 PORTA = 5056
 PORTA_CDP = 9333
 
@@ -226,9 +336,14 @@ def checar_js():
     if not caminho.exists():
         return
     js = re.sub(r"//[^\n]*", "", caminho.read_text(encoding="utf-8"))  # comentários não contam
-    for proibido in ("scrollTo", "scrollBy", "scrollIntoView", "preventDefault", "'wheel'", "'touchmove'"):
-        check(proibido not in js, f"historia.js não pode usar {proibido} (rolagem nativa)")
+    for proibido in ("scrollTo", "scrollBy", "scrollIntoView", "preventDefault", "'wheel'", "'touchmove'", "aria-live"):
+        check(proibido not in js, f"historia.js não pode usar {proibido}")
     check("fps" not in js.lower() and "matar" not in js, "historia.js não duplica a guarda de desempenho do maquetes.js")
+
+
+def checar_maquetes_js():
+    js = (SITE / "maquetes.js").read_text(encoding="utf-8")
+    check("dur:sc.dur" in js, "maquetes.js precisa expor a duração da cena em fig.__maquete.dur")
 
 
 class WS:
@@ -323,10 +438,10 @@ def chromium(largura, extra=()):
 
 
 def navegador(largura=390, extra=("--disable-3d-apis",)):
-    """Roda o harness e devolve as linhas do <pre id="resultado"> (espera até 60 s pelo FIM)."""
+    """Roda o harness e devolve as linhas do <pre id="resultado"> (espera até 150 s pelo FIM)."""
     with chromium(largura, extra) as ws:
         ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/tests/historia_teste.html")
-        prazo = time.time() + 60
+        prazo = time.time() + 150
         texto = ""
         while time.time() < prazo:
             texto = ws.avaliar("(document.getElementById('resultado')||{}).textContent||''") or ""
@@ -337,14 +452,15 @@ def navegador(largura=390, extra=("--disable-3d-apis",)):
 
 
 def checar_navegador():
-    maquetes = {p for p, *_resto, maq in ROTEIRO if maq}
+    maquetes = [c["passo"] for c in ROTEIRO if c["fundo"] and c["fundo"][0] == "maquete"]
     normal = navegador(390)
     check("FIM" in normal, f"390 px: o harness não terminou — últimas linhas {normal[-3:]}")
     for linha in ("reduzido=false", "js-historia=true", "overflow-x=false", "inicio ativa=tese", "salto ativa=tese maquetes=-",
-                  "reversao-48 ativa=sige", "reversao-95 ativa=precisao"):
+                  "reversao-48 ativa=casa", "reversao-95 ativa=precisao"):
         check(linha in normal, f"390 px: faltou {linha!r}")
-    for passo, _tag, _frase, _ressalva, imagem, *_resto in ROTEIRO:
-        fundo = passo if imagem else "nenhum"
+    for c in ROTEIRO:
+        passo = c["passo"]
+        fundo = passo if c["fundo"] else "nenhum"
         maq = passo if passo in maquetes else "-"
         esperado = f"cena {passo} ativa={passo} fundo={fundo} maquetes={maq}"
         check(esperado in normal, f"390 px: esperava {esperado!r}")
@@ -355,33 +471,29 @@ def checar_navegador():
     check("overflow-x=false" in estreito, "320 px: a página rola na horizontal")
     reduzido = navegador(390, ("--disable-3d-apis", "--force-prefers-reduced-motion"))
     check("reduzido=true" in reduzido, "o Chromium não aplicou --force-prefers-reduced-motion")
-    for linha in ("js-historia=false", "palco-filhos=0", "frases-visiveis=10", "overflow-x=false"):
+    for linha in ("js-historia=false", "palco-filhos=0", f"frases-visiveis={len(ROTEIRO)}", "overflow-x=false"):
         check(linha in reduzido, f"movimento reduzido: faltou {linha!r}")
-    check(re.search(r"^seek-tardio zip=\d", "\n".join(normal), re.M) is not None,
+    texto_normal = "\n".join(normal)
+    check(re.search(r"^seek-tardio zip=\d", texto_normal, re.M) is not None,
           "three.js que chega depois da rolagem: a maquete precisa ser sincronizada (e congelada), sem limite de tentativas")
     check("progresso=0 0.5 1 0" in normal, "Historia.progresso fora do esperado (0 no topo, 0,5 no meio, 1 no fim, 0 sem altura)")
-    texto_normal = "\n".join(normal)
-    for passo in sorted(maquetes):
+    for passo in maquetes:
         for chave, alvo in (("seek", 500), ("seek25", 250)):
             m = re.search(rf"^{chave} {passo}=([\d.]+)$", texto_normal, re.M)
             check(m is not None and abs(float(m.group(1)) - alvo) <= 20,
                   f"{chave} {passo}: esperava ≈{alvo} (dur 1000), achei {m.group(1) if m else 'nada'}")
 
 
-def checar_maquetes_js():
-    js = (SITE / "maquetes.js").read_text(encoding="utf-8")
-    check("dur:sc.dur" in js, "maquetes.js precisa expor a duração da cena em fig.__maquete.dur")
-
-
 def main():
     check(PAGINA.exists(), "portfolio/site/index.html (a história) não existe")
     if PAGINA.exists():
         pagina = PAGINA.read_text(encoding="utf-8")
-        index = (SITE / "portfolio.html").read_text(encoding="utf-8")
-        checar_marcacao(pagina)
-        checar_texto(pagina, index)
+        portfolio = PORTFOLIO.read_text(encoding="utf-8")
+        checar_marcacao(pagina, portfolio)
+        checar_texto(pagina, portfolio)
         checar_css(pagina)
         checar_scripts(pagina)
+        checar_curriculo(pagina)
         checar_js()
         checar_maquetes_js()
         if "--navegador" in sys.argv:
