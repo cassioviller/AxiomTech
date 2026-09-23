@@ -148,6 +148,27 @@ def checar_design(atual):
         check(hexa in d.upper(), f"DESIGN.md não documenta a cor {hexa}")
 
 
+LEGENDAS = {
+    # antiga → nova
+    "Rede de restaurantes de rodovia · o prédio medido e desenhado pelo sistema a partir do arquivo do cliente, cobertura em corte":
+        "Rede de restaurantes de rodovia · sem nenhuma quantidade no pacote, o prédio foi medido no próprio arquivo do cliente — cobertura em corte",
+    "B-36 · celeiro 6 × 6 m com sótão, entregue em duas caixas":
+        "B-36 · o celeiro 6 × 6 m não cabe inteiro no caminhão: vai em duas caixas",
+    "B-36 · interior com bancada sob a viga da junção":
+        "B-36 · a viga da junção ficou aparente — sai mais barato que fechar — e a bancada vai embaixo dela",
+    "Kitnet modular 30 m² · layouts validados por código":
+        "Kitnet modular 30 m² · cada layout passa pelo validador de colisões antes de ser desenhado",
+    "Como cada caixa viaja e como fica depois de unida":
+        "Como cada caixa viaja e onde fica a junção depois de unida",
+}
+
+
+def checar_legendas(atual):
+    for antiga, nova in LEGENDAS.items():
+        check(antiga not in atual, f"legenda antiga ainda no site: {antiga[:50]!r}")
+        check(nova in atual, f"legenda nova ausente: {nova[:50]!r}")
+
+
 def main():
     atual = SITE.read_text(encoding="utf-8")
     base = subprocess.run(
@@ -157,6 +178,7 @@ def main():
     checar_invariantes(atual, base)
     checar_minto(atual)
     checar_design(atual)
+    checar_legendas(atual)
     if FALHAS:
         print("FALHOU:")
         for f in FALHAS:
