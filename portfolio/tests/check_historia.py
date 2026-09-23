@@ -81,8 +81,8 @@ ROTEIRO = [
         "B-36, pré-dimensionado e sujeito à revisão do engenheiro responsável: duas caixas, três viagens, 37 decisões registradas.",
         ("maquete", "casa-viaja", "m1.webp", 900, 562), ("modular", "Ver o caso completo: celeiro B-36 →")),
     cap("icamento", "h2", ("ago/2026", ["2026-08"]),
-        "O módulo sobe pelo balancim, com os cabos na vertical.",
-        "Assim a parede não é comprimida; balancim de içamento e guindaste da classe certa viraram itens de regra no orçamento.",
+        "No estudo, o módulo sobe pelo balancim, cabos na vertical.",
+        "Estudo 3D de agosto: com os cabos na vertical, a parede não é comprimida. Balancim de içamento e guindaste da classe certa viraram itens de regra no orçamento.",
         ("maquete", "icamento", "m2.webp", 900, 562), ("modular", "Ver o caso completo: casas modulares →")),
     cap("whatsapp", "h2", ("ago/2026", ["2026-08-11"]),
         "Depois de 11/08, o diário saiu do sistema.",
@@ -98,7 +98,7 @@ ROTEIRO = [
         ("maquete", "36min", "upa-plan-grey.webp", 1400, 440), ("orcamento", "Ver o caso completo: 36 minutos →")),
     cap("metodo", "h2", None,
         "Construí o jeito de o número não sumir.",
-        "De 2017 a 2026: contabilidade, obra e sistemas. Idealizei e dirigi; o código foi escrito com assistentes de IA, e as regras e a revisão são meus.",
+        "De 2017 a 2026: contabilidade, obra e sistemas. Idealizei e dirigi; o código foi escrito com assistentes de IA, e as regras e a revisão são minhas.",
         ("img", "o-proposta.webp", 885, 1060), None),
     cap("convite", "h2", None,
         "Faltam 3 semestres para o diploma. Não falta obra feita.",
@@ -132,6 +132,17 @@ def corpo(pagina):
 
 def numeros(texto):
     return set(re.findall(r"\d+(?:[.,]\d+)*", texto))
+
+
+MESES = "jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez"
+# Datas que o Cássio confirmou na conversa de 23/09/2026 (linha do tempo) e que o portfólio não traz por extenso.
+# Registros do SIGE (22/07 a 14/09/2026), início da obra dos galpões (jun/2026) e arquivos das casas modulares (ago/2026).
+DATAS_CONFIRMADAS = {"22/07", "14/09/2026", "abr/2026", "jun/2026", "ago/2026"}
+
+
+def datas(texto):
+    """Datas inteiras do texto (dd/mm, dd/mm/aaaa, mmm/aaaa), em minúsculas — nunca pedaços como '22' e '07'."""
+    return set(re.findall(r"\b\d{1,2}/\d{2}(?:/\d{4})?\b", texto)) | set(re.findall(rf"\b(?:{MESES})/\d{{4}}\b", texto.lower()))
 
 
 def atributos(tag):
@@ -268,6 +279,9 @@ def checar_texto(pagina, portfolio):
     t = limpo(corpo(pagina))
     extras = numeros(t) - numeros(limpo(corpo(portfolio)))
     check(not extras, f"números que o portfólio não sustenta: {sorted(extras)}")
+    base_datas = limpo(corpo(portfolio)).lower() + " " + (" ".join(CURRICULO_TXT.read_text(encoding="utf-8").split()).lower() if CURRICULO_TXT.exists() else "")
+    datas_novas = sorted({d for d in datas(t) if d not in base_datas and d not in DATAS_CONFIRMADAS})
+    check(not datas_novas, f"datas que nem o portfólio, nem o currículo, nem a linha do tempo confirmada sustentam: {datas_novas}")
     for r in RESSALVAS:
         check(r in t, f"ressalva ausente: {r!r}")
     for p in PROIBIDOS:
@@ -357,6 +371,7 @@ def checar_regua(pagina):
     css = "\n".join(re.findall(r"<style>(.*?)</style>", pagina, re.S))
     check(re.search(r"\.regua a\{[^}]*min-width:28px", css) is not None, "cada marco da régua precisa de pelo menos 28 px de largura (alvo de toque)")
     check(re.search(r"\.regua ol\{[^}]*overflow-x:auto", css) is not None, "quando não couber, a régua rola sozinha — nunca a página")
+    check(".regua a:focus-visible{outline-offset:-3px}" in css, "o anel de foco da régua fica por dentro do marco (a lista rolável cortaria o anel de fora)")
 
 
 PORTA = 5056
@@ -377,6 +392,9 @@ def checar_js():
 def checar_maquetes_js():
     js = (SITE / "maquetes.js").read_text(encoding="utf-8")
     check("dur:sc.dur" in js, "maquetes.js precisa expor a duração da cena em fig.__maquete.dur")
+    comprimento = re.search(r"function cenaIcamento\(fig\)\{.*?var DUR=16,L=([\d.]+)", js, re.S)
+    check(comprimento is not None and float(comprimento.group(1)) <= 8,
+          "módulo do içamento com no máximo 8 m: acima disso o estudo pede pontos intermediários, e a maquete só tem 4 olhais")
     check("'icamento':cenaIcamento" in js, "maquetes.js precisa registrar a cena 3D do içamento em CENAS")
 
 

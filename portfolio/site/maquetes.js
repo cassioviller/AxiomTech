@@ -194,7 +194,7 @@ function cenaCasa(fig){
 // Com o balancim, os cabos descem verticais: o módulo recebe só tração nos olhais e a parede não é comprimida.
 function cenaIcamento(fig){
   var st=stage(fig,0xCFDDEA,30,110),S=st.S,mat=st.mat,box=st.box;
-  var DUR=16,L=10,C=3.2,H=2.9,CH=.3,TOPO=6.5,XC=6,XR=-6; // módulo 10 × 3,2 m; carreta em x=6, radier em x=-6
+  var DUR=16,L=8,C=3.2,H=2.9,CH=.3,TOPO=6.5,XC=6,XR=-6; // módulo 8 × 3,2 m (acima de ~8 m o estudo pede pontos intermediários); carreta em x=6, radier em x=-6
   var AMARELO=0xE8A13C;
   box(160,.6,160,mat(0x8A9A6A),0,-.3,0);                                 // terreno (grande: a borda some na névoa)
   box(L+2,.5,C+1.6,mat(0xB9B4A8),XR,.25,0);                              // radier (topo em y=.5)
