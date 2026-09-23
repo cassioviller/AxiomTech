@@ -16,7 +16,7 @@ if(!cenas.length||!palco||!('IntersectionObserver' in window))return;
 if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 
 // cada fundo vai para o palco fixo; a maquete fica hidden fora da sua cena, para só uma renderizar por vez
-var fundos={},esconder={},tentativas=0,pendente=false;
+var fundos={},esconder={},aguardando=0,pendente=false;
 cenas.forEach(function(c){
   var f=c.querySelector('.fundo');
   if(!f)return;
@@ -31,8 +31,8 @@ function sincronizar(){
   var f=H.ativa&&fundos[H.ativa];
   if(!f||!f.classList.contains('maquete'))return;
   var api=f.__maquete;
-  if(!api||!api.dur){ // three.js ainda carregando: tenta de novo por até 5 s
-    if(tentativas++<25)setTimeout(sincronizar,200);
+  if(!api||!api.dur){ // three.js ainda carregando: um só temporizador, repetido enquanto a cena da maquete estiver ativa
+    if(!aguardando)aguardando=setTimeout(function(){aguardando=0;sincronizar();},200);
     return;
   }
   var r=document.querySelector('.cena[data-passo="'+H.ativa+'"]').getBoundingClientRect();
@@ -57,7 +57,6 @@ function ativar(passo){
     void f.offsetWidth; // aplica o display antes da opacidade, senão não há transição
     f.classList.add('ativo');
   }
-  tentativas=0;
   sincronizar();
 }
 function cenaNoCentro(){
@@ -66,8 +65,10 @@ function cenaNoCentro(){
   return null;
 }
 
-var io=new IntersectionObserver(function(es){
-  es.forEach(function(e){if(e.isIntersecting)ativar(e.target.dataset.passo);});
+var io=new IntersectionObserver(function(){
+  // qualquer entrada ou saída na faixa do meio recalcula a cena: numa pequena volta, quem sai não "entra" de novo
+  var c=cenaNoCentro();
+  if(c)ativar(c.dataset.passo);
 },{rootMargin:'-45% 0px -45% 0px',threshold:0});
 cenas.forEach(function(c){io.observe(c);});
 addEventListener('scroll',function(){

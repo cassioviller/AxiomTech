@@ -47,7 +47,7 @@ ROTEIRO = [
      "Serviço a serviço, contra a tabela SINAPI da Caixa; acima de 1% de desvio, a importação é recusada.",
      "o-orcamento.webp", 1040, 1080, None),
     ("sige", "h2", "Numa obra real, 23 diários estavam só no WhatsApp.",
-     "No SIGE, que concebi: recuperados, levam a obra de 27,6% para 44,7% concluído, contra 60,8% planejado — lido numa cópia do sistema.",
+     "No SIGE: com eles, a obra vai de 27,6% a 44,7% (60,8% planejado) — lido numa cópia do sistema; no sistema em uso, a carga ainda não foi aplicada.",
      "p-diario-portal.webp", 1600, 1193, None),
     ("casa", "h2", "O celeiro não cabe inteiro no caminhão.",
      "B-36: vai em duas caixas, em três viagens, com 37 decisões registradas.",
@@ -190,6 +190,8 @@ def checar_css(pagina):
         check(css.count(f"{n}svh") > 0 and css.count(f"{n}vh") >= css.count(f"{n}svh"),
               f"cada {n}svh precisa de um {n}vh antes, como fallback")
     check(".palco{display:none}" in css, "o palco precisa começar escondido (modo empilhado)")
+    check(".js-historia .historia{max-width:none;padding:0;position:relative;background:var(--tinta)}" in css,
+          "no modo cenas o fundo da história é tinta: sem faixa clara quando a barra do navegador recolhe (svh < lvh)")
     check(".fundo .pausa{display:none!important}" in css, "o botão de pausa da maquete não pode ficar focável dentro do fundo aria-hidden")
     m = re.search(r"--scrim:\s*rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)", css)
     check(m is not None, "falta --scrim: rgba(...)")
@@ -338,7 +340,8 @@ def checar_navegador():
     maquetes = {p for p, *_resto, maq in ROTEIRO if maq}
     normal = navegador(390)
     check("FIM" in normal, f"390 px: o harness não terminou — últimas linhas {normal[-3:]}")
-    for linha in ("reduzido=false", "js-historia=true", "overflow-x=false", "inicio ativa=tese", "salto ativa=tese maquetes=-"):
+    for linha in ("reduzido=false", "js-historia=true", "overflow-x=false", "inicio ativa=tese", "salto ativa=tese maquetes=-",
+                  "reversao-48 ativa=sige", "reversao-95 ativa=precisao"):
         check(linha in normal, f"390 px: faltou {linha!r}")
     for passo, _tag, _frase, _ressalva, imagem, *_resto in ROTEIRO:
         fundo = passo if imagem else "nenhum"
@@ -354,6 +357,8 @@ def checar_navegador():
     check("reduzido=true" in reduzido, "o Chromium não aplicou --force-prefers-reduced-motion")
     for linha in ("js-historia=false", "palco-filhos=0", "frases-visiveis=10", "overflow-x=false"):
         check(linha in reduzido, f"movimento reduzido: faltou {linha!r}")
+    check(re.search(r"^seek-tardio zip=\d", "\n".join(normal), re.M) is not None,
+          "three.js que chega depois da rolagem: a maquete precisa ser sincronizada (e congelada), sem limite de tentativas")
     check("progresso=0 0.5 1 0" in normal, "Historia.progresso fora do esperado (0 no topo, 0,5 no meio, 1 no fim, 0 sem altura)")
     texto_normal = "\n".join(normal)
     for passo in sorted(maquetes):
