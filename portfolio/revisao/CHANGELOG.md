@@ -94,3 +94,43 @@ Rodada de correção após os verificadores (fatos). Arquivo editado: `site/inde
 - Varredura: nenhuma outra ocorrência de "jul–set", "jul-set" ou "julho" no site, no currículo ou nas folhas (a única data com "jul" é "fev/2025 – jul/2026" da V Alves, fato de currículo).
 - Falso positivo: nenhum.
 - `./build.sh` rodado: `curriculo-cassio-viller.pdf`, `caso-23-diarios.pdf`, `caso-36-minutos.pdf`, `caso-casa-no-teto.pdf` — 1 pág. cada.
+
+---
+
+# Rodada 3 — cruzamento com `portfolio.zip` e `saida.zip`, 23/09/2026
+
+Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO.md`, `uma-pagina.md` e o manual do app v2 (`saida/manual-do-app-v2/prints`).
+
+## Números e afirmações
+- "13 obras orçadas" → "13 obras no sistema, 11 com proposta" (meta, og, JSON-LD, stat do hero, lede, cota, Resultado e stat da Folha 02), como nos PDFs novos.
+- 0,25% qualificado com "nos 19 serviços conferidos" (hero, Resultado, stat, "Medido"); o 0,00% ganhou a ressalva "repete a mesma conta, não acerta custo de obra pronta".
+- "11 sem." ganhou o período: 9/jul a 21/set/2026.
+- Caso R$ 24,5 mi: tirado "em horas" (nenhuma fonte sustenta).
+- Margens: "não aparecem aqui" → as das obras reais não aparecem; as da casa de demonstração, sim (a legenda da consolidação mostra 30%).
+- SIGE: Resultado, cota, legenda do portal e caso 01 com "cópia do sistema" e carga pendente no sistema em uso (REVISAO L-01); legenda do portal sem "previsão de entrega" (L-02).
+- SIGE: "4 guias ilustrados" → "4 guias passo a passo (3 ilustrados)"; período "1ª versão 2025 · atual mai–set/2026" e autoria com assistente de IA, como em `uma-pagina.md`.
+- SIGE: "avisos automáticos para 10 tipos de evento" removido (S7-10/S7-21); compras e conta a pagar com a ressalva "onde a empresa ligou"; ponto "com opção de" reconhecimento facial; 3.300 → "3.343 sem falha na última rodada completa (04/09/2026)"; "seis frentes concluídas" (S7-05 desatualizada) → "atacados em seis frentes".
+- Frase de ponte: o SIGE é outro sistema, e o "Ainda falta" da Folha 02 diz que o diário em uso real é do SIGE.
+
+## Imagens novas
+- Folha 02, "Depois da proposta": `o-mapa.webp` (mapa comparativo, de `diretor-obras-1-compras-requisicoes-1.png`) e `o-financeiro.webp` (orçado × comprometido × realizado, de `diretor-obras-1-financeiro.png`), manual v2, obra DEMO-CASA.
+- Caso 04 (compras): `c-aprovacao.webp` (`demo/11-aprovacao.png`) e `c-recebimento.webp` (`demo/12-recebimento.png`, sem o menu fantasma).
+
+## Folha de caso
+- `casos/caso-23-diarios.html`: "voltaram para o lugar certo" → leitura em cópia, 27,6% → 44,7% (60,8% planejado), carga pendente no sistema em uso. PDF regerado (1 página) e copiado para `site/casos/`.
+
+## Acessibilidade
+- Link "Pular para o conteúdo" e `main#conteudo`.
+- Botão Pausar/Continuar nas maquetes 3D (WCAG 2.2.2), em `maquetes.js`.
+
+## Não publicar (achado na análise)
+- `diretor-admin-usuarios.png` (e-mail pessoal), `diretor-painel.png` e `orcamento_109_1506.*` (obra real e nome de pessoa), `diretor-admin-diagnostico.png` (caminho local e alertas), `encarregado-obras-1-rdo-10.png` (hash não confere no demo).
+- Manual v1: as telas do encarregado são páginas 404; usar só a v2.
+
+## Pendente — decisão do autor
+- PDFs novos com "[SEU NOME]", "[cargo/área]", "[e-mail]", "[preencher]": preencher antes de linkar no site.
+- Nomes de clientes nos PDFs novos (Rede Graal, DIASE/Goodman, Tenda Una, "Residência Cassio") x site anonimizado: escolher um padrão.
+- Margens abertas no `portfolio.pdf` novo x sigilo no site.
+- `og:image` absoluto, `og:url` e canonical dependem do domínio definitivo.
+- "Marcos Tavares" em `c-aprovacao.webp`: confirmar que é usuário fictício do manual.
+- Versão em inglês (há `PORTFOLIO.en.md`); títulos h2 → h5 nos blocos Problema/O que fiz/Resultado.

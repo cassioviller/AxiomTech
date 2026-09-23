@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cássio Viller — orçamento e gestão de obra</title>
-<meta name="description" content="Cássio Viller — orçamento de obras, gestão de obra e sistemas para construtoras. Uma proposta do pacote de projeto ao PDF assinável em 36 minutos; 13 obras orçadas até R$ 24,5 milhões.">
+<meta name="description" content="Cássio Viller — orçamento de obras, gestão de obra e sistemas para construtoras. Uma proposta do pacote de projeto ao PDF assinável em 36 minutos; 13 obras no sistema, 11 com proposta, até R$ 24,5 milhões.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:title" content="Cássio Viller — do pacote de projeto à proposta em 36 minutos">
-<meta property="og:description" content="Orçamento de obras, gestão de obra e sistemas para construtoras. 13 obras orçadas, até R$ 24,5 milhões.">
+<meta property="og:description" content="Orçamento de obras, gestão de obra e sistemas para construtoras. 13 obras no sistema, 11 com proposta, até R$ 24,5 milhões.">
 <meta property="og:image" content="og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -21,14 +21,14 @@
   "name": "Cássio Viller Silva de Azevedo",
   "alternateName": "Cássio Viller",
   "jobTitle": "Analista de orçamento, planejamento e custos",
-  "description": "Orçamento de obras, planejamento e controle de custos, gestão de obra e sistemas para construtoras. 13 obras orçadas até R$ 24,5 milhões; proposta do pacote de projeto ao PDF em 36 minutos; criador do SIGE.",
+  "description": "Orçamento de obras, planejamento e controle de custos, gestão de obra e sistemas para construtoras. 13 obras no sistema de orçamento (11 com proposta), até R$ 24,5 milhões; proposta do pacote de projeto ao PDF em 36 minutos; criador do SIGE.",
   "email": "mailto:cassiovillers@gmail.com",
   "telephone": "+55-12-98207-1116",
   "address": {"@type": "PostalAddress", "addressLocality": "São José dos Campos", "addressRegion": "SP", "addressCountry": "BR"},
   "sameAs": ["https://github.com/cassioviller", "https://www.linkedin.com/in/cassioviller"],
   "affiliation": [
     {"@type": "CollegeOrUniversity", "name": "Universidade Cruzeiro do Sul", "description": "Engenharia Civil (EAD), 7º semestre, em curso"},
-    {"@type": "CollegeOrUniversity", "name": "PUC", "description": "Sistemas de Informação (EAD), 3º semestre, em curso"}
+    {"@type": "CollegeOrUniversity", "name": "PUC (EAD)", "description": "Sistemas de Informação (EAD), 3º semestre, em curso"}
   ],
   "alumniOf": [
     {"@type": "CollegeOrUniversity", "name": "Universidade Federal de Itajubá (UNIFEI)", "description": "6 semestres de Engenharia Civil, transferido para a Cruzeiro do Sul"},
@@ -160,6 +160,19 @@ details ol{margin:0;padding-left:20px;color:var(--ink-2);display:grid;gap:4px}
 .areas div{padding:14px 16px;background:var(--surface);border:1px solid var(--rule)}
 .areas b{display:block;font-family:var(--display);font-size:1.2rem;font-weight:600;margin-bottom:6px}
 .areas p{font-size:.86rem;color:var(--ink-2)}
+/* portal do cliente */
+.portal-show{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:14px;align-items:start;margin:4px 0 14px}
+.portal-show figure,.telas figure,.shot.fotos{margin:0}
+.portal-show img,.telas img,.shot.fotos img{width:100%;display:block}
+.telas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:14px;align-items:start}
+.shot.fotos{margin-bottom:28px}
+@media (max-width:720px){.portal-show{grid-template-columns:minmax(0,1fr)}.portal-show .cel{max-width:260px}.telas{grid-template-columns:minmax(0,1fr)}}
+.walk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.walk figure{margin:0}
+.walk img{width:100%;display:block}
+.walk figcaption b{display:block;font-family:var(--display);font-size:1.15rem;font-weight:600;color:var(--ink);letter-spacing:0;text-transform:none;margin-bottom:4px}
+.walk figcaption{font-family:var(--body);font-size:.88rem;color:var(--ink-2);line-height:1.5;margin-top:10px}
+@media (max-width:720px){.walk{grid-template-columns:minmax(0,1fr)}}
 /* project list */
 .projects{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
 .projects li{display:grid;grid-template-columns:170px minmax(0,1fr);gap:8px 24px;padding:22px 0;border-bottom:1px solid var(--rule-soft)}
@@ -298,7 +311,13 @@ footer{padding-block:28px 40px;font-family:var(--mono);font-size:.72rem;color:va
 .maquete.viva .hud{display:flex;flex-direction:row-reverse}
 .maquete .hud b{font-family:var(--display);font-weight:700;font-size:clamp(1.8rem,5vw,3rem);line-height:1;color:#F07A3E;font-variant-numeric:tabular-nums;white-space:nowrap}
 .maquete .hud span{font-size:clamp(.8rem,1.6vw,1rem);line-height:1.35;max-width:46ch;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.maquete .pausa{position:absolute;right:8px;top:8px;display:none;font-family:var(--mono);font-size:.68rem;letter-spacing:.04em;color:#fff;background:rgba(23,31,41,.82);border:1px solid rgba(255,255,255,.35);border-radius:2px;padding:5px 9px;cursor:pointer}
+.maquete.viva .pausa{display:block}
+.maquete .pausa:hover{border-color:#F07A3E}
+.pular{position:absolute;left:-9999px;top:8px;z-index:50;background:var(--accent);color:var(--accent-ink);padding:10px 14px;font-family:var(--mono);font-size:.8rem;text-decoration:none}
+.pular:focus{left:12px;color:var(--accent-ink)}
 .maquete figcaption{position:absolute;left:0;top:0;font-family:var(--mono);font-size:.68rem;letter-spacing:.04em;color:#fff;background:rgba(23,31,41,.82);padding:5px 9px;max-width:100%}
+.maquete.viva figcaption{max-width:calc(100% - 118px)}
 .hero h1{font-size:clamp(2.8rem,7vw,4.4rem)}
 .hero{padding-block:36px 48px}
 .hero .top{margin-bottom:18px}
@@ -336,6 +355,7 @@ details.mais .sec-head+*{margin-top:0}
 </style>
 </head>
 <body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
 <div class="wrap">
 <div class="topbar"><b>Cássio Viller</b><a href="https://wa.me/5512982071116?text=Ol%C3%A1%2C%20C%C3%A1ssio.%20Vi%20seu%20portf%C3%B3lio%20e%20quero%20te%20mandar%20uma%20obra%20para%20or%C3%A7ar." target="_blank" rel="noopener">Me mande uma obra</a></div>
 <div class="layout">
@@ -346,7 +366,7 @@ details.mais .sec-head+*{margin-top:0}
     <a href="#inicio">Início</a>
     <a href="#orcamento">Orçamento em 36 min</a>
     <a href="#sistema">Sistema de orçamento</a>
-    <a href="#sige">SIGE</a>
+    <a href="#sige">Portal do cliente</a>
     <a href="#modular">Casas modulares</a>
     <a href="#obra">Obra e projetos</a>
     <a href="#ferramentas">Ferramentas</a>
@@ -356,7 +376,7 @@ details.mais .sec-head+*{margin-top:0}
   <a class="cv" href="https://wa.me/5512982071116?text=Ol%C3%A1%2C%20C%C3%A1ssio.%20Vi%20seu%20portf%C3%B3lio%20e%20quero%20te%20mandar%20uma%20obra%20para%20or%C3%A7ar." target="_blank" rel="noopener">Me mande uma obra</a>
 </aside>
 
-<main>
+<main id="conteudo">
 
 <section class="hero" id="inicio">
   <div class="carimbo" aria-hidden="true"><span class="hot">Cássio Viller</span><span>Orçamento · gestão de obra · sistemas para construtoras</span><span>São José dos Campos/SP</span></div>
@@ -377,8 +397,8 @@ details.mais .sec-head+*{margin-top:0}
 
   <div class="stats s3" aria-label="Em números">
     <a href="#orcamento"><b>36 min</b><span>do pacote do projeto à proposta de mão de obra assinável, num orçamento real, com o relógio na tela</span></a>
-    <a href="#sistema"><b>R$ 24,5 mi</b><span>a maior das 13 obras orçadas com o sistema de orçamento que idealizei — reproduz as composições SINAPI com desvio máximo de 0,25%</span></a>
-    <a href="#sige"><b>50 módulos</b><span>no SIGE, o sistema de gestão para construtoras que concebi e construí, hoje em uso numa empresa de Light Steel Frame</span></a>
+    <a href="#sistema"><b>R$ 24,5 mi</b><span>a maior das 13 obras no sistema de orçamento que idealizei (11 com proposta) — nos 19 serviços SINAPI conferidos, desvio máximo de 0,25%</span></a>
+    <a href="#sige"><b>1 link</b><span>por obra: o cliente vê o andamento e o diário de cada dia com foto, e confirma que leu com senha e recibo — no SIGE, o sistema de 50 módulos que concebi e construí</span></a>
   </div>
 
   <div class="contacts">
@@ -468,27 +488,51 @@ details.mais .sec-head+*{margin-top:0}
   <div class="carimbo" aria-hidden="true"><span class="hot">Folha 02/08</span><span>Sistema de orçamento</span><span>VEKS · 2026</span></div>
   <div class="sec-head">
     <h2>Do desenho do cliente à proposta pronta para assinatura</h2>
-    <p class="lede">Na VEKS, idealizei o sistema que recebe o que o cliente tem, mede a obra no próprio desenho, orça, programa o prazo e gera a proposta — e orcei 13 obras com ele.</p>
+    <p class="lede">Na VEKS, idealizei o sistema que recebe o que o cliente tem, mede a obra no próprio desenho, orça, programa o prazo e gera a proposta — e levei 13 obras por ele, 11 até a proposta.</p>
   </div>
-  <div class="cota" aria-hidden="true"><span>R$ 29 mil</span><i></i><span>13 obras · reproduz o SINAPI a 0,25%</span><i></i><span>R$ 24,5 mi</span></div>
+  <div class="cota" aria-hidden="true"><span>R$ 29 mil</span><i></i><span>13 obras · 11 com proposta · SINAPI a 0,25%</span><i></i><span>R$ 24,5 mi</span></div>
   <div class="tres">
     <div><h5>O problema</h5><p>O cliente chega com o que tem — prancha em PDF, modelo 3D de outro escritório, croqui fotografado pelo WhatsApp. O orçamentista passa dias medindo e digitando, e <b>um item esquecido só aparece quando a obra já dá prejuízo</b>.</p></div>
     <div><h5>O que fiz</h5><p>Idealizei o sistema que lê o desenho, mede, orça, programa o prazo e gera a proposta. Dirigi o desenvolvimento, feito com assistentes de IA — as regras de engenharia e de negócio, os testes e a revisão são meus. E <b>orcei as obras com ele</b>.</p></div>
-    <div class="r"><h5>Resultado</h5><p><b>13 obras orçadas, de R$ 29 mil a R$ 24,5 milhões</b>, num sistema que reproduz as composições SINAPI com desvio máximo de 0,25%. A mesma obra sai em três tamanhos de proposta sem mover nenhum número.</p></div>
+    <div class="r"><h5>Resultado</h5><p><b>13 obras no sistema, 11 com proposta, de R$ 29 mil a R$ 24,5 milhões</b>. Nos 19 serviços SINAPI conferidos, o sistema reproduz as composições com desvio máximo de 0,25%. A mesma obra sai em três tamanhos de proposta sem mover nenhum número.</p></div>
   </div>
 
   <div class="stats" style="margin-top:0">
-    <div><b>13</b><span>obras orçadas, de R$ 29 mil a R$ 24,5 milhões, com o mesmo sistema</span></div>
-    <div><b>0,25%</b><span>desvio máximo ao reproduzir as composições SINAPI publicadas pela Caixa</span></div>
+    <div><b>13</b><span>obras no mesmo sistema, de R$ 29 mil a R$ 24,5 milhões — 11 com proposta, 2 ainda em orçamento</span></div>
+    <div><b>0,25%</b><span>desvio máximo ao reproduzir as composições SINAPI publicadas pela Caixa, nos 19 serviços conferidos</span></div>
     <div><b>71 → 0</b><span>menções a informação interna numa proposta de cliente, por verificação automática</span></div>
-    <div><b>11 sem.</b><span>do primeiro registro à 13ª obra orçada</span></div>
+    <div><b>11 sem.</b><span>de 9/jul a 21/set/2026, do primeiro registro à 13ª obra no sistema</span></div>
   </div>
 
   <div class="gallery" style="margin-top:24px">
     <figure class="g-wide"><img src="img/s1.webp" alt="Restaurante de rodovia desenhado pelo sistema a partir do arquivo do cliente, com a cobertura em corte mostrando o interior" loading="lazy"><figcaption>Rede de restaurantes de rodovia · o prédio medido e desenhado pelo sistema a partir do arquivo do cliente, cobertura em corte</figcaption></figure>
     <figure><img src="img/s2.webp" alt="Ponto de venda em planta curva, em forma de feijão, desenhado pelo sistema a partir das pranchas do arquiteto" loading="lazy"><figcaption>Ponto de venda em planta curva — a primeira obra sem uma parede reta</figcaption></figure>
     <figure><img src="img/s3.webp" alt="Tela do cronograma: duração de cada etapa, horas previstas e quais etapas estão no caminho crítico" loading="lazy"><figcaption>Cronograma: cada etapa com horas previstas e a marcação de quais atrasam a obra inteira</figcaption></figure>
-    <figure><img src="img/s4.webp" alt="Portal do cliente no celular: avanço da obra em 70,99% e o executado por etapa" loading="lazy"><figcaption>O que o cliente vê no celular: avanço por etapa, sem custo nem fornecedor</figcaption></figure>
+    <figure><img src="img/s4.webp" alt="Portal do cliente no celular: avanço da obra em 70,99% e o executado por etapa" loading="lazy"><figcaption>O portal do cliente deste sistema, em obra de demonstração: avanço por etapa, sem custo nem fornecedor</figcaption></figure>
+  </div>
+
+  <div class="sec-head" style="margin-top:44px">
+    <h3>Do desenho ao preço, tela a tela</h3>
+    <p class="lede">Oito telas do sistema, na ordem em que o orçamento acontece. São de uma casa de demonstração de 8 × 6 m, fotografadas num tour automático de 26/08/2026: os custos das obras reais são sigilosos.</p>
+  </div>
+  <div class="walk">
+    <figure class="shot"><img src="img/o-planta.webp" alt="Tela Planta: nível térreo com pé-direito de 2,8 m, uma planta retangular de 8 por 6 m cotada, e a tabela das quatro paredes externas com coordenadas de início e fim e o perfil Ue90 de 0,95 mm" loading="lazy"><figcaption><b>1 · O desenho vira planta medida</b>Cada parede com início, fim e perfil. A planta pode ser desenhada na tela ou importada do DXF do arquiteto, e a escala é medida no desenho, nunca presumida.</figcaption></figure>
+    <figure class="shot"><img src="img/o-estrutura.webp" alt="Tela Visualização 3D: a estrutura de perfis de aço da casa desenhada em três dimensões sobre a fundação, com filtros por elemento, e os totais de 541 kg líquidos, 606 kg comprados, 118 peças e confiança estimado" loading="lazy"><figcaption><b>2 · Da planta sai a estrutura, peça por peça</b>541 kg de aço líquido, 606 kg comprados, 118 peças. O peso sai da soma das peças, não de uma taxa por m². A tela avisa: pré-dimensionamento para orçamento, não projeto executivo.</figcaption></figure>
+    <figure class="shot"><img src="img/o-quantitativos.webp" alt="Tela Quantitativos, etapa Fundação: itens como concretagem, fôrma, armação e escavação da viga baldrame com quantidade e a origem PARAMETRICO, e itens de radier sem quantidade, com origem em branco" loading="lazy"><figcaption><b>3 · Cada quantidade diz de onde veio</b>"Parametrico" é calculada pelo sistema a partir da planta; "manual" foi lançada por alguém. Item sem quantidade fica em branco, nunca vira zero.</figcaption></figure>
+    <figure class="shot"><img src="img/o-orcamento.webp" alt="Tela Orçamento: custo direto de R$ 61.593,33, BDI de 27,79%, preço de venda entre R$ 66.901,87 e R$ 90.514,29 com faixa de 15%, 8 de 8 macroetapas completas, e a planilha por etapa com custo de material e mão de obra por item" loading="lazy"><figcaption><b>4 · O orçamento, com a fonte ao lado</b>Custo direto, BDI e preço de venda com faixa de ±15% porque a confiança é "paramétrico". Cada linha traz a etiqueta de origem do preço. Item sem preço bloqueia a proposta.</figcaption></figure>
+    <figure class="shot"><img src="img/o-consolidacao.webp" alt="Tela Consolidação: custo direto R$ 61.593,33, preço de contrato R$ 109.729,84 por margem linha a linha, referência BDI TCU R$ 78.708,08, diferença de R$ 31.021,76, imposto embutido, lucro bruto e margem líquida de 32,93%; abaixo, o bloco de margem com imposto e lucro separados para material e mão de obra" loading="lazy"><figcaption><b>5 · O preço, escolhido e registrado</b>Margem linha a linha e BDI do TCU lado a lado, com a diferença à vista. Material e mão de obra têm imposto e lucro separados, e o preço sai por divisão, não por multiplicação: multiplicar por 1,38 deixaria 19,5% de margem, não 30%.</figcaption></figure>
+    <figure class="shot"><img src="img/o-cronograma.webp" alt="Tela Cronograma: 29 dias corridos, tabela das oito etapas com duração, horas, início, fim, folga e marcação de caminho crítico, e a curva S com o desembolso semanal do custo direto" loading="lazy"><figcaption><b>6 · O prazo pela sequência e pela equipe</b>29 dias corridos, com as etapas que atrasam a obra inteira marcadas como críticas, e a curva S do desembolso, que fecha com o custo direto do orçamento. Exporta em MSPDI, o formato do MS Project e do ProjectLibre.</figcaption></figure>
+    <figure class="shot"><img src="img/o-paineis.webp" alt="Tela Caderno de painéis: 4 paredes e 541 kg no caderno; a elevação da parede 1, de 8 m, dividida em três painéis com identificação e peso de cada um, e a parede 2, de 6 m, em dois painéis" loading="lazy"><figcaption><b>7 · A parede vira painel para a fábrica</b>Cada parede dividida em painéis transportáveis, com identificação e peso, e o romaneio em CSV para a linha de produção. É daqui que sai a lista de peças das casas modulares.</figcaption></figure>
+    <figure class="shot"><img src="img/o-proposta.webp" alt="A proposta publicada no link do cliente: valor total com BDI entre R$ 70.644,82 e R$ 95.578,28, o escopo turn-key em oito etapas, o aviso em destaque de que o documento é pré-dimensionamento e não substitui projeto estrutural, e o início do orçamento analítico" loading="lazy"><figcaption><b>8 · A proposta, num link que o cliente abre sem senha</b>O conteúdo é congelado na publicação e o link pode ser revogado. As condições abertas ficam em destaque, e a verificação automática não deixa sair o que é interno da empresa.</figcaption></figure>
+  </div>
+
+  <div class="sec-head" style="margin-top:44px">
+    <h3>Depois da proposta: compras e custo da obra</h3>
+    <p class="lede">A mesma casa de demonstração, já como obra. A parte de gestão está construída e testada, mas ainda não rodou numa obra real — veja "Ainda falta", abaixo.</p>
+  </div>
+  <div class="walk">
+    <figure class="shot"><img src="img/o-mapa.webp" alt="Mapa comparativo de cotações: dois fornecedores, preço por item e unidade, aviso de que um deles cotou só 2 de 3 itens e por isso o total não se compara, a melhor proposta completa de R$ 4.904,00 e o piso teórico item a item de R$ 4.628,00" loading="lazy"><figcaption><b>9 · Cotação que não engana</b>Quem cotou só parte dos itens não entra na comparação do total — o sistema avisa. O piso item a item aparece como argumento para negociar, não como compra.</figcaption></figure>
+    <figure class="shot"><img src="img/o-financeiro.webp" alt="Tela Financeiro da obra de demonstração: orçado de R$ 61.593,33, comprometido, realizado de R$ 4.904,00 e saldo contra o orçado, e a tabela das oito macroetapas com orçado, realizado e saldo" loading="lazy"><figcaption><b>10 · Orçado × comprometido × realizado</b>O custo direto do orçamento vira a linha de base da obra. Cada compra recebida baixa o saldo da macroetapa certa, e a medição sai do diário validado.</figcaption></figure>
   </div>
 
   <div class="sec-head" style="margin-top:44px">
@@ -509,7 +553,7 @@ details.mais .sec-head+*{margin-top:0}
       <div class="body">
         <p><strong>Desafio.</strong> Restaurante, plataforma de ônibus e posto de estrada para uma rede de rodovia. O cliente entregou um desenho de 756 MB e documentos de referência, sem uma única quantidade e sem um único preço. O documento mais completo do pacote era a proposta de um concorrente.</p>
         <p><strong>O que o sistema fez.</strong> Mediu no próprio desenho as paredes e as coberturas da obra inteira. Onde o desenho não bastava — o posto, que não vinha desenhado —, o projeto foi montado a partir da implantação do memorial e entrou pelo mesmo caminho, declarado como estimativa. Saíram orçamento, prazo e três propostas de tamanhos diferentes.</p>
-        <p><strong>Resultado.</strong> Uma proposta de obra completa de R$ 24,5 milhões. Quando a direção mudou o papel da empresa, de construtora para subempreiteira, o sistema gerou <strong>em horas</strong> uma segunda revisão, de R$ 9,6 milhões, e manteve a primeira intacta para comparação.</p>
+        <p><strong>Resultado.</strong> Uma proposta de obra completa de R$ 24,5 milhões. Quando a direção mudou o papel da empresa, de construtora para subempreiteira, o sistema gerou uma segunda revisão, de R$ 9,6 milhões, e manteve a primeira intacta para comparação.</p>
       </div>
     </details>
     <details>
@@ -553,7 +597,7 @@ details.mais .sec-head+*{margin-top:0}
       </div>
       <div class="calc-box">
         <span class="eyebrow">Do custo ao preço</span>
-        <p>Material e mão de obra recebem margens diferentes, porque imposto e risco são diferentes. Para que a margem seja mesmo a fração prometida do preço final, o sistema <b>divide o custo</b> pelo que sobra depois da margem, em vez de somar percentual em cima. As margens são da empresa e não aparecem aqui.</p>
+        <p>Material e mão de obra recebem margens diferentes, porque imposto e risco são diferentes. Para que a margem seja mesmo a fração prometida do preço final, o sistema <b>divide o custo</b> pelo que sobra depois da margem, em vez de somar percentual em cima. As margens das obras reais são da empresa e não aparecem aqui — as da casa de demonstração, sim.</p>
       </div>
       <div class="calc-box">
         <span class="eyebrow">E o prazo</span>
@@ -572,7 +616,7 @@ details.mais .sec-head+*{margin-top:0}
     <div>
       <h5>Medido</h5>
       <ul>
-        <li>Reproduz as composições SINAPI com desvio máximo de 0,25%; reprodução com 0,00% de desvio da calculadora que a empresa usava antes.</li>
+        <li>Nos 19 serviços SINAPI conferidos, reproduz as composições com desvio máximo de 0,25%. Contra a calculadora que a empresa usava antes, 0,00% — o que mostra que repete a mesma conta, não que acerta o custo de obra pronta.</li>
         <li>Mesma obra em três tamanhos de proposta, do mesmo dado, sem mover nenhum número.</li>
         <li>Toda obra passa pelo mesmo caminho — ler, medir, orçar, programar, propor — com guia escrito para um colega repetir.</li>
         <li>O sistema confere a si mesmo: foi assim que apareceram e foram corrigidos um serviço 25,9% abaixo do oficial e um prazo lido ao pé da letra que dava 234 dias para uma obra de 49.</li>
@@ -582,7 +626,7 @@ details.mais .sec-head+*{margin-top:0}
       <h5>Ainda falta</h5>
       <ul>
         <li>Publicar no servidor definitivo — a hospedagem foi ensaiada duas vezes com sucesso.</li>
-        <li>Usar a parte de gestão de obra (diário, compras, financeiro) numa obra real; está construída e testada, mas o uso no dia a dia foi orçamento e proposta.</li>
+        <li>Usar a parte de gestão de obra <em>deste</em> sistema (diário, compras, financeiro) numa obra real; está construída e testada, mas o uso no dia a dia foi orçamento e proposta. O diário em uso real, mostrado a seguir, é de outro sistema, o SIGE.</li>
         <li>Confrontar um orçamento com o custo final de uma obra concluída — a empresa ainda não tem esse histórico.</li>
         <li>Os valores são propostas, não contratos assinados.</li>
       </ul>
@@ -591,42 +635,71 @@ details.mais .sec-head+*{margin-top:0}
 </section>
 
 <section id="sige">
-  <div class="carimbo" aria-hidden="true"><span class="hot">Folha 03/08</span><span>SIGE · sistema de gestão para construtoras</span><span>2025–2026</span></div>
+  <div class="carimbo" aria-hidden="true"><span class="hot">Folha 03/08</span><span>SIGE · portal do cliente e diário de obra</span><span>Mai–Set/2026</span></div>
   <div class="sec-head">
-    <h2>Um sistema para a vida inteira da obra</h2>
-    <p class="lede">O SIGE reúne tudo o que acontece numa construtora, da primeira conversa com o cliente ao último pagamento. Nasceu na Estruturas do Vale, durante o estágio; hoje está em uso numa empresa de Light Steel Frame.</p>
+    <h2>O cliente vê a obra pelo link. Todo dia, com foto.</h2>
+    <p class="lede">Cada obra ganha um endereço próprio, que a construtora liga e desliga. Quem paga a obra abre no celular, sem conta e sem instalar nada, e vê o andamento, o cronograma e o diário de cada dia com as fotos da equipe — e confirma que leu, com senha e recibo. Por trás do link está o SIGE, o sistema de gestão que concebi e construí, hoje em uso numa empresa de Light Steel Frame.</p>
+    <p class="note" style="margin-top:4px">O SIGE é um sistema diferente do sistema de orçamento da folha anterior: ele cuida da obra depois da venda e é o que roda numa obra real.</p>
   </div>
-  <div class="cota" aria-hidden="true"><span>1 entrada</span><i></i><span>a informação entra uma vez</span><i></i><span>≈ 50 módulos</span></div>
+  <div class="cota" aria-hidden="true"><span>1 link por obra</span><i></i><span>65 diários · 378 fotos (cópia)</span><i></i><span>27,6% → 44,7%</span></div>
   <div class="tres">
-    <div><h5>O problema</h5><p>A mesma informação digitada cinco vezes, em cinco planilhas — e ninguém confia no número. Diário no grupo de WhatsApp, compras combinadas por mensagem, fluxo de caixa classificado à mão todo mês.</p></div>
-    <div><h5>O que fiz</h5><p>Concebi e construí o SIGE sobre a rotina real de uma construtora: <b>a informação entra uma vez</b>, onde o fato acontece, e alimenta o resto. Aprovar a proposta abre a obra; o diário move o cronograma e calcula a medição; o material conferido gera a conta a pagar.</p></div>
-    <div class="r"><h5>Resultado</h5><p><b>Cerca de 50 módulos em 6 áreas</b>, manual de 17 capítulos — em uso numa empresa de Light Steel Frame.</p></div>
+    <div><h5>O problema</h5><p>Quem paga a obra pergunta por telefone e recebe uma resposta montada à mão a cada vez. O diário fica no grupo de WhatsApp, sem ligação com o cronograma. E <b>diário que o cliente não confirmou que leu não serve de registro</b>.</p></div>
+    <div><h5>O que fiz</h5><p>Fiz do portal a porta de saída de tudo o que o sistema registra: o diário que o encarregado preenche move o cronograma, e o portal mostra os dois — o percentual da obra, as etapas e cada dia com foto. O representante do cliente dá ciência com uma senha só dele e recebe um recibo; se o diário mudar depois, a ciência passa a aparecer como "alterado".</p></div>
+    <div class="r"><h5>Resultado</h5><p>Numa obra de galpões em LSF, lida numa cópia do sistema com os dados reais: <b>65 diários, 378 fotos e 109 etapas num único link</b>. E o portal mostrou o que as mensagens escondiam: sem 23 dias que estavam só no WhatsApp, marcava 27,6% concluído; com eles, <b>44,7%</b>, contra 60,8% planejado. A carga desses 23 dias ainda não foi aplicada no sistema em uso.</p></div>
   </div>
+
+  <div class="portal-show">
+    <figure class="shot"><img src="img/p-portal.webp" alt="Portal do cliente no computador: 44,7% concluído, obra em andamento iniciada em 08/06/2026, 109 etapas, 65 relatórios e 106 dias de obra; abaixo, o cronograma por etapa com mobilização e marcação de obra a 100% e baias a 42,7%" loading="lazy"><figcaption>O portal da obra (cópia do sistema, com a carga dos 23 dias): percentual concluído, o cronograma por etapa e, abaixo, os 65 diários com foto. A data de entrega no topo não é previsão calculada pelo sistema: com 44,7% feito contra 60,8% planejado, não deve ser lida como estimativa. Nome da obra e do cliente ocultados.</figcaption></figure>
+    <figure class="shot cel"><img src="img/p-celular.webp" alt="O mesmo portal aberto no celular, com o anel de 44,7% concluído e os totais de etapas, relatórios e dias de obra" loading="lazy"><figcaption>No celular, onde o cliente está.</figcaption></figure>
+  </div>
+  <div class="telas">
+    <figure class="shot"><img src="img/p-diario-portal.webp" alt="Diário de 07/09/2026 aberto no portal: aviso de que o relatório aguarda ciência do representante do cliente, clima chuvoso, e três atividades com o percentual anterior, o incremento do dia e o atual — verticalização de LSF de 60% para 85%" loading="lazy"><figcaption>O diário como o cliente lê: clima, atividades que avançaram no dia (antes → depois) e o aviso de que falta a ciência.</figcaption></figure>
+    <figure class="shot"><img src="img/p-ciencia.webp" alt="Bloco de ciência dos responsáveis: o representante do cliente marcado, campo de senha preenchido, observação opcional e o botão Confirmar minha ciência" loading="lazy"><figcaption>Para dar ciência, o representante marca o próprio nome e confirma com a senha, pedida só nesse momento.</figcaption></figure>
+    <figure class="shot"><img src="img/p-recibo.webp" alt="Recibo da ciência registrada: responsável, cargo, data e hora do servidor, endereço de acesso e impressão digital do conteúdo, com botão para baixar em PDF" loading="lazy"><figcaption>O recibo: quem confirmou, quando, de onde e a impressão digital do conteúdo. Ciência feita na cópia de teste — por isso o endereço é o do próprio computador.</figcaption></figure>
+  </div>
+  <figure class="shot fotos"><img src="img/p-fotos.webp" alt="As 12 fotos do diário de 07/09 no portal: painéis de Light Steel Frame sendo verticalizados no galpão B e pilares metálicos da cobertura sendo posicionados no galpão A, com as legendas escritas pela equipe" loading="lazy"><figcaption>As 12 fotos do diário de 07/09, com as legendas da própria equipe: painéis de LSF verticalizados no galpão B, pilares da cobertura no galpão A.</figcaption></figure>
 
   <div class="case-banner">
     <div>
       <h3>Concebido, construído, implantado — e em uso</h3>
-      <p>Nasceu dentro de uma empresa de estruturas, durante o estágio comercial, para resolver a operação dela; hoje está em uso numa empresa de Light Steel Frame. O software é meu e está licenciado para quem o usa; os dados de cada empresa são dela. Manual de 17 capítulos e 4 guias ilustrados para a equipe.</p>
+      <p>A primeira versão nasceu dentro de uma empresa de estruturas, durante o estágio comercial; a versão atual foi construída de maio a setembro de 2026 e está em uso numa empresa de Light Steel Frame. Idealizei, defini as regras e conferi cada entrega; o código foi escrito com um assistente de programação com IA sob a minha direção. O software é meu e está licenciado para quem o usa; os dados de cada empresa são dela. Cerca de 50 módulos em 6 áreas, manual de 17 capítulos e 4 guias passo a passo (3 ilustrados) para a equipe.</p>
     </div>
     <div class="meta">
-      2025–2026 · software próprio, licenciado para a empresa<br>
+      1ª versão 2025 · atual mai–set/2026<br>
+      software próprio, licenciado<br>
       <a href="https://github.com/cassioviller/EnterpriseSync-1" target="_blank" rel="noopener">ver o repositório público ↗</a>
     </div>
   </div>
 
-
   <div class="flow" aria-label="Fluxo único">
-    <span>Proposta</span><i>→</i><span>Obra</span><i>→</i><span>Cronograma</span><i>→</i><span>Diário</span><i>→</i><span>Medição</span><i>→</i><span>Cobrança</span><i>→</i><span>Caixa</span>
+    <span>Proposta</span><i>→</i><span>Obra</span><i>→</i><span>Cronograma</span><i>→</i><span>Diário</span><i>→</i><span>Medição</span><i>→</i><span>Cobrança</span><i>→</i><span>Caixa</span><i>→</i><span>Portal do cliente</span>
   </div>
-
-
 
   <div class="sec-head" style="margin-top:44px">
     <h3>Como isso se traduziu no dia a dia</h3>
   </div>
   <div class="stories">
     <details open>
-      <summary><span class="n">01</span><h4>Da venda à obra</h4><span class="x" aria-hidden="true">+</span></summary>
+      <summary><span class="n">01</span><h4>O diário que estava no WhatsApp</h4><span class="x" aria-hidden="true">+</span></summary>
+      <div class="body">
+        <div><h5>O problema</h5><p>Numa obra de galpões, o sistema tinha 42 diários lançados até 11/08. Dali em diante, nada. O encarregado garantia que os diários estavam "devidamente atualizados" — e estavam, mas no grupo de WhatsApp, não no sistema. Resultado: 28 atividades já concluídas apareciam como atrasadas. Quem olhasse o sistema veria uma obra parada; quem estivesse no canteiro via o serviço avançando.</p></div>
+        <div><h5>O que fiz</h5><p>Li as mensagens e fotos do grupo dia a dia e montei uma carga de recuperação: 23 diários, 185 fotos e 72 registros de avanço em 23 atividades. Cada percentual ganhou uma justificativa escrita, apoiada no que a mensagem do dia dizia, num relatório que o gestor pode conferir. A carga passa por um ensaio que mostra tudo o que seria criado sem gravar nada — e se recusa a desfazer um avanço já lançado.</p></div>
+        <figure class="shot"><img src="img/p-diario-sistema.webp" alt="Produção do dia no diário de 07/09 dentro do sistema: três atividades com o planejado e o realizado lado a lado — verticalização de LSF planejada a 100% e realizada a 85%, instalação dos portões a 60% e 40%, pilares metálicos a 100% e 65% — todas marcadas como atrasadas" loading="lazy"><figcaption>O diário de 07/09, um dos 23 recuperados: para cada atividade, o planejado e o feito — e o aviso de atraso no dia em que acontece.</figcaption></figure>
+        <div><h5>Resultado</h5><p>Sem esses 23 dias, o portal mostrava a obra com <b>27,6%</b> concluído. Com eles lançados — numa cópia do sistema com os dados reais —, o mesmo portal mostra <b>44,7%</b>, com 65 diários e 378 fotos — contra 60,8% planejado para 07/09. A obra estava atrasada, mas bem menos do que os 27,6% faziam parecer; sem o registro, nem o tamanho do atraso era confiável. E o sistema ganhou uma ferramenta permanente: importar de uma vez diários e fotos que ficaram de fora, sempre com ensaio antes de gravar.</p></div>
+        <p class="learn">Sistema não muda hábito sozinho: a ferramenta existia e a equipe seguiu no WhatsApp por 23 dias. A resposta não foi só código — foi carga de recuperação, norma escrita do diário e combinado com os encarregados.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="n">02</span><h4>O cliente confirma que leu</h4><span class="x" aria-hidden="true">+</span></summary>
+      <div class="body">
+        <div><h5>O problema</h5><p>O diário de obra só serve de registro se o cliente confirmar que o leu — e essa confirmação costuma se perder numa conversa. "O cliente viu?" Ninguém sabe provar.</p></div>
+        <div><h5>O que fiz</h5><p>O representante do cliente tem uma senha só dele, que vale apenas para aquela obra. Para dar ciência num diário, marca o próprio nome e confirma com a senha. O sistema grava quem confirmou, a data e a hora do servidor, o endereço de onde a pessoa acessou e uma impressão digital do conteúdo do diário. Se alguém alterar o diário depois, a confirmação passa a aparecer como "alterado" — o sistema não esconde a mudança. Na hora, o cliente recebe um recibo, que pode baixar em PDF.</p></div>
+        <div><h5>Como ficou para quem usa</h5><ol><li>A construtora liga o portal na tela da obra e manda o link para o cliente.</li><li>O cliente abre o link, vê o andamento e o cronograma, e entra nos diários que quiser.</li><li>Para dar ciência, marca o próprio nome, digita a senha e recebe o recibo.</li><li>A construtora vê, diário por diário, quem já deu ciência e quem falta.</li><li>Se o cliente esquecer a senha, pede uma nova pelo próprio portal, e a construtora gera uma senha provisória.</li></ol></div>
+        <p class="learn">A senha é pedida só na hora de assinar, não para navegar. Confirmação difícil é confirmação que não acontece.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="n">03</span><h4>Da venda à obra</h4><span class="x" aria-hidden="true">+</span></summary>
       <div class="body">
         <div><h5>O problema</h5><p>A venda fechada costumava ser o começo de um retrabalho: cliente, itens do contrato e cronograma que já estavam na proposta precisavam ser cadastrados de novo em outros controles. Um item esquecido ou um valor trocado só aparecia meses depois, quando a cobrança não batia com o contrato.</p></div>
         <div><h5>O que fiz</h5><p>Aprovar a proposta passou a abrir a obra numa só ação. O cliente não é cadastrado de novo — o sistema reaproveita o que já existe. Os itens a medir e os custos previstos nascem prontos. Se o cronograma ainda não foi revisado, a obra abre pedindo conferência ao gestor em vez de nascer com um plano em que ninguém confia. Em seguida, a obra é entregue formalmente a quem vai executar, com dossiê.</p></div>
@@ -635,23 +708,17 @@ details.mais .sec-head+*{margin-top:0}
       </div>
     </details>
     <details>
-      <summary><span class="n">02</span><h4>Compras com governança</h4><span class="x" aria-hidden="true">+</span></summary>
+      <summary><span class="n">04</span><h4>Compras com governança</h4><span class="x" aria-hidden="true">+</span></summary>
       <div class="body">
         <div><h5>O problema</h5><p>Compras de obra combinadas por mensagem, sem registro de quem aprovou nem comparação de preços. Ficava difícil responder três perguntas simples sobre qualquer gasto: quem pediu, quem autorizou e o que realmente chegou ao canteiro.</p></div>
-        <div><h5>O que fiz</h5><p>Cada compra passou a seguir um ciclo de 9 etapas, do pedido ao pagamento, e mostra em que etapa está. Quem aprova depende do valor: o sistema avalia 4 condições para definir quantas aprovações o pedido precisa. As regras mais rígidas — trava contra compra fatiada, número mínimo de cotações por faixa e rito de emergência com 48 h para regularizar — são ligadas empresa por empresa. O recebimento conferido é o que dá entrada no estoque e gera a conta a pagar. A equipe ganhou um manual ilustrado de 22 passos.</p></div>
+        <div><h5>O que fiz</h5><p>Onde o controle está ligado, cada compra passa a seguir um ciclo de 9 etapas, do pedido ao pagamento, e mostra em que etapa está. Quem aprova depende do valor: o sistema avalia 4 condições para definir quantas aprovações o pedido precisa. As regras mais rígidas — trava contra compra fatiada, número mínimo de cotações por faixa e rito de emergência com 48 h para regularizar — são ligadas empresa por empresa. O recebimento conferido é o que dá entrada no estoque e gera a conta a pagar. A equipe ganhou um manual ilustrado de 22 passos.</p></div>
         <figure class="shot"><img src="img/s-000.webp" alt="Tela de nova requisição de compra do SIGE, com campos numerados para obra, data de necessidade, justificativa, rito de emergência, mapa de concorrência e itens" loading="lazy"><figcaption>Requisição de compra — a tela como aparece no manual de 22 passos.</figcaption></figure>
+        <div class="walk">
+          <figure class="shot"><img src="img/c-aprovacao.webp" alt="Requisição RC-2026-0002 aguardando aprovação: vergalhão CA-50, total estimado de R$ 2.336,00, quadro de alçada indicando a faixa até R$ 5.000,00 e que falta 1 aprovação de 1, e o histórico de aprovação com data, hora e responsável" loading="lazy"><figcaption>A alçada na tela: qual faixa de valor se aplica, quantas aprovações faltam e o histórico de quem mexeu. Dados de exemplo do manual.</figcaption></figure>
+          <figure class="shot"><img src="img/c-recebimento.webp" alt="Tela Receber pedido PC-2026-0101: quantidade recebida por item, data da entrega, observação de divergência, opção de encerrar o saldo quando o resto não vem e opção de registrar que chegou mais do que o pedido, com observação obrigatória" loading="lazy"><figcaption>O recebimento conferido: o que chegou de fato, divergência por escrito, "o resto não vem" e "chegou mais do que o pedido" — sem isso, o sistema recusa.</figcaption></figure>
+        </div>
         <div><h5>Quatro papéis, um ciclo</h5><ol><li><strong>Quem precisa, pede</strong> — obra, itens e justificativa; se urgente, usa o rito de emergência.</li><li><strong>Quem responde pela obra, decide</strong> — aprova ou devolve para correção.</li><li><strong>Quem compra, negocia</strong> — compara fornecedores no mapa e emite o pedido.</li><li><strong>Quem paga, confere</strong> — recebimento e nota; o pagamento só libera quando os três batem.</li></ol></div>
         <p class="learn">Mudança que mexe com dinheiro não entra de uma vez para todo mundo: entrega-se por fases, com roteiro de volta atrás.</p>
-      </div>
-    </details>
-    <details>
-      <summary><span class="n">03</span><h4>O diário que estava no WhatsApp</h4><span class="x" aria-hidden="true">+</span></summary>
-      <div class="body">
-        <div><h5>O problema</h5><p>Numa obra de galpões, o sistema tinha 42 diários lançados até 11/08. Dali em diante, nada. O encarregado garantia que os diários estavam "devidamente atualizados" — e estavam, mas no grupo de WhatsApp, não no sistema. Resultado: 28 atividades já concluídas apareciam como atrasadas. Quem olhasse o sistema veria uma obra parada; quem estivesse no canteiro via o serviço avançando.</p></div>
-        <div><h5>O que fiz</h5><p>Li as mensagens e fotos do grupo dia a dia e montei uma carga de recuperação: 23 diários, 185 fotos e 72 registros de avanço em 23 atividades. Cada percentual ganhou uma justificativa escrita, apoiada no que a mensagem do dia dizia, num relatório que o gestor pode conferir. A carga passa por um ensaio que mostra tudo o que seria criado sem gravar nada — e se recusa a desfazer um avanço já lançado.</p></div>
-        <figure class="shot"><img src="img/s-002.webp" alt="Apontamento de produção no diário de obra: atividades do cronograma com avanço planejado × realizado e campos de quantidade, percentual e marco concluído" loading="lazy"><figcaption>Avanço informado no diário por quantidade, percentual ou marco — e o cronograma se move.</figcaption></figure>
-        <div><h5>Resultado</h5><p>Uma lacuna que, espalhada nas mensagens, não aparecia, ficou visível e recuperável. E o sistema ganhou uma ferramenta permanente: importar de uma vez diários e fotos que ficaram de fora, sempre com ensaio antes de gravar.</p></div>
-        <p class="learn">Sistema não muda hábito sozinho. Recuperar o passado corrige o número de hoje; só o acordo com quem preenche evita o próximo buraco. Daí a norma escrita do diário.</p>
       </div>
     </details>
   </div>
@@ -659,35 +726,61 @@ details.mais .sec-head+*{margin-top:0}
   <details class="mais"><summary>Ver as 6 áreas, o antes e depois em 8 temas e o que sustenta os números</summary><div class="corpo">
   <div class="areas">
     <div><b>Comercial</b><p>Funil de vendas em 8 etapas, catálogo de materiais com histórico de preços, orçamento com regra única de margem, proposta em PDF com versões e aprovação por link.</p></div>
-    <div><b>Obra</b><p>Abertura automática ao aprovar a proposta, cronograma interativo com linha de base, diário de obra com fotos e assinatura, medição a partir do avanço, portal do cliente.</p></div>
-    <div><b>Compras e estoque</b><p>Pedido → cotação comparativa → aprovação por faixa de valor → recebimento conferido → nota → pagamento. Nove etapas, cada uma visível.</p></div>
-    <div><b>Pessoas</b><p>Escala semanal de equipes, ponto (inclusive por reconhecimento facial), folha processada a partir do ponto, alimentação e reembolsos por obra.</p></div>
+    <div><b>Obra</b><p>Abertura automática ao aprovar a proposta, cronograma interativo com linha de base, diário de obra com fotos e assinatura, medição a partir do avanço, portal do cliente com ciência e recibo. O percentual da obra é um número só — a média das atividades ponderada pela duração — igual no cronograma e no portal.</p></div>
+    <div><b>Compras e estoque</b><p>Pedido → cotação comparativa → aprovação por faixa de valor → recebimento conferido → nota → pagamento. Nove etapas, cada uma visível; as regras mais rígidas são ligadas empresa por empresa.</p></div>
+    <div><b>Pessoas</b><p>Escala semanal de equipes, ponto (com opção de reconhecimento facial), folha processada a partir do ponto, alimentação e reembolsos por obra.</p></div>
     <div><b>Financeiro</b><p>Contas a pagar e receber, fluxo de caixa com classificação por regras que o usuário ensina, custo previsto × realizado por obra, contabilidade com balancete e DRE.</p></div>
-    <div><b>Administração</b><p>Várias empresas no mesmo sistema, 5 perfis de acesso, painel de indicadores, manual embutido e avisos automáticos para 10 tipos de evento.</p></div>
+    <div><b>Administração</b><p>Várias empresas no mesmo sistema, 5 perfis de acesso no SIGE, painel de indicadores, manual embutido; avisos para fora do sistema dependem de ligar um serviço externo de envio.</p></div>
   </div>
   <div class="sec-head" style="margin-top:44px">
     <h3>O que mudou na operação</h3>
   </div>
   <ul class="ba">
     <li class="h"><span>Tema</span><span>Antes</span><span>Depois, com o sistema</span></li>
-    <li><span class="t">Venda → obra</span><span class="a">Cliente, itens e cronograma recadastrados em outros controles a cada venda fechada.</span><span class="d">Aprovar a proposta cria a obra com cliente, itens a medir e custos previstos, numa só ação.</span></li>
+    <li><span class="t">Cliente</span><span class="a">Pede notícias por telefone, e o diário é lido sem confirmação.</span><span class="d">Um link próprio da obra, com andamento, cronograma e diários com foto; ciência do cliente com senha e recibo, e aviso de "alterado" se o diário mudar depois.</span></li>
     <li><span class="t">Diário de obra</span><span class="a">Texto e fotos no grupo de WhatsApp, sem ligação com o cronograma e sem valor de documento.</span><span class="d">Diário no sistema com clima, equipe, ocorrências e fotos; passa por envio, assinatura, aprovação e ciência do cliente; vira PDF.</span></li>
-    <li><span class="t">Compras</span><span class="a">Combinadas por mensagem, sem registro de quem aprovou nem comparação formal de preços.</span><span class="d">Pedido, mapa comparativo de fornecedores e aprovador definido pelo valor. Trava contra compra fatiada para fugir da alçada.</span></li>
-    <li><span class="t">Conta a pagar</span><span class="a">Nascia no pedido, mesmo sem o material ter chegado.</span><span class="d">Nasce do que foi recebido e conferido no canteiro.</span></li>
+    <li><span class="t">Venda → obra</span><span class="a">Cliente, itens e cronograma recadastrados em outros controles a cada venda fechada.</span><span class="d">Aprovar a proposta cria a obra com cliente, itens a medir e custos previstos, numa só ação.</span></li>
+    <li><span class="t">Compras</span><span class="a">Combinadas por mensagem, sem registro de quem aprovou nem comparação formal de preços.</span><span class="d">Pedido, mapa comparativo de fornecedores e aprovador definido pelo valor. Trava contra compra fatiada para fugir da alçada, onde a empresa ligou.</span></li>
+    <li><span class="t">Conta a pagar</span><span class="a">Nascia no pedido, mesmo sem o material ter chegado.</span><span class="d">Nasce do que foi recebido e conferido no canteiro, com o controle de compras ligado.</span></li>
     <li><span class="t">Fluxo de caixa</span><span class="a">Cada lançamento da planilha classificado à mão, todo mês.</span><span class="d">Classificação por regras que o usuário ensina; só os casos duvidosos vão para uma fila, agrupados por fornecedor.</span></li>
     <li><span class="t">Medição</span><span class="a">Calculada à mão em planilha, com levantamento à parte.</span><span class="d">Calculada a partir do avanço já lançado nos diários, com fechamento, aprovação, PDF e cobrança gerada.</span></li>
-    <li><span class="t">Cliente</span><span class="a">Pede notícias por telefone.</span><span class="d">Portal com andamento, diários, medições e aprovações — inclusive de compras.</span></li>
     <li><span class="t">Conhecimento</span><span class="a">Regras "de cabeça", diferentes para cada pessoa.</span><span class="d">Manual embutido e normas escritas de preenchimento do diário e de revisão do cronograma.</span></li>
   </ul>
   <div class="sec-head" style="margin-top:44px">
     <h3>O que sustenta os números</h3>
   </div>
   <div class="prose">
-    <p>Mais de <strong>3.300 verificações automáticas</strong> rodam antes de cada entrega importante — cada uma simula um uso e confere o resultado. Numa revisão geral, <strong>114 problemas</strong> foram catalogados e as seis frentes de correção concluídas, entre eles erros de dinheiro que passariam despercebidos: um campo que multiplicava o valor de um contrato por 100, uma folha que dobraria o valor a pagar se reprocessada, relatórios contábeis que não fechavam entre si.</p>
+    <p>No SIGE, <strong>3.343 verificações automáticas</strong> passaram sem falha na última rodada completa registrada (04/09/2026) — cada uma simula um uso e confere o resultado. Numa revisão geral, <strong>114 problemas</strong> foram catalogados e atacados em seis frentes de correção, entre eles erros de dinheiro que passariam despercebidos: um campo que multiplicava o valor de um contrato por 100, uma folha que dobraria o valor a pagar se reprocessada, relatórios contábeis que não fechavam entre si.</p>
     <p>Toda mudança arriscada é ligada empresa por empresa, com roteiro de volta atrás.</p>
   </div>
 
   </div></details>
+
+  <div class="sec-head" style="margin-top:44px">
+    <span class="eyebrow">Sem maquiagem</span>
+    <h3>O que está medido — e o que ainda falta</h3>
+  </div>
+  <div class="honest">
+    <div>
+      <h5>Medido</h5>
+      <ul>
+        <li>65 diários, 378 fotos, 109 etapas e os 27,6% → 44,7% foram lidos em 22/09/2026 numa cópia do sistema com os dados reais da obra, exportados em 08/09, com a carga dos 23 dias aplicada.</li>
+        <li>Os 60,8% planejados para 07/09 saem do cronograma da própria obra, com 109 atividades ligadas entre si.</li>
+        <li>A carga de recuperação passou pelo ensaio sem pendências: 23 diários, 185 fotos e 72 registros de avanço, cada um com justificativa escrita.</li>
+        <li>O percentual da obra é o mesmo número na tela do cronograma e no portal.</li>
+      </ul>
+    </div>
+    <div>
+      <h5>Ainda falta</h5>
+      <ul>
+        <li>Aplicar a carga dos 23 dias no sistema em uso — em 08/09 constava como pendente.</li>
+        <li>O aceite dos encarregados à norma escrita do diário ainda estava em aberto no último registro.</li>
+        <li>Não há medição de tempo economizado nem de ligações a menos; o que parece ganho é estimativa.</li>
+        <li>A obra ainda não tem medição lançada no sistema — por isso o portal mostra 0 medições.</li>
+        <li>A ciência mostrada foi feita na cópia de teste, com um cadastro de exemplo.</li>
+      </ul>
+    </div>
+  </div>
   <p class="folha-link"><a href="casos/caso-23-diarios.pdf" target="_blank" rel="noopener">Baixar o caso dos 23 diários em uma página (PDF) ↓</a></p>
 </section>
 
@@ -708,7 +801,7 @@ details.mais .sec-head+*{margin-top:0}
     <canvas aria-hidden="true"></canvas>
     <img src="img/m1.webp" alt="Render externo do celeiro B-36 em LSF, com portão de correr aberto, deck e sótão" loading="lazy">
     <div class="hud"><b data-relogio>3,8 t</b><span data-legenda>Cada caixa sai pronta da fábrica.</span></div>
-    <figcaption>Maquete · o B-36 chega em duas caixas e o telhado desce em kit — três viagens</figcaption>
+    <figcaption>Maquete · o B-36 chega em duas caixas com a junção aberta; o telhado vem deitado, é montado no chão e sobe inteiro — três viagens</figcaption>
   </figure>
 
   <div class="gallery">
@@ -888,7 +981,7 @@ details.mais .sec-head+*{margin-top:0}
   <ul class="tl" style="margin-bottom:36px">
     <li><b>Levantamento e orçamento de propostas</b><p>Meço no projeto, orço na planilha da empresa e entrego a proposta no seu modelo.</p></li>
     <li><b>Compras com cotação e quadro de concorrência</b><p>Requisição, cotações, quadro de concorrência e conferência do que chegou ao canteiro.</p></li>
-    <li><b>Cronograma, diário e medição</b><p>Diário que move o cronograma e calcula a medição, com norma escrita para quem preenche.</p></li>
+    <li><b>Cronograma, diário, medição e portal do cliente</b><p>Diário que move o cronograma e calcula a medição, com norma escrita para quem preenche; o cliente acompanha pelo link e confirma que leu.</p></li>
     <li><b>Fluxo de caixa e custo previsto × realizado</b><p>Lançamentos classificados por regra, obra separada de escritório, custo por centro de custo.</p></li>
   </ul>
   <h3 style="margin-bottom:16px">Como trabalho</h3>
