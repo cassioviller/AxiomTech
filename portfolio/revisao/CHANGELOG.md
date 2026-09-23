@@ -166,3 +166,17 @@ Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO
 - Relógio da maquete sobre faixa escura (contraste ≥ 3:1).
 - `tests/check_historia.py`: cronologia, datas contra o currículo, links únicos, régua, WebGL real do içamento.
 - Para o Cássio conferir: iPhone real, zoom 200%, leitor de tela e memória das três maquetes. Em aberto: estágio/júnior; UNIFEI 2020–2024 (currículo) ou 2022–2024 (conversa) — a página não mostra o ano de entrada.
+
+---
+
+# Rodada 7 — o filme como trailer da história, 23/09/2026
+
+- Pesquisa das 5 personas (rodada 3) em `docs/superpowers/research/2026-09-23-filme/`; spec em `docs/superpowers/specs/2026-09-23-filme-trailer-design.md`.
+- "Comecei pela contabilidade, não pela obra." na história, no portfólio e no filme.
+- `portfolio/filme/`: o filme do zip, corrigido por `corrigir_filme.py` — 13 obras no sistema/11 com proposta; SIGE mai → set/2026; balancim como estudo; "só no WhatsApp"; "vi o dado digitado"; nome com acento; sem "26 anos"; tabela da abertura com números do portfólio; post-its e planilha sem valores inventados; legendas antigas removidas; apoio ≤ 200 palavras/min.
+- `render.py` roda no Replit com o Chromium do sistema; `site/video/historia.mp4` (960×540, 85 s, sem áudio) e capa.
+- Trailer na história, só por clique, com transcrição; "Assistir ao filme ↓" no convite.
+- Correção: o palco (sticky, `margin-bottom:-100vh`) cobria por uma tela o que vinha depois da história — a ficha, no fim da página; `overflow:clip` no `<main>` corta o palco onde a história acaba.
+- `tests/check_filme.py` (texto do filme e vídeo) e `check_historia.py` (seção do trailer; vídeo e ficha à vista depois do palco).
+- Próximo passo (plano separado): dioramas ao vivo como fundo dos capítulos, com um renderizador compartilhado.
+- Em aberto (Cássio): idade; UNIFEI 2020 ou 2022; estágio/júnior; versão curta do trailer para o LinkedIn.
