@@ -42,6 +42,8 @@ f.addEventListener('load',function(){
       if(parar===p)return;
       var fa=d.querySelector('.palco .fundo.ativo');
       log('cena '+p+' ativa='+H.ativa+' fundo='+(fa?fa.dataset.passo:'nenhum')+' maquetes='+maquetesVisiveis(d));
+      var rc=d.querySelectorAll('.regua [aria-current="step"]');
+      log('regua '+p+'='+(rc[0]?rc[0].getAttribute('href'):'-')+' n='+rc.length+' data='+d.querySelector('.regua-data').textContent);
       var m=d.querySelector('figure.maquete[data-passo="'+p+'"]');
       if(m){
         log('img '+p+'='+w.getComputedStyle(m.querySelector('img')).visibility);
@@ -69,6 +71,12 @@ f.addEventListener('load',function(){
     }
     centralizar(w,cenas[0],.5);await espera(1000);
     log('salto ativa='+H.ativa+' maquetes='+maquetesVisiveis(d));
+    // salto pela régua: o foco vai para o título do capítulo, que fica abaixo da barra
+    var marco=d.querySelector('.regua a[href="#veks"]');
+    if(marco){marco.click();await espera(900);}
+    var foco=d.activeElement,secao=foco&&foco.closest?foco.closest('.cena'):null;
+    var abaixo=!!foco&&foco.getBoundingClientRect().top>=d.querySelector('.barra').getBoundingClientRect().bottom;
+    log('salto-regua foco='+(secao?secao.id:'-')+' ativa='+H.ativa+' abaixo-da-barra='+abaixo);
     document.getElementById('resultado').textContent=saida.join('\n')+'\nFIM';
   })();
 });

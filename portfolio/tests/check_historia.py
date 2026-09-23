@@ -326,6 +326,34 @@ def checar_curriculo(pagina):
         check(na_pagina in t and no_cv in cv, f"datas da história e do currículo divergem: {na_pagina!r} × {no_cv!r}")
 
 
+MARCOS = {"tese": "Início", "origem": "Contabilidade e UNIFEI", "mudanca": "Mudança para São José dos Campos",
+          "obra": "Entrada na obra", "veks": "VEKS Engenharia", "ferramentas": "Ferramentas", "sige": "SIGE, versão atual",
+          "galpoes": "Obra dos galpões", "escala": "Sistema de orçamento", "precisao": "Conferência SINAPI",
+          "casa": "Celeiro B-36", "icamento": "Içamento do módulo", "whatsapp": "Diário no WhatsApp",
+          "recuperado": "Diários recuperados", "zip": "36 minutos", "metodo": "O método", "convite": "Convite"}
+
+
+def checar_regua(pagina):
+    barra = re.search(r'<header class="barra">(.*?)</header>', pagina, re.S)
+    nav = re.search(r'<nav class="regua" aria-label="Linha do tempo">(.*?)</nav>', barra.group(1) if barra else "", re.S)
+    check(nav is not None, "a régua (<nav class=\"regua\" aria-label=\"Linha do tempo\">) precisa estar dentro da barra")
+    if not nav:
+        return
+    links = re.findall(r'<li><a href="#([a-z0-9]+)"([^>]*)>(.*?)</a></li>', nav.group(1), re.S)
+    check([l[0] for l in links] == [c["passo"] for c in ROTEIRO], "a régua precisa de um link por capítulo, na ordem do roteiro")
+    for (passo, extra, miolo), c in zip(links, ROTEIRO):
+        esperado = (c["data"][0] + " " if c["data"] else "") + MARCOS[passo]
+        check(limpo(miolo) == esperado, f"régua {passo}: nome acessível {limpo(miolo)!r}, esperava {esperado!r}")
+        if c["data"]:
+            check(f'<time datetime="{c["data"][1][0]}">' in miolo, f"régua {passo}: falta <time datetime=\"{c['data'][1][0]}\">")
+    atuais = [l[0] for l in links if 'aria-current="step"' in l[1]]
+    check(atuais == ["tese"], f"no HTML, só o primeiro marco tem aria-current=\"step\" (achei {atuais})")
+    check("aria-live" not in pagina, "a régua não anuncia troca de capítulo (sem aria-live)")
+    css = "\n".join(re.findall(r"<style>(.*?)</style>", pagina, re.S))
+    check(re.search(r"\.regua a\{[^}]*min-width:28px", css) is not None, "cada marco da régua precisa de pelo menos 28 px de largura (alvo de toque)")
+    check(re.search(r"\.regua ol\{[^}]*overflow-x:auto", css) is not None, "quando não couber, a régua rola sozinha — nunca a página")
+
+
 PORTA = 5056
 PORTA_CDP = 9333
 
@@ -464,6 +492,9 @@ def checar_navegador():
         maq = passo if passo in maquetes else "-"
         esperado = f"cena {passo} ativa={passo} fundo={fundo} maquetes={maq}"
         check(esperado in normal, f"390 px: esperava {esperado!r}")
+        rotulo = c["data"][0].split("→")[0].strip() if c["data"] else "2017–2026"
+        check(f"regua {passo}=#{passo} n=1 data={rotulo}" in normal,
+              f"390 px: na cena {passo}, o marco ativo da régua deve ser #{passo} (e só ele), com a data {rotulo!r} à direita")
         if passo in maquetes:
             check(f"img {passo}=visible" in normal, f"390 px: sem WebGL, a imagem de reserva da cena {passo} precisa ficar visível")
     estreito = navegador(320)
@@ -471,7 +502,10 @@ def checar_navegador():
     check("overflow-x=false" in estreito, "320 px: a página rola na horizontal")
     reduzido = navegador(390, ("--disable-3d-apis", "--force-prefers-reduced-motion"))
     check("reduzido=true" in reduzido, "o Chromium não aplicou --force-prefers-reduced-motion")
-    for linha in ("js-historia=false", "palco-filhos=0", f"frases-visiveis={len(ROTEIRO)}", "overflow-x=false"):
+    check("salto-regua foco=veks ativa=veks abaixo-da-barra=true" in normal,
+          "390 px: saltar pela régua leva o foco ao título do capítulo, abaixo da barra, e ativa a cena")
+    for linha in ("js-historia=false", "palco-filhos=0", f"frases-visiveis={len(ROTEIRO)}", "overflow-x=false",
+                  "salto-regua foco=veks ativa=null abaixo-da-barra=true"):
         check(linha in reduzido, f"movimento reduzido: faltou {linha!r}")
     texto_normal = "\n".join(normal)
     check(re.search(r"^seek-tardio zip=\d", texto_normal, re.M) is not None,
@@ -494,6 +528,7 @@ def main():
         checar_css(pagina)
         checar_scripts(pagina)
         checar_curriculo(pagina)
+        checar_regua(pagina)
         checar_js()
         checar_maquetes_js()
         if "--navegador" in sys.argv:
