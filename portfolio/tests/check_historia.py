@@ -6,12 +6,20 @@ marcação acessível e CSS. Com --navegador (a partir da Task 2): o Chromium he
 abre tests/historia_teste.html e confere a troca de cenas.
 Uso: python3 portfolio/tests/check_historia.py [--navegador]
 """
+import base64
+import contextlib
 import html
+import json
+import os
 import re
+import socket
+import struct
 import subprocess
 import sys
 import time
+import urllib.request
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]  # portfolio/
 SITE = ROOT / "site"
@@ -206,6 +214,148 @@ def checar_scripts(pagina):
     check("<script>" not in pagina, "sem script inline")
 
 
+PORTA = 5056
+PORTA_CDP = 9333
+
+
+def checar_js():
+    caminho = SITE / "historia.js"
+    check(caminho.exists(), "portfolio/site/historia.js não existe")
+    if not caminho.exists():
+        return
+    js = re.sub(r"//[^\n]*", "", caminho.read_text(encoding="utf-8"))  # comentários não contam
+    for proibido in ("scrollTo", "scrollBy", "scrollIntoView", "preventDefault", "'wheel'", "'touchmove'"):
+        check(proibido not in js, f"historia.js não pode usar {proibido} (rolagem nativa)")
+    check("fps" not in js.lower() and "matar" not in js, "historia.js não duplica a guarda de desempenho do maquetes.js")
+
+
+class WS:
+    """Cliente WebSocket mínimo (mensagens de texto) para falar com o Chromium pelo DevTools Protocol."""
+
+    def __init__(self, url):
+        u = urlparse(url)
+        self.s = socket.create_connection((u.hostname, u.port), timeout=60)
+        chave = base64.b64encode(os.urandom(16)).decode()
+        self.s.sendall((f"GET {u.path} HTTP/1.1\r\nHost: {u.hostname}:{u.port}\r\nUpgrade: websocket\r\n"
+                        f"Connection: Upgrade\r\nSec-WebSocket-Key: {chave}\r\nSec-WebSocket-Version: 13\r\n\r\n").encode())
+        resposta = b""
+        while b"\r\n\r\n" not in resposta:
+            resposta += self.s.recv(1)
+        if b" 101 " not in resposta.split(b"\r\n")[0]:
+            raise RuntimeError(f"WebSocket recusado: {resposta[:80]!r}")
+        self.n = 0
+
+    def _ler(self, n):
+        b = b""
+        while len(b) < n:
+            parte = self.s.recv(n - len(b))
+            if not parte:
+                raise RuntimeError("a conexão com o Chromium caiu")
+            b += parte
+        return b
+
+    def _receber(self):
+        texto = b""
+        while True:
+            b1, b2 = self._ler(2)
+            n = b2 & 0x7F
+            if n == 126:
+                n = struct.unpack(">H", self._ler(2))[0]
+            elif n == 127:
+                n = struct.unpack(">Q", self._ler(8))[0]
+            texto += self._ler(n)
+            if b1 & 0x80:
+                return json.loads(texto)
+
+    def comando(self, metodo, **params):
+        self.n += 1
+        dados = json.dumps({"id": self.n, "method": metodo, "params": params}).encode()
+        n = len(dados)
+        if n < 126:
+            cab = bytes([0x81, 0x80 | n])
+        elif n < 65536:
+            cab = bytes([0x81, 0x80 | 126]) + struct.pack(">H", n)
+        else:
+            cab = bytes([0x81, 0x80 | 127]) + struct.pack(">Q", n)
+        mascara = os.urandom(4)
+        self.s.sendall(cab + mascara + bytes(b ^ mascara[i % 4] for i, b in enumerate(dados)))
+        while True:
+            msg = self._receber()
+            if msg.get("id") == self.n:
+                return msg.get("result", {})
+
+    def avaliar(self, expressao):
+        r = self.comando("Runtime.evaluate", expression=expressao, returnByValue=True)
+        return r.get("result", {}).get("value")
+
+
+@contextlib.contextmanager
+def chromium(largura, extra=()):
+    """Servidor estático em portfolio/ + Chromium headless em tempo real, controlado pelo DevTools Protocol.
+    Não usar --virtual-time-budget: nele quase não há quadros, e sem quadros nem o IntersectionObserver nem o scroll disparam."""
+    srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORTA), "--bind", "127.0.0.1", "--directory", str(ROOT)],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    nav = subprocess.Popen(["chromium", "--headless", "--no-sandbox", "--disable-gpu", "--hide-scrollbars",
+                            f"--window-size={largura},800", f"--remote-debugging-port={PORTA_CDP}", *extra, "about:blank"],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        alvos = []
+        for _ in range(100):
+            try:
+                alvos = json.load(urllib.request.urlopen(f"http://127.0.0.1:{PORTA_CDP}/json/list"))
+                break
+            except OSError:
+                time.sleep(0.1)
+        paginas = [a for a in alvos if a.get("type") == "page"]
+        if not paginas:
+            raise RuntimeError("o Chromium não abriu a porta do DevTools")
+        ws = WS(paginas[0]["webSocketDebuggerUrl"])
+        # o headless impõe janela mínima de ~500×657; o override garante exatamente largura × 800
+        ws.comando("Emulation.setDeviceMetricsOverride", width=largura, height=800, deviceScaleFactor=1, mobile=False)
+        yield ws
+    finally:
+        nav.terminate()
+        nav.wait()
+        srv.terminate()
+        srv.wait()
+
+
+def navegador(largura=390, extra=("--disable-3d-apis",)):
+    """Roda o harness e devolve as linhas do <pre id="resultado"> (espera até 60 s pelo FIM)."""
+    with chromium(largura, extra) as ws:
+        ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/tests/historia_teste.html")
+        prazo = time.time() + 60
+        texto = ""
+        while time.time() < prazo:
+            texto = ws.avaliar("(document.getElementById('resultado')||{}).textContent||''") or ""
+            if texto.endswith("FIM"):
+                break
+            time.sleep(0.5)
+    return texto.splitlines()
+
+
+def checar_navegador():
+    maquetes = {p for p, *_resto, maq in ROTEIRO if maq}
+    normal = navegador(390)
+    check("FIM" in normal, f"390 px: o harness não terminou — últimas linhas {normal[-3:]}")
+    for linha in ("reduzido=false", "js-historia=true", "overflow-x=false", "inicio ativa=tese", "salto ativa=tese maquetes=-"):
+        check(linha in normal, f"390 px: faltou {linha!r}")
+    for passo, _tag, _frase, _ressalva, imagem, *_resto in ROTEIRO:
+        fundo = passo if imagem else "nenhum"
+        maq = passo if passo in maquetes else "-"
+        esperado = f"cena {passo} ativa={passo} fundo={fundo} maquetes={maq}"
+        check(esperado in normal, f"390 px: esperava {esperado!r}")
+        if passo in maquetes:
+            check(f"img {passo}=visible" in normal, f"390 px: sem WebGL, a imagem de reserva da cena {passo} precisa ficar visível")
+    estreito = navegador(320)
+    check("FIM" in estreito, "320 px: o harness não terminou")
+    check("overflow-x=false" in estreito, "320 px: a página rola na horizontal")
+    reduzido = navegador(390, ("--disable-3d-apis", "--force-prefers-reduced-motion"))
+    check("reduzido=true" in reduzido, "o Chromium não aplicou --force-prefers-reduced-motion")
+    for linha in ("js-historia=false", "palco-filhos=0", "frases-visiveis=10", "overflow-x=false"):
+        check(linha in reduzido, f"movimento reduzido: faltou {linha!r}")
+
+
 def main():
     check(PAGINA.exists(), "portfolio/site/historia.html não existe")
     if PAGINA.exists():
@@ -215,6 +365,9 @@ def main():
         checar_texto(pagina, index)
         checar_css(pagina)
         checar_scripts(pagina)
+        checar_js()
+        if "--navegador" in sys.argv:
+            checar_navegador()
     if FALHAS:
         print("FALHOU:")
         for f in FALHAS:

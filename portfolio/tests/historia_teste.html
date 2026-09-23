@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Teste da história</title>
+<style>html,body{margin:0}#f{position:absolute;top:0;left:0;width:100%;height:800px;border:0}#resultado{position:absolute;top:820px;left:0;margin:0}</style>
+</head>
+<body>
+<iframe id="f" src="../site/historia.html" title="História"></iframe>
+<pre id="resultado">rodando</pre>
+<script>
+// Harness do Chromium headless: rola o iframe cena a cena e registra o estado em #resultado.
+// ?parar=<passo> interrompe no meio dessa cena (para tirar screenshot).
+(function(){
+'use strict';
+var parar=new URLSearchParams(location.search).get('parar');
+var f=document.getElementById('f'),saida=[];
+function log(s){saida.push(s);}
+function espera(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function centralizar(w,el,fracao){var r=el.getBoundingClientRect();w.scrollTo(0,Math.round(r.top+w.scrollY+r.height*fracao-w.innerHeight/2));}
+function maquetesVisiveis(d){return [].filter.call(d.querySelectorAll('.palco .maquete'),function(m){return !m.hidden;}).map(function(m){return m.dataset.passo;}).join(',')||'-';}
+function tempo(m){var t=m.__maquete&&m.__maquete.t;return typeof t==='number'?t.toFixed(1):'null';}
+f.addEventListener('load',function(){
+  var w=f.contentWindow,d=f.contentDocument;
+  // maquete falsa: com --disable-3d-apis o maquetes.js desiste e a API real nunca aparece
+  [].forEach.call(d.querySelectorAll('figure.maquete'),function(m){m.__maquete={dur:1000,t:null,seek:function(x){this.t=x;}};});
+  (async function(){
+    await espera(800);
+    var H=w.Historia||{};
+    log('reduzido='+w.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    log('js-historia='+d.documentElement.classList.contains('js-historia'));
+    log('palco-filhos='+d.querySelector('.palco').children.length);
+    log('frases-visiveis='+[].filter.call(d.querySelectorAll('.frase'),function(x){return x.offsetHeight>0;}).length);
+    log('overflow-x='+(d.documentElement.scrollWidth>d.documentElement.clientWidth));
+    log('inicio ativa='+H.ativa);
+    if(H.progresso)log('progresso='+[H.progresso(400,1000,800),H.progresso(-100,1000,800),H.progresso(-700,1000,800),H.progresso(0,0,800)].join(' '));
+    var cenas=[].slice.call(d.querySelectorAll('.cena[data-passo]'));
+    for(var i=0;i<cenas.length;i++){
+      var c=cenas[i],p=c.dataset.passo;
+      centralizar(w,c,.5);await espera(700);
+      if(parar===p)return;
+      var fa=d.querySelector('.palco .fundo.ativo');
+      log('cena '+p+' ativa='+H.ativa+' fundo='+(fa?fa.dataset.passo:'nenhum')+' maquetes='+maquetesVisiveis(d));
+      var m=d.querySelector('figure.maquete[data-passo="'+p+'"]');
+      if(m){
+        log('img '+p+'='+w.getComputedStyle(m.querySelector('img')).visibility);
+        log('seek '+p+'='+tempo(m));
+        centralizar(w,c,.25);await espera(300);
+        log('seek25 '+p+'='+tempo(m));
+      }
+    }
+    centralizar(w,cenas[0],.5);await espera(900);
+    log('salto ativa='+H.ativa+' maquetes='+maquetesVisiveis(d));
+    document.getElementById('resultado').textContent=saida.join('\n')+'\nFIM';
+  })();
+});
+})();
+</script>
+</body>
+</html>
