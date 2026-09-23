@@ -1,16 +1,22 @@
-// História em cenas: quando a frase cruza o meio da tela, o fundo troca de cena.
+// História em cenas: quando a frase cruza o meio da tela, o fundo troca de cena; nas cenas de maquete,
+// o tempo da animação 3D é o progresso do scroll dentro da cena.
 // Regras: rolagem nativa (o script nunca move a página nem bloqueia o gesto); sem JS, sem
 // IntersectionObserver ou com prefers-reduced-motion a página fica empilhada e estática, cada frase com a sua imagem.
 (function(){
 'use strict';
-var H=window.Historia={ativa:null};
+// progresso 0→1 de uma cena: 0 quando o topo cruza o meio da tela, 1 quando o fim cruza
+function progresso(topo,altura,alturaTela){
+  if(!(altura>0))return 0;
+  return Math.max(0,Math.min(1,(alturaTela/2-topo)/altura));
+}
+var H=window.Historia={ativa:null,progresso:progresso};
 var cenas=[].slice.call(document.querySelectorAll('.cena[data-passo]'));
 var palco=document.querySelector('.palco');
 if(!cenas.length||!palco||!('IntersectionObserver' in window))return;
 if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 
 // cada fundo vai para o palco fixo; a maquete fica hidden fora da sua cena, para só uma renderizar por vez
-var fundos={},esconder={};
+var fundos={},esconder={},tentativas=0,pendente=false;
 cenas.forEach(function(c){
   var f=c.querySelector('.fundo');
   if(!f)return;
@@ -20,6 +26,18 @@ cenas.forEach(function(c){
 });
 document.documentElement.classList.add('js-historia');
 
+// maquete da cena ativa: o relógio da animação segue o scroll (seek congela o tempo), nunca anda sozinho
+function sincronizar(){
+  var f=H.ativa&&fundos[H.ativa];
+  if(!f||!f.classList.contains('maquete'))return;
+  var api=f.__maquete;
+  if(!api||!api.dur){ // three.js ainda carregando: tenta de novo por até 5 s
+    if(tentativas++<25)setTimeout(sincronizar,200);
+    return;
+  }
+  var r=document.querySelector('.cena[data-passo="'+H.ativa+'"]').getBoundingClientRect();
+  api.seek(progresso(r.top,r.height,innerHeight)*api.dur*0.999);
+}
 function esconderDepois(passo){
   clearTimeout(esconder[passo]);
   esconder[passo]=setTimeout(function(){if(H.ativa!==passo)fundos[passo].hidden=true;},650);
@@ -39,6 +57,8 @@ function ativar(passo){
     void f.offsetWidth; // aplica o display antes da opacidade, senão não há transição
     f.classList.add('ativo');
   }
+  tentativas=0;
+  sincronizar();
 }
 function cenaNoCentro(){
   var meio=innerHeight/2;
@@ -50,6 +70,11 @@ var io=new IntersectionObserver(function(es){
   es.forEach(function(e){if(e.isIntersecting)ativar(e.target.dataset.passo);});
 },{rootMargin:'-45% 0px -45% 0px',threshold:0});
 cenas.forEach(function(c){io.observe(c);});
+addEventListener('scroll',function(){
+  if(pendente)return;
+  pendente=true;
+  requestAnimationFrame(function(){pendente=false;sincronizar();});
+},{passive:true});
 var inicial=cenaNoCentro();
 if(inicial)ativar(inicial.dataset.passo);
 })();

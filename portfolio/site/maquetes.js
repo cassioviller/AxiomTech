@@ -213,7 +213,7 @@ function montar(fig){
     raf=requestAnimationFrame(frame);
   }
   function matar(){dead=true;fig.classList.remove('viva');cancelAnimationFrame(raf);sc.R.dispose();}
-  var api={frozen:false,seek:function(x){t=x;api.frozen=true;}}; // seek(): usado nos testes para conferir um quadro exato
+  var api={frozen:false,dur:sc.dur,seek:function(x){t=x;api.frozen=true;}}; // seek(): testes e historia.js (tempo = scroll)
   fig.__maquete=api;if(TFIXO)api.seek(parseFloat(TFIXO));
   // pausar/continuar (WCAG 2.2.2: animação com mais de 5 s precisa de pausa)
   var bt=document.createElement('button');bt.type='button';bt.className='pausa';

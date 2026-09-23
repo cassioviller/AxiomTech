@@ -354,6 +354,18 @@ def checar_navegador():
     check("reduzido=true" in reduzido, "o Chromium não aplicou --force-prefers-reduced-motion")
     for linha in ("js-historia=false", "palco-filhos=0", "frases-visiveis=10", "overflow-x=false"):
         check(linha in reduzido, f"movimento reduzido: faltou {linha!r}")
+    check("progresso=0 0.5 1 0" in normal, "Historia.progresso fora do esperado (0 no topo, 0,5 no meio, 1 no fim, 0 sem altura)")
+    texto_normal = "\n".join(normal)
+    for passo in sorted(maquetes):
+        for chave, alvo in (("seek", 500), ("seek25", 250)):
+            m = re.search(rf"^{chave} {passo}=([\d.]+)$", texto_normal, re.M)
+            check(m is not None and abs(float(m.group(1)) - alvo) <= 20,
+                  f"{chave} {passo}: esperava ≈{alvo} (dur 1000), achei {m.group(1) if m else 'nada'}")
+
+
+def checar_maquetes_js():
+    js = (SITE / "maquetes.js").read_text(encoding="utf-8")
+    check("dur:sc.dur" in js, "maquetes.js precisa expor a duração da cena em fig.__maquete.dur")
 
 
 def main():
@@ -366,6 +378,7 @@ def main():
         checar_css(pagina)
         checar_scripts(pagina)
         checar_js()
+        checar_maquetes_js()
         if "--navegador" in sys.argv:
             checar_navegador()
     if FALHAS:
