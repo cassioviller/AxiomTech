@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Checagens da página historia.html (a história em cenas).
+"""Checagens da página principal, site/index.html (a história em cenas).
 
-Estático: roteiro exato, ressalvas, números (só os que o index.html já sustenta),
+Estático: roteiro exato, ressalvas, números (só os que o portfólio, site/portfolio.html, já sustenta),
 marcação acessível e CSS. Com --navegador (a partir da Task 2): o Chromium headless
 abre tests/historia_teste.html e confere a troca de cenas.
 Uso: python3 portfolio/tests/check_historia.py [--navegador]
@@ -23,7 +23,7 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]  # portfolio/
 SITE = ROOT / "site"
-PAGINA = SITE / "historia.html"
+PAGINA = SITE / "index.html"
 FALHAS = []
 
 # (passo, tag da frase, frase, ressalva, imagem de fundo, largura, altura, cena 3D do maquetes.js)
@@ -162,7 +162,7 @@ def checar_marcacao(pagina):
         check("Cássio Viller" in limpo(tb) and "Orçamento, planejamento e custos" in limpo(tb), "barra sem nome ou cargo-alvo")
         check(f'href="{CURRICULO}"' in tb and f'href="{WHATSAPP}' in tb, "barra sem currículo ou WhatsApp")
     ultima = cs[-1][3] if cs else ""
-    for alvo in (WHATSAPP, "index.html", CURRICULO):
+    for alvo in (WHATSAPP, "portfolio.html", CURRICULO):
         check(f'href="{alvo}' in ultima, f"cena final sem link para {alvo}")
     ficha = re.search(r'<section class="ficha"[^>]*>(.*?)</section>', pagina, re.S)
     check(ficha is not None, "falta a ficha (<section class=\"ficha\">)")
@@ -177,7 +177,7 @@ def checar_texto(pagina, index):
         check(0 < len(ressalva.split()) <= 30, f"cena {passo}: ressalva com {len(ressalva.split())} palavras (1 a 30)")
     t = limpo(corpo(pagina))
     extras = numeros(t) - numeros(limpo(corpo(index)))
-    check(not extras, f"números que o index.html não sustenta: {sorted(extras)}")
+    check(not extras, f"números que o portfólio não sustenta: {sorted(extras)}")
     for r in RESSALVAS:
         check(r in t, f"ressalva ausente: {r!r}")
     check(t.lower().count("você") == 1, "\"você\" deve aparecer uma vez só, no convite final")
@@ -374,10 +374,10 @@ def checar_maquetes_js():
 
 
 def main():
-    check(PAGINA.exists(), "portfolio/site/historia.html não existe")
+    check(PAGINA.exists(), "portfolio/site/index.html (a história) não existe")
     if PAGINA.exists():
         pagina = PAGINA.read_text(encoding="utf-8")
-        index = (SITE / "index.html").read_text(encoding="utf-8")
+        index = (SITE / "portfolio.html").read_text(encoding="utf-8")
         checar_marcacao(pagina)
         checar_texto(pagina, index)
         checar_css(pagina)

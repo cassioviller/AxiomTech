@@ -1,0 +1,83 @@
+# Persona 3 — Lia (rodada 2: linha do tempo)
+
+## O arco na linha do tempo (e por quê)
+
+Cássio pediu explicitamente "um storytelling de acordo com minha linha do tempo e de quando montei cada coisa". Isso muda a régua de decisão de Lia: na rodada 1 ela podia reordenar os fatos livremente em torno do arco ABT; agora a ordem cronológica é uma restrição do briefing, não uma escolha estilística — e a pesquisa desta rodada é clara em avisar que ordem cronológica pura é o cenário onde o "efeito lista de eventos" é mais provável de acontecer, não menos.
+
+A solução de Lia é manter a espinha ABT por baixo, mas fazer a **régua de tempo fazer o trabalho que a reordenação fazia antes**:
+
+1. **E (2017–2024).** Um único capítulo comprime contabilidade, UNIFEI, DCE e InLoco Jr. — o "todo dia" disperso antes da obra. Comprimir aqui, não espalhar, é o que sobra de orçamento de tela para os capítulos que carregam prova.
+2. **MAS (2025).** A entrada na obra continua sendo o único "mas" do roteiro — mas agora ele carrega, também, a primeira sobreposição de vínculos real (V Alves + Estruturas do Vale, ao mesmo tempo). A régua de tempo é o que deixa isso legível sem precisar de um parágrafo de explicação: duas datas que se cruzam na mesma faixa do carimbo já mostram a simultaneidade.
+3. **PORTANTO (2026, em sequência real).** Cada sistema entra na ordem em que nasceu de verdade: ferramentas pequenas (mar–abr) → SIGE em versão nova (mai–set) → a obra real que usa o SIGE (jun) → o sistema de orçamento crescendo (jul–set) → dois projetos correndo em paralelo em agosto (o diário que parou no WhatsApp e as casas modulares) → o resultado do SIGE recuperado → a proposta de 36 minutos, o caso mais recente e mais rápido. A segunda sobreposição de vínculo (V Alves só termina em julho, a VEKS já começou em março) aparece de novo, mais rápido, como eco — não como um segundo "mas".
+4. **LOGO.** Fecha com o eco da tese, como na rodada 1, e a mesma virada final para StoryBrand nas duas últimas telas (recrutador como quem tem o problema; Cássio como quem já construiu a resposta).
+
+Duas coisas a pesquisa desta rodada confirma e que mudam a execução em relação à rodada 1:
+
+- **A régua de tempo não é decoração — é o mecanismo que evita a lista.** Um cronograma que revela uma data de cada vez, com o detalhe daquela data, lê-se como narrativa; a mesma informação numa fileira estática lê-se como currículo. É por isso que cada capítulo abaixo é "um marco, uma tela" — a régua persistente (já decidida no contexto comum: 2017 · 2022 · 2025 · 2026) faz o papel do "chapter panel" que a pesquisa de jornalismo de dados usa.
+- **Tensão cronológica não precisa de reordenação — precisa dos pontos de virada reais.** A literatura sobre timelines de ficção lista a reordenação (flashback, timeline fraturada) como uma forma de gerar tensão; Lia descarta essa opção aqui porque o pedido do Cássio é o oposto ("de acordo com minha linha do tempo"). A tensão vem de dentro da própria sequência real: os dois vínculos simultâneos e os 23 dias que sumiram do sistema já são pontos de virada verdadeiros — não é preciso inventar um.
+
+## O que a pesquisa diz
+
+- Uma linha do tempo bem-feita revela um marco de cada vez, com a data e o detalhe daquele marco — e é isso que faz o leitor viver a história em vez de escanear uma fileira plana de datas; o formato serve qualquer narrativa cronológica, incluindo histórias pessoais. [fonte](https://scrollytelling.ai/tools/timeline-maker/)
+- Boas peças de scrollytelling em timeline quebram o conteúdo em seções digestíveis, com título em cada seção, e usam navegação (como um seletor de ano) para não obrigar o leitor a rolar por tudo de uma vez quando o conjunto é grande — o design certo depende de quantos "ativos" (fotos, telas) a história realmente tem, não do que seria ideal. [fonte](https://www.newmediacampaigns.com/blog/website-timeline-examples-best-practices)
+- A regra central para não sobrecarregar quem lê é "uma ideia por seção": cada parada do scroll carrega um único ponto, não todos os achados de uma vez — a sequência é curada para guiar, não para despejar dado em cima do leitor. [fonte](https://flourish.studio/blog/scrollytelling-examples/)
+- O ritmo é o que regula a velocidade de leitura numa peça de scrollytelling: dividir o conteúdo em seções administráveis evita que o leitor se sinta atropelado ou entediado — e cada rolagem funciona como um "microcompromisso" que sustenta o engajamento, o que só funciona se cada seção realmente entregar algo novo. [fonte](https://capturly.com/blog/level-up-your-user-experience-with-scrollytelling/)
+- Existem quatro tipos de linha do tempo narrativa — linear, fraturada, emoldurada e em tempo real — e adiar a revelação de informação crucial é a ferramenta clássica para gerar tensão numa história; como o pedido aqui é ordem cronológica fiel, essa ferramenta fica fora de uso, e a tensão precisa vir dos próprios pontos de virada da sequência real. [fonte](https://jerichowriters.com/story-timelines/)
+- Mesmo dentro de uma ordem cronológica, um arco narrativo continua precisando de picos e planaltos (exposição, ação crescente, clímax, desfecho) para não virar uma lista de eventos no mesmo nível de importância — o que justifica tratar alguns capítulos (a entrada na obra, o mês de agosto, os 36 minutos) como picos, e os capítulos de formação como planalto de abertura. [fonte](https://reedsy.com/blog/narrative-arc/)
+- O boom do scrollytelling jornalístico ("Snow Fall", do NYT; peças de dados do The Pudding; "Firestorm", do Guardian) mostra o mesmo padrão: a peça vira uma sucessão de cenas com uma revelação cada, não um artigo corrido — é o mesmo princípio que already orienta `historia.html`/Scrollama, agora aplicado a uma sequência com datas. [fonte](https://medium.com/nightingale/the-past-present-and-future-of-scrollytelling-10dd37dc1003)
+
+## Roteiro proposto por capítulos
+
+Todos os números e datas vêm de `00-contexto.md` ou de `portfolio.html`; nenhum é inventado. 16 capítulos (dentro da faixa de 12 a 16 pedida): 3 de moldura (abertura, resolução, convite) e 13 datados, em ordem estritamente cronológica.
+
+| # | capítulo | data exibida | frase grande (≤10 palavras) | linha de apoio/ressalva (≤30 palavras) | fundo sugerido | âncora do portfólio |
+|---|---|---|---|---|---|---|
+| 1 | Abertura (tese, metade E) | — (moldura, antes da régua) | Um número sem origem custa caro na obra. | Cássio Viller, Engenharia Civil (7º semestre), mira orçamento, planejamento e custos. | `img/o-quantitativos.webp` (já usado na rodada 1) | — |
+| 2 | Antes da obra | 2017–2024 | Comecei no centavo, não na parede. | Escritório da família desde 2017; na UNIFEI, fiscal do DCE (2022) e diretor de vendas da InLoco Jr. (2023–2024). | Nenhuma imagem disponível em `img/` para este período — fundo neutro de prancha, como já ocorre nas cenas sem foto da rodada 1. | `#curriculo` |
+| 3 | Muda de cidade e de curso | 2025 | Em 2025, mudei de cidade e de curso. | Cruzeiro do Sul (EAD) e São José dos Campos; hoje no 7º semestre, faltam 3. Sistemas de Informação na PUC, em paralelo. | Nenhuma imagem disponível — fundo neutro. | `#curriculo` |
+| 4 | Entrada na obra (o "mas" único) | fev/2025 – mar/2026 | Mas na obra, vi a mesma informação digitada cinco vezes. | V Alves (gerente de produção, meio período) e Estruturas do Vale (estágio comercial), em paralelo — foi ali que nasceu o SIGE, com mais de 10 módulos. | `img/p-fotos.webp` (fotos reais de obra em LSF; risco de anacronismo, ver "Riscos") | `#curriculo` (a frase "foi aqui que o SIGE nasceu" está literalmente nesta seção) |
+| 5 | Começa a PJ na VEKS | mar/2026 | Em março, entrei na VEKS, ainda na V Alves. | VEKS Engenharia, contrato PJ de 6 meses (mar–set/2026); a V Alves só terminaria em julho. | Nenhuma imagem específica — fundo neutro de transição. | `#curriculo` |
+| 6 | Ferramentas pequenas primeiro | mar–abr/2026 | Toda conta repetida virou ferramenta. | Calculadora de parede em LSF/drywall e classificador do fluxo de caixa, nos primeiros meses na VEKS. | Nenhuma imagem em `img/` (a seção `#ferramentas` do portfólio não tem prints) — fundo neutro. | `#ferramentas` |
+| 7 | SIGE, versão atual | mai–set/2026 | De maio a setembro, o SIGE ganhou versão nova. | Entregas registradas de 22/07 a 14/09/2026; cerca de 50 módulos em 6 áreas. | `img/p-portal.webp` | `#sige` |
+| 8 | Começa a obra real | 08/06/2026 | Em junho, começou a obra que testaria tudo. | Galpões (baias) em Light Steel Frame: a obra real que passaria a usar o SIGE. | `img/p-fotos.webp` (mesma foto do capítulo 4 — ver "Riscos" sobre reúso e data) | `#sige` |
+| 9 | O sistema de orçamento cresce | 9/jul – 21/set/2026 | Treze obras no sistema; onze viraram proposta. | De R$ 29 mil a R$ 24,5 milhões; a gestão de obra desse sistema ainda não rodou numa obra real. | `img/s1.webp` | `#sistema` |
+| 10 | Precisão do sistema | 9/jul – 21/set/2026 | Nos serviços conferidos, desvio máximo de 0,25%. | 19 serviços SINAPI conferidos, contra a tabela da Caixa; acima de 1% de desvio, a importação é recusada. | `img/o-orcamento.webp` | `#sistema` |
+| 11 | O diário some do sistema | ago/2026 (após 11/08) | Depois de 11/08, o diário parou de entrar no sistema. | 42 diários lançados até então; os 23 seguintes ficaram só no grupo do WhatsApp. | `img/p-diario-sistema.webp` | `#sige` |
+| 12 | Casas modulares, no mesmo mês | ago/2026 | No mesmo mês, uma casa que não cabe no caminhão. | Celeiro B-36 (VEKS): arquivos de 07/08 a 02/09; duas caixas, três viagens, 37 decisões registradas. | Maquete `casa-viaja` (existente); fallback `img/m1.webp` — ou `configurador-b36.webp`. Se a 3ª maquete de içamento (zip: `icamento-3d.html`) estiver pronta, é o fundo mais literal para este capítulo. | `#modular` |
+| 13 | O SIGE recuperado | set/2026 | Recuperado, o diário mostrou 44,7% de avanço. | Antes, 27,6%; o planejado para a data era 60,8%. Lido numa cópia do sistema; a carga ainda não foi aplicada no sistema em uso. | `img/p-diario-portal.webp` | `#sige` |
+| 14 | 36 minutos | set/2026 | Em setembro, uma proposta em 36 minutos. | 11:35 → 12:11, numa ampliação de unidade de saúde: 26 ambientes, 328 m²; à mão, cerca de 2 dias úteis (estimativa). | Maquete `36min` (existente); fallback `img/upa-plan-grey.webp` | `#orcamento` |
+| 15 | Resolução (tese, metade LOGO) | — (moldura, depois da régua) | Eu construí o jeito de ele não sumir. | Contabilidade, obra e sistemas, de 2017 a 2026 — idealizados e dirigidos por mim, com assistentes de IA na construção. | `img/o-proposta.webp` (mesma escolha da rodada 1) | — |
+| 16 | Convite (StoryBrand invertido) | — (moldura, convite) | Faltam 3 semestres para o diploma. Não falta obra feita. | Me manda uma obra (WhatsApp) → leva também ao site completo. | Nenhuma imagem — igual à rodada 1. | `#contato` |
+
+## Requisitos para o plano
+
+1. **P3-01 (MUST):** os capítulos seguem ordem estritamente cronológica (2017 → set/2026); nenhum flashback ou reordenação para efeito dramático — testável comparando a sequência das telas com a ordem de `00-contexto.md`.
+2. **P3-02 (MUST):** cada capítulo datado exibe uma data ou intervalo de datas copiado literalmente de `00-contexto.md`; nenhuma data aproximada além do que o contexto já aproxima (ex.: "ago/2026").
+3. **P3-03 (MUST):** cada frase grande tem no máximo 10 palavras e cada linha de apoio no máximo 30 palavras, por contagem simples de tokens separados por espaço.
+4. **P3-04 (MUST):** toda frase grande que contém uma **métrica quantitativa** (percentual, valor em R$, contagem, duração — ex.: "13 obras", "0,25%", "36 minutos") tem ressalva na mesma tela, sem exceção. Referências de calendário (ano, mês, dia) dentro do texto da frase **não** acionam esta regra por si só, porque a data já aparece na régua/carimbo do capítulo.
+5. **P3-05 (MUST):** as duas sobreposições de vínculo — V Alves + Estruturas do Vale (2025–2026) e V Alves + VEKS (mar–jul/2026) — aparecem citadas com datas de início/fim, nos capítulos 4 e 5; nenhuma das duas fica implícita ou omitida.
+6. **P3-06 (MUST):** nenhum capítulo mistura números do sistema de orçamento (capítulos 9–10) com números do SIGE (capítulos 7, 8, 11, 13) — regra herdada do contexto comum.
+7. **P3-07 (MUST):** a expressão "cópia do sistema" (ou equivalente que preserve o sentido) permanece intacta no capítulo 13, junto dos números 44,7% / 27,6% / 60,8%.
+8. **P3-08 (SHOULD):** a palavra "mas" aparece uma única vez, no capítulo 4 (entrada na obra); as demais transições usam conectivos temporais ("em março", "no mesmo mês", "depois de 11/08"), para não competir com a virada real.
+9. **P3-09 (SHOULD):** o roteiro tem entre 12 e 16 capítulos; cada um cobre um único marco, com uma exceção documentada (capítulo 2, que comprime três marcos de formação anteriores a 2025 por não terem prova visual própria).
+10. **P3-10 (SHOULD):** cada capítulo, exceto abertura (1), resolução (15) e convite (16), tem uma ligação "ver o caso completo →" para a âncora do `portfolio.html` indicada na tabela.
+
+## Riscos e armadilhas
+
+- **Efeito "lista de eventos" pesa mais numa timeline fiel.** Como a ordem agora é uma restrição (pedido do Cássio), não uma escolha, o risco de soar como currículo cronológico é maior do que na rodada 1; a régua de tempo persistente e a regra "uma ideia por capítulo" são a mitigação, não um enfeite — se qualquer capítulo futuro tentar caber duas datas ou dois marcos, o efeito lista volta.
+- **Capítulo 2 é denso por necessidade, não por escolha.** Comprimir contabilidade + UNIFEI + DCE + InLoco Jr. numa única tela é a exceção documentada em P3-09; se a implementação achar que ainda está muito cheio, o corte seguro é tirar o DCE (2022) e deixar só contabilidade + InLoco Jr., não o contrário — contabilidade é a origem da tese.
+- **Anacronismo em `p-fotos.webp`.** A legenda original desse arquivo, em `portfolio.html`, é "as 12 fotos do diário de 07/09" — ou seja, é uma foto de setembro de 2026, usada aqui tanto no capítulo 4 (obra em geral, 2025) quanto no capítulo 8 (começo da obra, junho de 2026). Nos dois casos é uma aproximação: mostra "obra em LSF de verdade", mas não é literalmente a obra ou a data daquele capítulo. Se isso incomodar na revisão visual, a solução mais simples é deixar os capítulos 2, 4 e 5 sem foto (fundo neutro) e reservar `p-fotos.webp` só para o capítulo 8, mais próximo da data real.
+- **Seções sem nenhum print.** `#ferramentas` (calculadora LSF, classificador de fluxo de caixa) não tem uma única imagem em `portfolio/site/img/`; o capítulo 6 vai precisar de fundo neutro até existir um print novo — isso é uma lacuna do portfólio, não do roteiro.
+- **Quatro capítulos apontando para `#sige` (7, 8, 11, 13).** Como o SIGE atravessa a história inteira — nasce em 2025, ganha versão nova em 2026, entra numa obra real, e essa obra revela o problema do WhatsApp —, quatro capítulos diferentes linkam para a mesma âncora. Isso é fiel à linha do tempo real, mas vale conferir com quem cuida da navegação do `portfolio.html` se a seção `#sige` consegue "receber" o leitor em pontos diferentes da sua própria narrativa sem desorientar.
+- **Duas sobreposições de vínculo em telas próximas (4 e 5) podem soar repetitivo.** O risco é o leitor sentir que está sendo avisado duas vezes da mesma coisa. A saída é manter a segunda menção curta (capítulo 5 tem a frase mais curta do roteiro, 9 palavras) — ela é eco, não repetição.
+- **16 capítulos é o teto da faixa pedida.** Se a implementação achar a peça longa demais no celular, o corte mais seguro é o capítulo 5 (começo da PJ na VEKS): é o único capítulo sem fato de prova próprio — só marca uma data —, e a informação de sobreposição que ele carrega pode migrar para a ressalva do capítulo 9.
+
+## Fontes
+
+- [scrollytelling.ai — Free Timeline Maker (Scrollytelling)](https://scrollytelling.ai/tools/timeline-maker/)
+- [New Media Campaigns — Website Timeline Examples & Best Practices](https://www.newmediacampaigns.com/blog/website-timeline-examples-best-practices)
+- [Flourish — What great scrollytelling looks like — and how to build it yourself](https://flourish.studio/blog/scrollytelling-examples/)
+- [Capturly — Level Up Your User Experience With Scrollytelling](https://capturly.com/blog/level-up-your-user-experience-with-scrollytelling/)
+- [Jericho Writers — Story Timelines: How To Structure Your Narrative](https://jerichowriters.com/story-timelines/)
+- [Reedsy — What is a Narrative Arc? A Guide to Storytelling Structure](https://reedsy.com/blog/narrative-arc/)
+- [Nightingale (Medium) — The Past, Present, and Future of Scrollytelling](https://medium.com/nightingale/the-past-present-and-future-of-scrollytelling-10dd37dc1003)

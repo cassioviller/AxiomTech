@@ -1,6 +1,6 @@
 # DESIGN.md — Cássio Viller · portfólio
 
-Linguagem visual do site `portfolio/site/index.html`. Leia antes de mexer em qualquer página, folha de caso ou currículo: a ideia é que tudo pareça saído da mesma prancha.
+Linguagem visual do site: `portfolio/site/index.html` (a história em cenas, página principal) e `portfolio/site/portfolio.html` (o portfólio completo). Leia antes de mexer em qualquer página, folha de caso ou currículo: a ideia é que tudo pareça saído da mesma prancha.
 
 ## 1. Tema visual e atmosfera
 

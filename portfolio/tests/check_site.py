@@ -12,7 +12,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]  # portfolio/
-SITE = ROOT / "site" / "index.html"
+SITE = ROOT / "site" / "portfolio.html"  # o portfólio completo; a história é o index.html
 BASE = "2a686cf"  # commit de referência dos números conferidos
 FALHAS = []
 
