@@ -3,6 +3,9 @@ axiom/
 
 # pacote de handoff do portfólio (contém documentos pessoais)
 handoff-portfolio-cassio.zip
+
+# pacotes exportados (portfolio.zip, saida.zip): trazem prints com e-mail pessoal e dados de obra real
+*.zip
 docs-pessoais/
 BRIEF.md
 
