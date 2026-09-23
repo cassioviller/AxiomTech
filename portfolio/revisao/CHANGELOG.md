@@ -134,3 +134,12 @@ Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO
 - `og:image` absoluto, `og:url` e canonical dependem do domínio definitivo.
 - "Marcos Tavares" em `c-aprovacao.webp`: confirmar que é usuário fictício do manual.
 - Versão em inglês (há `PORTFOLIO.en.md`); títulos h2 → h5 nos blocos Problema/O que fiz/Resultado.
+
+---
+
+# Rodada 4 — storytelling Minto e DESIGN.md, 23/09/2026
+
+- `portfolio/DESIGN.md`: linguagem visual do site no formato awesome-design-md (9 seções, todos os tokens de `:root`).
+- 10 casos em Minto (resultado → o que fiz → prova): Folha 02 com "O que fiz" em primeira pessoa e "com o sistema"; Folha 03 com Resultado no topo (casos 02–04 ganharam Resultado a partir de fatos já no site); Folha 04 com Resultado no topo.
+- 5 legendas de galeria reescritas para dizer a decisão.
+- `portfolio/tests/check_site.py`: números iguais a `2a686cf`, ressalvas presentes, tags balanceadas, casos abrindo pelo resultado, DESIGN.md completo.
