@@ -29,6 +29,19 @@ RESSALVAS = [
     "Dados de exemplo do manual",
 ]
 
+DESIGN = ROOT / "DESIGN.md"
+SECOES_DESIGN = [
+    "## 1. Tema visual e atmosfera",
+    "## 2. Paleta de cores e papéis",
+    "## 3. Tipografia",
+    "## 4. Componentes",
+    "## 5. Layout",
+    "## 6. Profundidade e elevação",
+    "## 7. Faça e não faça",
+    "## 8. Comportamento responsivo",
+    "## 9. Guia para agentes",
+]
+
 
 def check(cond, msg):
     if not cond:
@@ -108,6 +121,18 @@ def checar_minto(atual):
         )
 
 
+def checar_design(atual):
+    check(DESIGN.exists(), "portfolio/DESIGN.md não existe")
+    if not DESIGN.exists():
+        return
+    d = DESIGN.read_text(encoding="utf-8")
+    for s in SECOES_DESIGN:
+        check(s in d, f"DESIGN.md sem a seção {s!r}")
+    raiz = re.findall(r":root[^{]*\{(.*?)\}", atual, flags=re.S)
+    for hexa in sorted({h.upper() for bloco in raiz for h in re.findall(r"#[0-9A-Fa-f]{6}", bloco)}):
+        check(hexa in d.upper(), f"DESIGN.md não documenta a cor {hexa}")
+
+
 def main():
     atual = SITE.read_text(encoding="utf-8")
     base = subprocess.run(
@@ -116,6 +141,7 @@ def main():
     ).stdout
     checar_invariantes(atual, base)
     checar_minto(atual)
+    checar_design(atual)
     if FALHAS:
         print("FALHOU:")
         for f in FALHAS:
