@@ -25,6 +25,9 @@ CASOS_MINTO = [
     "O cliente confirma que leu",
     "Da venda à obra",
     "Compras com governança",
+    "O celeiro não cabe inteiro no caminhão",
+    "Empilhar encarece, geminar barateia",
+    "A planta do cliente não cabia no terreno dele",
 ]
 
 RESSALVAS = [
