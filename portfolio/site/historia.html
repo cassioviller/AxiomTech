@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cássio Viller — a história</title>
+<meta name="description" content="Cássio Viller — orçamento, planejamento e custos. A história em cenas: da contabilidade à obra e aos sistemas que dão origem a cada número.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Cássio Viller — um número sem origem custa caro na obra">
+<meta property="og:description" content="A história em cenas: contabilidade, obra e os sistemas que dão origem a cada número.">
+<meta property="og:image" content="og.png">
+<meta name="theme-color" content="#12171D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="preload" as="image" href="img/o-quantitativos.webp" fetchpriority="high">
+<style>
+:root{
+  --ground:#ECEBE6; --surface:#FFFFFF; --ink:#171F29; --ink-2:#3C4652; --muted:#5B6672;
+  --accent:#B5440E; --accent-ink:#FFFFFF; --rule:#D3D1CA;
+  --tinta:#12171D; --scrim:rgba(12,16,21,.78); --texto-cena:#FFFFFF; --ressalva-cena:#D7E1EC; --relogio:#F07A3E;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#12171D; --surface:#1A2129; --ink:#E9E7E1; --ink-2:#C4C8CC; --muted:#93A0AD;
+    --accent:#F07A3E; --accent-ink:#161616; --rule:#2E3A47;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#12171D; --surface:#1A2129; --ink:#E9E7E1; --ink-2:#C4C8CC; --muted:#93A0AD;
+  --accent:#F07A3E; --accent-ink:#161616; --rule:#2E3A47;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.pular{position:absolute;left:-9999px;top:8px;z-index:50;background:var(--accent);color:var(--accent-ink);padding:10px 14px;font-family:var(--mono);font-size:.8rem;text-decoration:none}
+.pular:focus{left:12px}
+/* barra: nome, cargo-alvo e contato sempre à mão */
+.barra{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:10px 16px;background:var(--ground);border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:.78rem}
+.barra .nome{font-family:var(--display);font-weight:700;font-size:1.15rem;letter-spacing:.01em;text-transform:uppercase;color:var(--ink);text-decoration:none}
+.barra .cargo{flex:1 1 auto;color:var(--ink-2)}
+.barra .acoes{display:flex;flex-wrap:wrap;gap:10px}
+.barra .acoes a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--accent);padding:4px 0}
+.barra .acoes .zap{background:var(--accent);color:var(--accent-ink);border:0;padding:6px 10px;border-radius:2px}
+/* modo empilhado (padrão): sem JS, sem IntersectionObserver ou com movimento reduzido */
+.palco{display:none}
+.historia{display:block;max-width:880px;margin:0 auto;padding:0 16px}
+.cena{padding:40px 0;border-bottom:1px solid var(--rule)}
+.fundo{position:relative;margin:0 0 18px}
+.fundo img{width:100%;max-height:60vh;object-fit:cover;border:1px solid var(--rule)}
+.fundo canvas,.fundo .hud{display:none}
+.fundo .pausa{display:none!important}
+.frase{font-family:var(--display);font-weight:700;font-size:clamp(2rem,6vw,3.6rem);line-height:1.02;letter-spacing:.005em;margin:0;text-wrap:balance}
+.ressalva{font-family:var(--mono);font-size:.86rem;line-height:1.55;color:var(--ink-2);margin:12px 0 0;max-width:62ch}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
+.btn{display:inline-block;font-family:var(--mono);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;padding:13px 16px;border-radius:2px;background:var(--accent);color:var(--accent-ink)}
+.btn.fantasma{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.ficha{max-width:880px;margin:0 auto;padding:48px 16px 24px}
+.ficha h2{font-family:var(--display);font-weight:600;font-size:2rem;line-height:1.05;margin:0 0 12px}
+.ficha p{color:var(--ink-2);max-width:66ch;margin:0 0 10px}
+footer{max-width:880px;margin:0 auto;padding:20px 16px 40px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:.74rem;color:var(--muted);border-top:1px solid var(--rule)}
+footer a{color:var(--ink)}
+/* modo cenas: historia.js liga .js-historia no <html> e leva cada .fundo para o .palco */
+.js-historia .historia{max-width:none;padding:0;position:relative}
+.js-historia .palco{display:block;position:sticky;top:0;height:100vh;height:100svh;margin-bottom:-100vh;margin-bottom:-100svh;overflow:hidden;background:var(--tinta)}
+.js-historia .palco .fundo{position:absolute;inset:0;margin:0;opacity:0;transition:opacity .6s ease}
+.js-historia .palco .fundo.ativo{opacity:1}
+.js-historia .palco .fundo img{width:100%;height:100%;max-height:none;object-fit:cover;border:0;filter:brightness(.6) saturate(.85)}
+.js-historia .palco .fundo canvas{display:block;position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .5s}
+.js-historia .palco .fundo.viva canvas{opacity:1}
+.js-historia .palco .fundo.viva img{visibility:hidden}
+.js-historia .palco .hud{display:block;position:absolute;right:16px;bottom:14px}
+.js-historia .palco .hud b{font-family:var(--display);font-weight:700;font-size:clamp(1.8rem,5vw,3rem);line-height:1;color:var(--relogio);font-variant-numeric:tabular-nums}
+.js-historia .palco .hud [data-legenda]{display:none}
+.js-historia .cena{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:96px 16px;border:0}
+.js-historia .cena.longa{min-height:200vh;min-height:200svh;align-items:flex-start}
+.js-historia .cena.longa .texto{position:sticky;top:28vh;top:28svh}
+.js-historia .texto{max-width:960px;text-align:center;background:var(--scrim);padding:22px 24px}
+.js-historia .frase{color:var(--texto-cena);font-size:clamp(2.2rem,7vw,5rem);max-width:18ch;margin:0 auto}
+.js-historia .ressalva{color:var(--ressalva-cena);margin:14px auto 0}
+.js-historia .cta{justify-content:center}
+.js-historia .btn.fantasma{color:var(--texto-cena);box-shadow:inset 0 0 0 1.5px var(--texto-cena)}
+@media (prefers-reduced-motion: reduce){.js-historia .palco .fundo,.js-historia .palco .fundo canvas{transition:none}}
+</style>
+</head>
+<body>
+<a class="pular" href="#c1">Pular para o texto</a>
+<header class="barra">
+  <a class="nome" href="index.html">Cássio Viller</a>
+  <span class="cargo">Orçamento, planejamento e custos</span>
+  <nav class="acoes" aria-label="Contato">
+    <a href="curriculo-cassio-viller.pdf" target="_blank" rel="noopener">Currículo (PDF)</a>
+    <a class="zap" href="https://wa.me/5512982071116?text=Ol%C3%A1%2C%20C%C3%A1ssio.%20Vi%20seu%20portf%C3%B3lio%20e%20quero%20te%20mandar%20uma%20obra%20para%20or%C3%A7ar." target="_blank" rel="noopener">WhatsApp</a>
+  </nav>
+</header>
+
+<main id="historia" class="historia">
+  <div class="palco" aria-hidden="true"></div>
+
+  <section class="cena" id="c1" data-passo="tese">
+    <figure class="fundo" data-passo="tese" aria-hidden="true"><img src="img/o-quantitativos.webp" alt="" width="1040" height="1000" fetchpriority="high"></figure>
+    <div class="texto">
+      <h1 class="frase">Um número sem origem custa caro na obra.</h1>
+      <p class="ressalva">Cássio Viller, estudante de Engenharia Civil (7º semestre), mira orçamento, planejamento e custos.</p>
+    </div>
+  </section>
+
+  <section class="cena" id="c2" data-passo="origem">
+    <div class="texto">
+      <h2 class="frase">Comecei no centavo, não na parede.</h2>
+      <p class="ressalva">Folha, notas e balancete no escritório da família, desde 2017.</p>
+    </div>
+  </section>
+
+  <section class="cena" id="c3" data-passo="obra">
+    <figure class="fundo" data-passo="obra" aria-hidden="true"><img src="img/p-fotos.webp" alt="" width="1600" height="1353" loading="lazy"></figure>
+    <div class="texto">
+      <h2 class="frase">Mas na obra, vi a mesma informação digitada cinco vezes.</h2>
+      <p class="ressalva">VEKS Engenharia, V Alves e Estruturas do Vale, entre 2025 e 2026.</p>
+    </div>
+  </section>
+
+  <section class="cena longa" id="c4" data-passo="zip">
+    <figure class="fundo maquete" data-passo="zip" data-cena="36min" aria-hidden="true">
+      <canvas></canvas>
+      <img src="img/upa-plan-grey.webp" alt="" width="1400" height="440" loading="lazy">
+      <div class="hud"><b data-relogio></b><span data-legenda></span></div>
+    </figure>
+    <div class="texto">
+      <h2 class="frase">Do zip à proposta assinável em 36 minutos.</h2>
+      <p class="ressalva">Medidos: 11:35 → 12:11, numa ampliação de unidade de saúde com 26 ambientes e 328 m². À mão, cerca de 2 dias úteis (estimativa).</p>
+    </div>
+  </section>
+
+  <section class="cena" id="c5" data-passo="escala">
+    <figure class="fundo" data-passo="escala" aria-hidden="true"><img src="img/s1.webp" alt="" width="1000" height="728" loading="lazy"></figure>
+    <div class="texto">
+      <h2 class="frase">13 obras no sistema, até R$ 24,5 milhões.</h2>
+      <p class="ressalva">11 com proposta; a menor, R$ 29 mil. A gestão de obra deste sistema ainda não rodou numa obra real.</p>
+    </div>
+  </section>
+
+  <section class="cena" id="c6" data-passo="precisao">
+    <figure class="fundo" data-passo="precisao" aria-hidden="true"><img src="img/o-orcamento.webp" alt="" width="1040" height="1080" loading="lazy"></figure>
+    <div class="texto">
+      <h2 class="frase">Desvio máximo de 0,25% nos 19 serviços conferidos.</h2>
+      <p class="ressalva">Serviço a serviço, contra a tabela SINAPI da Caixa; acima de 1% de desvio, a importação é recusada.</p>
+    </div>
+  </section>
+
+  <section class="cena" id="c7" data-passo="sige">
+    <figure class="fundo" data-passo="sige" aria-hidden="true"><img src="img/p-diario-portal.webp" alt="" width="1600" height="1193" loading="lazy"></figure>
+    <div class="texto">
+      <h2 class="frase">Numa obra real, 23 diários estavam só no WhatsApp.</h2>
+      <p class="ressalva">No SIGE, que concebi: recuperados, levam a obra de 27,6% para 44,7% concluído, contra 60,8% planejado — lido numa cópia do sistema.</p>
+    </div>
+  </section>
+
+  <section class="cena longa" id="c8" data-passo="casa">
+    <figure class="fundo maquete" data-passo="casa" data-cena="casa-viaja" aria-hidden="true">
+      <canvas></canvas>
+      <img src="img/m1.webp" alt="" width="900" height="562" loading="lazy">
+      <div class="hud"><b data-relogio></b><span data-legenda></span></div>
+    </figure>
+    <div class="texto">
+      <h2 class="frase">O celeiro não cabe inteiro no caminhão.</h2>
+      <p class="ressalva">B-36: vai em duas caixas, em três viagens, com 37 decisões registradas.</p>
+    </div>
+  </section>
+
+  <section class="cena" id="c9" data-passo="metodo">
+    <figure class="fundo" data-passo="metodo" aria-hidden="true"><img src="img/o-proposta.webp" alt="" width="885" height="1060" loading="lazy"></figure>
+    <div class="texto">
+      <h2 class="frase">Construí o jeito de o número não sumir.</h2>
+      <p class="ressalva">Idealizei e dirigi os sistemas; o código foi escrito com assistentes de IA, e as regras, os testes e a revisão são meus.</p>
+    </div>
+  </section>
+
+  <section class="cena" id="c10" data-passo="convite">
+    <div class="texto">
+      <h2 class="frase">Faltam 3 semestres para o diploma. Não falta obra feita.</h2>
+      <p class="ressalva">Você me manda o pacote do projeto; eu devolvo levantamento, orçamento com faixa e proposta no seu modelo.</p>
+      <p class="cta">
+        <a class="btn" href="https://wa.me/5512982071116?text=Ol%C3%A1%2C%20C%C3%A1ssio.%20Vi%20seu%20portf%C3%B3lio%20e%20quero%20te%20mandar%20uma%20obra%20para%20or%C3%A7ar." target="_blank" rel="noopener">Me mande uma obra ↗</a>
+        <a class="btn fantasma" href="index.html">Ver o portfólio completo</a>
+        <a class="btn fantasma" href="curriculo-cassio-viller.pdf" target="_blank" rel="noopener">Baixar currículo (PDF)</a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<section class="ficha" aria-labelledby="ficha-titulo">
+  <h2 id="ficha-titulo">O que faço numa construtora</h2>
+  <p>Levantamento de quantitativos no projeto, orçamento com composições SINAPI e BDI, cronograma físico-financeiro com curva S, diário de obra e medição, compras com cotação e quadro de concorrência, fluxo de caixa e custo previsto × realizado.</p>
+  <p>Engenharia Civil, 7º semestre, faltam 3 · CLT ou PJ · São José dos Campos/SP, presencial ou remoto.</p>
+</section>
+<footer>
+  <span>Cássio Viller · São José dos Campos/SP</span>
+  <a href="index.html">Ver o portfólio completo</a>
+</footer>
+<script src="maquetes.js" defer></script>
+<script src="historia.js" defer></script>
+</body>
+</html>
