@@ -17,7 +17,11 @@ BASE = "2a686cf"  # commit de referência dos números conferidos
 FALHAS = []
 
 # Casos já reescritos em Minto (título exato do <h4>). As Tasks 3–5 preenchem.
-CASOS_MINTO = []
+CASOS_MINTO = [
+    "O cliente impôs um teto — e a resposta foi outra casa",
+    "R$ 24,5 milhões — e nenhuma quantidade no pacote do cliente",
+    "As regras do cliente viraram regra do sistema",
+]
 
 RESSALVAS = [
     "cópia do sistema",
@@ -119,6 +123,10 @@ def checar_minto(atual):
             corpo.startswith("<p><strong>Resultado.</strong>") or corpo.startswith("<div><h5>Resultado</h5>"),
             f"caso não abre pelo resultado: {titulo!r}",
         )
+    check("O que o sistema fez" not in atual, "ainda há 'O que o sistema fez' — a autoria deve ser 'O que fiz'")
+    for titulo in CASOS_MINTO[:3]:
+        corpo = cs.get(titulo, "")
+        check("com o sistema" in corpo, f"caso da Folha 02 sem 'com o sistema' no O que fiz: {titulo!r}")
 
 
 def checar_design(atual):
