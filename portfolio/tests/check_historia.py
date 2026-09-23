@@ -41,7 +41,7 @@ ROTEIRO = [
         "Cássio Viller, estudante de Engenharia Civil (7º semestre), mira orçamento, planejamento e custos.",
         ("img", "o-quantitativos.webp", 1040, 1000), None),
     cap("origem", "h2", ("2017 → 2024", ["2017", "2024"]),
-        "Comecei no centavo, não na parede.",
+        "Comecei pela contabilidade, não pela obra.",
         "Escritório contábil da família desde 2017; na UNIFEI, fiscal do DCE em 2022 e diretor de vendas da InLoco Jr. de 2023 a 2024.",
         ("ano", "2017"), ("curriculo", "Ver no currículo: contabilidade e UNIFEI →")),
     cap("mudanca", "h2", ("2025", ["2025"]),
@@ -287,6 +287,7 @@ def checar_texto(pagina, portfolio):
     for p in PROIBIDOS:
         check(p not in t, f"texto proibido na página: {p!r}")
     check(t.lower().count("você") == 1, "\"você\" deve aparecer uma vez só, no convite final")
+    check("centavo, não na parede" not in portfolio, "portfolio.html ainda abre com a frase do centavo (agora é a da contabilidade)")
 
 
 def checar_css(pagina):
