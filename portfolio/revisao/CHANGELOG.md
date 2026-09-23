@@ -143,3 +143,14 @@ Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO
 - 10 casos em Minto (resultado → o que fiz → prova): Folha 02 com "O que fiz" em primeira pessoa e "com o sistema"; Folha 03 com Resultado no topo (casos 02–04 ganharam Resultado a partir de fatos já no site); Folha 04 com Resultado no topo.
 - 5 legendas de galeria reescritas para dizer a decisão.
 - `portfolio/tests/check_site.py`: números iguais a `2a686cf`, ressalvas presentes, tags balanceadas, casos abrindo pelo resultado, DESIGN.md completo.
+
+---
+
+# Rodada 5 — página historia.html (a história em cenas), 23/09/2026
+
+- Pesquisa com 5 personas (recrutadora, diretor de engenharia, roteirista, dev front-end e acessibilidade/desempenho) em `docs/superpowers/research/2026-09-23-historia/`; spec em `docs/superpowers/specs/2026-09-23-historia-scrollytelling-design.md`.
+- `site/historia.html`: 10 cenas (frase ≤ 10 palavras + ressalva), barra fixa com currículo e WhatsApp, ficha com as palavras-chave, rodapé. Sem JS ou com movimento reduzido: cenas empilhadas, cada frase com a sua imagem.
+- `site/historia.js`: fundo em palco `sticky`, troca no meio da tela (`IntersectionObserver`), crossfade; maquetes 3D amarradas ao scroll por `seek()`, só uma no fluxo por vez. Rolagem nativa.
+- `site/maquetes.js`: a API `fig.__maquete` passa a expor `dur`.
+- `tests/check_historia.py` (+ `tests/historia_teste.html` no Chromium headless): roteiro exato, números que o index sustenta, ressalvas, contraste da faixa no pior caso, `aria-hidden`, `svh`, 320 px sem rolagem horizontal, movimento reduzido.
+- O `index.html` não mudou. Em aberto (do Cássio): estágio/júnior, link a partir do portfólio, foto `p-fotos.webp`, imagem de prévia própria.
