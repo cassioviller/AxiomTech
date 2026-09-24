@@ -389,6 +389,8 @@ def checar_css(pagina):
     larga = bloco_css(css, "@media (min-width:900px) and (orientation:landscape){")
     check(".js-historia .cena{justify-content:flex-start}" in larga and ".js-historia .texto{max-width:min(620px,48vw);margin-left:max(24px,6vw);text-align:left}" in larga,
           "tela larga: a faixa de texto vai para a esquerda, como no filme")
+    check(".js-historia .palco .fundo.tipo{justify-content:flex-end;padding:0 4vw 3vh 0}" in larga,
+          "tela larga: o marco tipográfico (.ano) vai para a direita, longe da faixa de texto à esquerda")
     for sumido in (".hud", ".pausa", "canvas"):
         check(sumido not in css, f"CSS sem {sumido}")
     check("#E0622A" in (ROOT / "DESIGN.md").read_text(encoding="utf-8"), "DESIGN.md: a paleta dos clipes (#EFE6D6 / #1B1714 / #E0622A) fica registrada")
