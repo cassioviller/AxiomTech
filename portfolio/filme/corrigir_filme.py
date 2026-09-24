@@ -66,6 +66,32 @@ TROCAS_RODADA_4 = [
     ("for(var r=0;r<5;r++)for(var k=0;k<7;k++)c.fillText(String(r*7+k+1),14+k*34,110+r*40);",
      "for(var r=0;r<5;r++)for(var k=0;k<7;k++)if(r*7+k<31)c.fillText(String(r*7+k+1),14+k*34,110+r*40);"),
 ]
+# Rodada 4: blocos novos do filme "limpo" (clipes de fundo da história). Cada entrada é (âncora única, texto antes, texto depois).
+INSERCOES_RODADA_4 = [
+    # <style>: ?limpo esconde todo o DOM por cima do canvas (render_clipes.py)
+    ("#end .cta span{font:500 15px PM;color:#1E1A17}",
+     "",
+     "\n/* ?limpo (render_clipes.py): só o canvas; renderAt continua escrevendo nestes nós, eles só não aparecem */\n"
+     ".limpo #cap,.limpo #hud,.limpo #num,.limpo #cover,.limpo #end,.limpo .tag,.limpo .bar,.limpo .scrim,.limpo #prog,"
+     ".limpo #wipe,.limpo #fade,.limpo .vig{display:none!important}"),
+    # <script>, primeira linha: a flag ?limpo e as promessas das texturas das cenas portadas
+    ("var R=new THREE.WebGLRenderer",
+     "if(/[?&]limpo\\b/.test(location.search))document.documentElement.classList.add('limpo');\n"
+     "var PRONTOS=[]; // promessas das texturas que as cenas portadas carregam (a planta real); render_clipes.py espera window.PRONTO\n",
+     ""),
+    # render: logo depois de camAt, a duração de cada cena e renderCena(i, t)
+    ("function camAt(st,t,T){var u=ioSine(t/10)*.85+(t/10)*.15;st.cp.getPoint(u,tmp);st.ct.getPoint(u,tmp2);\n"
+     "  tmp.x+=Math.sin(T*.63)*.06+Math.sin(T*1.7)*.02;tmp.y+=Math.sin(T*.81+1)*.05;tmp.z+=Math.cos(T*.57)*.05;cam.position.copy(tmp);cam.lookAt(tmp2);}",
+     "",
+     "\n// clipes da história (render_clipes.py): a cena i no tempo local t (0..10), sem DOM por cima; puro em (i, t), independente de ORDER/START\n"
+     "var DURSC=[];ORDER.forEach(function(s,k){DURSC[s]=DUR[k];});DURSC[9]=10;DURSC[10]=8;DURSC[11]=10;\n"
+     "window.renderCena=function(i,t){SC.forEach(function(s,j){s.g.visible=j===i;});sun.position.set(-8,16,10);var st=SC[i];st.run(t);"
+     "camAt(st,t,t*DURSC[i]/10);R.render(S,cam);cur=-1;};"),
+    # última linha do script: render_clipes.py espera as texturas antes do primeiro quadro
+    ("renderAt(0);",
+     "",
+     "\nwindow.PRONTO=Promise.all(PRONTOS);"),
+]
 
 
 def main():
@@ -76,6 +102,9 @@ def main():
     for velho, novo in TROCAS_RODADA_4:
         assert s.count(velho) == 1, f"trecho da rodada 4 não encontrado (ou repetido): {velho[:60]!r}"
         s = s.replace(velho, novo)
+    for ancora, antes, depois in INSERCOES_RODADA_4:
+        assert s.count(ancora) == 1, f"âncora da rodada 4 não encontrada (ou repetida): {ancora[:60]!r}"
+        s = s.replace(ancora, antes + ancora + depois)
     s, n = re.subn(r"var rows=\[.*?\]\];", lambda m: TABELA, s, count=1, flags=re.S)
     assert n == 1, "tabela da abertura não encontrada"
     ini, fim = s.index("// ordem cronológica"), s.index("var NCH=CAPS.length-1;")

@@ -46,6 +46,8 @@ canvas{position:absolute;inset:0;width:1280px;height:720px}
 #end .cta{margin-top:26px;display:flex;gap:28px;align-items:center}
 #end .cta b{font:700 40px BC;color:#fff;background:#D9541E;padding:6px 16px}
 #end .cta span{font:500 15px PM;color:#1E1A17}
+/* ?limpo (render_clipes.py): só o canvas; renderAt continua escrevendo nestes nós, eles só não aparecem */
+.limpo #cap,.limpo #hud,.limpo #num,.limpo #cover,.limpo #end,.limpo .tag,.limpo .bar,.limpo .scrim,.limpo #prog,.limpo #wipe,.limpo #fade,.limpo .vig{display:none!important}
 </style></head><body>
 <canvas id="c" width="1280" height="720"></canvas>
 <div id="fade"></div><div class="vig"></div><div class="scrim"></div>
@@ -72,6 +74,8 @@ canvas{position:absolute;inset:0;width:1280px;height:720px}
 <div id="wipe"></div>
 <script src="three.min.js"></script>
 <script>
+if(/[?&]limpo\b/.test(location.search))document.documentElement.classList.add('limpo');
+var PRONTOS=[]; // promessas das texturas que as cenas portadas carregam (a planta real); render_clipes.py espera window.PRONTO
 var R=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true,preserveDrawingBuffer:true});
 R.setPixelRatio(1);R.setSize(1280,720,false);R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
 R.outputEncoding=THREE.sRGBEncoding;R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=.82;
@@ -312,6 +316,9 @@ function ioSine(x){x=cl(x);return .5-.5*Math.cos(Math.PI*x);}
 var tmp=new THREE.Vector3(),tmp2=new THREE.Vector3();
 function camAt(st,t,T){var u=ioSine(t/10)*.85+(t/10)*.15;st.cp.getPoint(u,tmp);st.ct.getPoint(u,tmp2);
   tmp.x+=Math.sin(T*.63)*.06+Math.sin(T*1.7)*.02;tmp.y+=Math.sin(T*.81+1)*.05;tmp.z+=Math.cos(T*.57)*.05;cam.position.copy(tmp);cam.lookAt(tmp2);}
+// clipes da história (render_clipes.py): a cena i no tempo local t (0..10), sem DOM por cima; puro em (i, t), independente de ORDER/START
+var DURSC=[];ORDER.forEach(function(s,k){DURSC[s]=DUR[k];});DURSC[9]=10;DURSC[10]=8;DURSC[11]=10;
+window.renderCena=function(i,t){SC.forEach(function(s,j){s.g.visible=j===i;});sun.position.set(-8,16,10);var st=SC[i];st.run(t);camAt(st,t,t*DURSC[i]/10);R.render(S,cam);cur=-1;};
 function setWords(txt){ch.innerHTML='';words=txt.split(' ').map(function(w,i,a){var sp=document.createElement('span');sp.textContent=w+(i<a.length-1?' ':'');ch.appendChild(sp);return sp;});}
 var eEls=['e1','e2','e3','e4','e5'].map(function(i){return document.getElementById(i);});
 window.renderAt=function(T){var k=0;while(k<ORDER.length-1&&T>=START[k+1])k++;var inEnd=T>=ENDSTART;
@@ -338,4 +345,5 @@ window.renderAt=function(T){var k=0;while(k<ORDER.length-1&&T>=START[k+1])k++;va
   endline.style.width=ramp(te,1.1,2)*100+'%';
   R.render(S,cam);};
 renderAt(0);
+window.PRONTO=Promise.all(PRONTOS);
 </script></body></html>

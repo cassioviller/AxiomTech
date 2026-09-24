@@ -9,8 +9,10 @@ Uso: python3 portfolio/tests/check_filme.py
 import html
 import json
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]  # portfolio/
@@ -19,6 +21,12 @@ SITE = ROOT / "site"
 VIDEO = SITE / "video" / "historia.mp4"
 CAPA = SITE / "video" / "historia.jpg"
 FALHAS = []
+
+sys.path.insert(0, str(ROOT / "filme"))
+from render_clipes import CLIPES, FPS, psnr, quadros  # noqa: E402  (a tabela do mapa é a fonte da verdade)
+
+VIDEO_DIR = SITE / "video"
+ZIP = ROOT.parent / "filme-codigo-fonte.zip"
 
 FRASE_CONTABILIDADE = "Comecei pela contabilidade, não pela obra."
 # (kicker, frase ≤ 7 palavras, apoio, ressalva, duração do capítulo em segundos) — na ordem do filme
@@ -145,6 +153,32 @@ def checar_texto(filme, portfolio, historia):
     check("m.rotation.z=i==4?Math.sin(t*9)*.08*cl(t-7.2):0" in rua, "rua: o 5º cartão continua tremendo")
 
 
+def checar_limpo(filme):
+    """film.html?limpo: nenhum DOM por cima do canvas; renderCena(i, t) puro; o trailer (ORDER, renderAt) intacto."""
+    check(".limpo #cap,.limpo #hud,.limpo #num,.limpo #cover,.limpo #end,.limpo .tag,.limpo .bar,.limpo .scrim,.limpo #prog,"
+          ".limpo #wipe,.limpo #fade,.limpo .vig{display:none!important}" in filme, "film.html: falta a regra .limpo")
+    check("if(/[?&]limpo\\b/.test(location.search))document.documentElement.classList.add('limpo');" in filme,
+          "film.html: a flag ?limpo liga a classe no <html>")
+    check("window.renderCena=function(i,t){" in filme, "film.html: falta window.renderCena(i, t)")
+    check("var PRONTOS=[];" in filme and "window.PRONTO=Promise.all(PRONTOS);" in filme, "film.html: falta PRONTOS/PRONTO")
+    check("DURSC[9]=10;DURSC[10]=8;DURSC[11]=10;" in filme, "film.html: durações das cenas portadas (casa 10 s, içamento 8 s, zip 10 s)")
+    check("cam.setViewOffset(1280,720,-230,-20,1280,720)" in filme, "film.html: o viewOffset da composição fica")
+    check("var ORDER=[5,0,1,6,3,7,8,2,4]" in filme and "window.renderAt=function(T)" in filme, "film.html: o trailer não muda")
+
+
+def checar_reproducao():
+    """corrigir_filme.py aplicado ao film.html do zip reproduz o film.html commitado, byte a byte (F-02)."""
+    if not ZIP.exists():
+        print("filme-codigo-fonte.zip ausente (fora do git): reprodução pulada")
+        return
+    with tempfile.TemporaryDirectory() as tmp:
+        subprocess.run(["unzip", "-q", "-o", str(ZIP), "-d", tmp], check=True)
+        shutil.copy(ROOT / "filme" / "corrigir_filme.py", tmp)
+        subprocess.run([sys.executable, str(Path(tmp) / "corrigir_filme.py")], check=True, capture_output=True)
+        check((Path(tmp) / "film.html").read_bytes() == FILME.read_bytes(),
+              "corrigir_filme.py não reproduz o film.html commitado a partir do zip (F-02)")
+
+
 def ffprobe(caminho):
     saida = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration,size:stream=codec_type,codec_name,width,height",
                             "-of", "json", str(caminho)], capture_output=True, text=True, check=True).stdout
@@ -172,12 +206,93 @@ def checar_video():
         check((capa["width"], capa["height"]) == (960, 540), "capa do vídeo em 960×540")
 
 
+def ffprobe_json(caminho, entradas):
+    return json.loads(subprocess.run(["ffprobe", "-v", "error", "-show_entries", entradas, "-of", "json", str(caminho)],
+                                     capture_output=True, text=True, check=True).stdout)
+
+
+def quadros_chave(mp4):
+    saida = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v", "-skip_frame", "nokey", "-show_entries", "frame=pts_time",
+                            "-of", "csv=p=0", str(mp4)], capture_output=True, text=True, check=True).stdout
+    return [float(x.strip(", ")) for x in saida.split() if x.strip(", ")]
+
+
+def tipos_de_quadro(mp4):
+    return subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v", "-show_entries", "frame=pict_type", "-of", "csv=p=0", str(mp4)],
+                          capture_output=True, text=True, check=True).stdout.replace(",", "").split()
+
+
+def luma(arquivo):
+    """(YAVG, YDIF) por quadro, pelo filtro signalstats (serve para MP4 e para o pôster WebP, que tem 1 quadro)."""
+    saida = subprocess.run(["ffprobe", "-v", "error", "-f", "lavfi", "-i", f"movie={arquivo},signalstats", "-show_entries",
+                            "frame_tags=lavfi.signalstats.YAVG,lavfi.signalstats.YDIF", "-of", "csv=p=0"],
+                           capture_output=True, text=True, check=True).stdout
+    return [tuple(float(x) for x in l.strip(",").split(",")) for l in saida.splitlines() if l.strip(",")]
+
+
+def quadro(mp4, n, destino):
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(mp4), "-vf", f"select='eq(n,{n})'", "-vframes", "1", "-update", "1",
+                    str(destino)], check=True)
+
+
+def checar_clipe(passo, tmp):
+    """Um clipe publicado: H.264 High ≤ 3.1, 960×540, 24 fps, sem áudio, moov antes, GOP ≤ 4, sem B-frames, ≤ 0,9 MB,
+    plano contínuo parado nas pontas, pôster = último quadro. Devolve o tamanho em bytes (0 se faltar)."""
+    _sc, _t0, _t1, dur = CLIPES[passo]
+    mp4, webp = VIDEO_DIR / f"cena-{passo}.mp4", VIDEO_DIR / f"cena-{passo}.webp"
+    check(mp4.exists() and webp.exists(), f"falta {mp4.name} ou {webp.name} (rode python3 portfolio/filme/render_clipes.py --so {passo})")
+    if not (mp4.exists() and webp.exists()):
+        return 0
+    info = ffprobe_json(mp4, "format=duration,size:stream=codec_type,codec_name,profile,level,width,height,pix_fmt,r_frame_rate")
+    v = [s for s in info["streams"] if s["codec_type"] == "video"]
+    check(len(v) == 1 and v[0]["codec_name"] == "h264" and v[0]["profile"] == "High" and int(v[0]["level"]) <= 31, f"{passo}: H.264 High ≤ 3.1 ({v})")
+    check(v and (v[0]["width"], v[0]["height"], v[0]["pix_fmt"], v[0]["r_frame_rate"]) == (960, 540, "yuv420p", "24/1"), f"{passo}: 960×540 yuv420p 24 fps")
+    check(not [s for s in info["streams"] if s["codec_type"] == "audio"], f"{passo}: sem faixa de áudio")
+    check(abs(float(info["format"]["duration"]) - dur) <= 1 / FPS + 1e-3, f"{passo}: duração {info['format']['duration']} s ≠ {dur} s")
+    dados = mp4.read_bytes()
+    check(0 <= dados.find(b"moov") < dados.find(b"mdat"), f"{passo}: moov antes de mdat (+faststart)")
+    tamanho = int(info["format"]["size"])
+    check(tamanho <= 0.9 * 1024 * 1024, f"{passo}: {tamanho / 1024:.0f} KB > 0,9 MB")
+    kf = quadros_chave(mp4)
+    check(kf and max(b - a for a, b in zip(kf, kf[1:])) <= 4 / FPS + 1e-3, f"{passo}: quadro-chave a cada ≤ 4 quadros")
+    check("B" not in tipos_de_quadro(mp4), f"{passo}: sem B-frames")
+    y = luma(mp4)
+    check(all(40 <= a <= 235 for a, _ in y), f"{passo}: luma média fora de 40..235 em algum quadro")
+    check(all(abs(b[0] - a[0]) <= 20 for a, b in zip(y, y[1:])), f"{passo}: salto de luma > 20 entre quadros consecutivos")
+    for i in range(0, len(y), FPS):
+        check(sum(1 for _, d in y[i:i + FPS] if d >= 25.5) <= 3, f"{passo}: mais de 3 mudanças ≥ 10 % no segundo {i // FPS}")
+    n = quadros(passo)
+    for a, b in ((0, int(round(0.3 * FPS))), (n - 1 - int(round(0.5 * FPS)), n - 1)):
+        fa, fb = tmp / f"{passo}-{a}.png", tmp / f"{passo}-{b}.png"
+        quadro(mp4, a, fa)
+        quadro(mp4, b, fb)
+        check(psnr(fa, fb) >= 35, f"{passo}: os quadros {a} e {b} deveriam ser iguais (o clipe começa e termina parado)")
+    p = ffprobe_json(webp, "stream=width,height")["streams"][0]
+    check((p["width"], p["height"]) == (960, 540) and webp.stat().st_size <= 60 * 1024, f"{passo}: pôster 960×540 ≤ 60 KB")
+    check(psnr(webp, tmp / f"{passo}-{n - 1}.png") >= 40, f"{passo}: pôster ≠ último quadro do clipe (PSNR < 40 dB)")
+    yp = luma(webp)
+    check(yp and 40 <= yp[0][0] <= 235, f"{passo}: pôster em branco ou preto")
+    return tamanho
+
+
+def checar_clipes(passos):
+    check(set(passos) <= set(CLIPES), f"passos desconhecidos: {sorted(set(passos) - set(CLIPES))}")
+    with tempfile.TemporaryDirectory() as tmp:
+        soma = sum(checar_clipe(p, Path(tmp)) for p in passos if p in CLIPES)
+    if set(passos) == set(CLIPES):
+        check(soma <= 8 * 1024 * 1024, f"soma dos clipes {soma / 1024 / 1024:.2f} MB > 8 MB")
+
+
 def main():
     check(FILME.exists(), "portfolio/filme/film.html não existe")
     if FILME.exists():
-        checar_texto(FILME.read_text(encoding="utf-8"), (SITE / "portfolio.html").read_text(encoding="utf-8"),
-                     (SITE / "index.html").read_text(encoding="utf-8"))
+        filme = FILME.read_text(encoding="utf-8")
+        checar_texto(filme, (SITE / "portfolio.html").read_text(encoding="utf-8"), (SITE / "index.html").read_text(encoding="utf-8"))
+        checar_limpo(filme)
+        checar_reproducao()
     if "--video" in sys.argv:
+        passos = [a for a in sys.argv[sys.argv.index("--video") + 1:] if not a.startswith("--")]
+        checar_clipes(passos or list(CLIPES))
         checar_video()
     if FALHAS:
         print("FALHOU:")
