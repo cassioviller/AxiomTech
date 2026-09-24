@@ -39,7 +39,7 @@ Fora do escopo, com o porquê: CLS de 0,005 do `#tese` (dentro do limite 0,01, a
 - **Nenhuma frase da página muda.** "você" continua 1×; o convite continua com exatamente 3 `<a class="btn`.
 - Figure de clipe: `<figure class="fundo clipe[ foco-alto| foco-baixo]" data-passo="X" data-dur="D" data-clipe="video/cena-X.mp4" aria-hidden="true">` com `<video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>` e `<img src="video/cena-X.webp" alt="" width="960" height="540">` (sem `loading`, sem `fetchpriority`); sem `src` no vídeo no HTML; sem `autoplay|loop|controls|poster|tabindex|<source>|<track>|<canvas>|.hud|data-cena`. Scripts exatamente `["clipes.js","historia.js"]`, `defer`, sem inline. `maquetes.js` continua só no `portfolio.html`.
 - `clipes.js`: só `currentTime`, quantizado ao quadro e **nunca além do último quadro** (`(min(round(t·24), round(dur·24)−1)+0,5)/24`); um seek em voo por vez; o último pedido vence; libera após 600 ms sem `seeked`; nunca `play()`, `fastSeek`, rAF, `fetch`, `createObjectURL`, `'scroll'`; nunca seek com `readyState<1`; carga só depois do `load` da janela e a 600 px da `.cena`; no máximo 2 `<video>` com dados (os 2 mais perto do centro); sem H.264, `?clipes=nao`, `saveData`, `effectiveType` ∈ {slow-2g, 2g} ou movimento reduzido: só o pôster; `.viva` só com quadro pronto (`readyState≥2`); `TETO=250`, `LENTOS=3`, `VOO=600`, `MAXIMO=2`, `FOLGA=100`, **`ESPERA_RANGE=1500`** (novo).
-- CSS: sem `filter` em seletor com `video`; `object-fit:cover`; `object-position:68% 50%` por padrão, `68% 0%` em `.foco-alto`, `68% 100%` em `.foco-baixo` (vídeo e pôster iguais); fotos mantêm `brightness(.6) saturate(.85)`; `100vh` antes de `100svh`, nunca `dvh`; `.palco{display:none}` no empilhado; `overflow:clip` no `<main>`; contraste `--scrim` ≥ 4,5; **o fundo do palco começa em `var(--barra,0px)`** (novo); ≥ 900 px em paisagem a faixa vai à esquerda (`max-width:min(620px,48vw)`); **paisagem com ≤ 520 px de altura: faixa à esquerda com `max-width:min(560px,58vw)`** (novo); comprimento do `<main>` inalterado (± 2 px da `tests/baseline.json`).
+- CSS: sem `filter` em seletor com `video`; `object-fit:cover`; `object-position:68% 50%` por padrão, `68% 0%` em `.foco-alto`, `68% 100%` em `.foco-baixo` (vídeo e pôster iguais); fotos mantêm `brightness(.6) saturate(.85)`; `100vh` antes de `100svh`, nunca `dvh`; `.palco{display:none}` no empilhado; `overflow:clip` no `<main>`; contraste `--scrim` ≥ 4,5; **o palco gruda em `top:var(--barra,0px)` com altura `100svh − var(--barra,0px)`** (novo; o `.fundo` continua `inset:0`); ≥ 900 px em paisagem a faixa vai à esquerda (`max-width:min(620px,48vw)`); **paisagem com ≤ 520 px de altura: faixa à esquerda com `max-width:min(560px,58vw)`** (novo); comprimento do `<main>` inalterado (± 2 px da `tests/baseline.json`).
 - Servidor com Range (`portfolio/servir.py`) no `run` do `.replit` e no `chromium()` dos testes. Sem build nem dependência nova.
 - Render: `scale=960:540`, 24 fps, `libx264 -preset slow -crf 28 -g 4 -keyint_min 4 -sc_threshold 0 -bf 0 -pix_fmt yuv420p -profile:v high -level 3.1 -movflags +faststart -an`; ≤ 0,9 MB por clipe, ≤ 8 MB na soma dos 11; pontas paradas (PSNR ≥ 35 dB nos 0,3 s iniciais e 0,5 s finais); pôster = último quadro (PSNR ≥ 40 dB). `corrigir_filme.py` reproduz o `film.html` a partir do zip byte a byte.
 
@@ -92,8 +92,9 @@ Expected: `git status` só com `?? "film (1).html"`; o branch novo aponta para o
 Em `checar_css`, logo depois da checagem `".cena{scroll-margin-top:9rem}"`:
 
 ```python
-    check(re.search(r"\.js-historia \.palco \.fundo\{position:absolute;inset:var\(--barra,0px\) 0 0 0;", css) is not None,
-          "modo cenas: o fundo começa abaixo da barra fixa (inset:var(--barra,0px) 0 0 0); sem isso a barra cobre o alto de cada cena")
+    check(re.search(r"\.js-historia \.palco\{display:block;position:sticky;top:var\(--barra,0px\);height:calc\(100vh - var\(--barra,0px\)\);"
+                    r"height:calc\(100svh - var\(--barra,0px\)\);margin-bottom:calc\(-100vh \+ var\(--barra,0px\)\);margin-bottom:calc\(-100svh \+ var\(--barra,0px\)\);", css) is not None,
+          "modo cenas: o palco gruda abaixo da barra fixa (top:var(--barra,0px)) e perde a altura dela; sem isso a barra cobre o alto de cada cena")
 ```
 
 Em `checar_js`, no fim da função:
@@ -111,9 +112,10 @@ Expected: `FALHOU:` com "o fundo começa abaixo da barra fixa" e "historia.js pr
 - [ ] **Step 3: CSS e JS**
 
 `index.html`: trocar
-`.js-historia .palco .fundo{position:absolute;inset:0;margin:0;opacity:0;transition:opacity .6s ease}`
+`.js-historia .palco{display:block;position:sticky;top:0;height:100vh;height:100svh;margin-bottom:-100vh;margin-bottom:-100svh;overflow:hidden;background:var(--tinta)}`
 por
-`.js-historia .palco .fundo{position:absolute;inset:var(--barra,0px) 0 0 0;margin:0;opacity:0;transition:opacity .6s ease}`
+`.js-historia .palco{display:block;position:sticky;top:var(--barra,0px);height:calc(100vh - var(--barra,0px));height:calc(100svh - var(--barra,0px));margin-bottom:calc(-100vh + var(--barra,0px));margin-bottom:calc(-100svh + var(--barra,0px));overflow:hidden;background:var(--tinta)}`
+(o `.fundo` continua `inset:0`: o palco já nasce abaixo da barra antes de grudar, então o recuo tem de estar no próprio palco — senão a primeira tela ganha um vão de uma barra e a LCP muda; altura e `margin-bottom` mudam juntos para o comprimento de `#historia` não mudar)
 
 `historia.js`: logo depois de `document.documentElement.classList.add('js-historia');` acrescentar:
 
@@ -135,7 +137,16 @@ Em `checar_layout`, dentro do laço `for largura, altura in ((1366, 768), (1920,
                 check(topo["fundo"] >= topo["barra"] - 1, f"{largura}×{altura}: o fundo ativo começa em {topo['fundo']:.0f} px, acima do pé da barra ({topo['barra']:.0f} px)")
 ```
 
-No bloco `with chromium(390, altura=844) as ws:`, dentro do laço `for passo in curtos:`, depois de `time.sleep(0.5)`:
+No bloco `with chromium(390, altura=844) as ws:`, logo depois de `navegar(ws)` (ainda em `scrollY=0`, antes de qualquer rolagem):
+
+```python
+        vao = json.loads(ws.avaliar("JSON.stringify((function(){var b=document.querySelector('.barra').getBoundingClientRect(),"
+                                    "f=document.querySelector('.palco figure.ativo').getBoundingClientRect();return {barra:b.bottom,fundo:f.top,scroll:scrollY};})())"))
+        check(vao["scroll"] == 0 and abs(vao["fundo"] - vao["barra"]) <= 1,
+              f"390×844 em scrollY=0: o fundo da tese tem de encostar no pé da barra (barra {vao['barra']:.0f}, fundo {vao['fundo']:.0f}): sem vão, sem sobreposição")
+```
+
+e, dentro do laço `for passo in curtos:`, depois de `time.sleep(0.5)`:
 
 ```python
             topo = json.loads(ws.avaliar("JSON.stringify((function(){var b=document.querySelector('.barra').getBoundingClientRect(),"
