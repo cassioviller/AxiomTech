@@ -337,12 +337,12 @@ function boneco(x,z,ry){var q=new THREE.Group();cyl(.14,.75,0x6F8FA8,0,.375,0,q,
 var YARD=new THREE.Vector3(3,0,-11.5),TOP=new THREE.Vector3(0,PIL+.27+H,0),BED=new THREE.Vector3(9,1.3,-.6);
 var gente=[boneco(-.4,-10.6,Math.PI/2),boneco(6.8,-14,-Math.PI/2),boneco(3.6,-15,0)];
 var TG={truck:new THREE.Vector3(9,0,0),site1:new THREE.Vector3(0,0,1.5),site2:new THREE.Vector3(0,0,-1.5),mid:new THREE.Vector3(0,0,0)};
-var cur=new THREE.Vector3(9,0,0),wp=new THREE.Vector3(),tipW=new THREE.Vector3();
-// mira do guindaste: o pivô gira com a torre (ponto fixo); parte de 0 e itera 5 vezes, para renderCena(9,t) ser puro em t
-function aimBoom(target){turret.rotation.y=0;for(var k=0;k<5;k++){g.updateMatrixWorld(true);pivot.getWorldPosition(wp);var dx=target.x-wp.x,dz=target.z-wp.z,d=Math.hypot(dx,dz);turret.rotation.y=Math.atan2(-dz,dx);}pivot.rotation.z=Math.acos(Math.min(.98,d/L));}
+var cur=new THREE.Vector3(9,0,0),tipW=new THREE.Vector3();
+// mira do guindaste pelo eixo da torre (x 4,9; z −6,5): eixo, pivô (a 0,6) e alvo ficam alinhados, então a mira é exata e pura em t
+function aimBoom(target){var dx=target.x-4.9,dz=target.z+6.5,D=Math.hypot(dx,dz);turret.rotation.y=Math.atan2(-dz,dx);pivot.rotation.z=Math.acos(Math.min(.98,(D-.6)/L));}
 function icar(t,t0,t1,bx,fr,to,restY,r0,r1,hy){var a=ramp(t,t0,t0+(t1-t0)*.3),b=ramp(t,t0+(t1-t0)*.3,t0+(t1-t0)*.7),c=ramp(t,t0+(t1-t0)*.7,t1);
  var x=lerp(fr.x,to.x,b),z=lerp(fr.z,to.z,b),y=c>0?lerp(hy,restY,c):lerp(fr.y,hy,a);bx.position.set(x,y,z);bx.rotation.y=lerp(r0,r1,b);cur.set(x,0,z);return bx;}
-st.cam=[[0,[21.2,9,28.4],[3,2,-1]],[2.5,[22,9.5,18.5],[4,2.5,-.5]],[5,[25,15,-10],[3,3,-2]],[7.5,[21.8,16,-23.2],[2,2.5,-7]],[10,[32,16,12],[3,2,-6]]];
+st.cam=[[0,[21.2,9,28.4],[3,2,-1]],[2.5,[22,9.5,18.5],[4,2.5,-.5]],[5,[25,15,-10],[3,3,-2]],[7.5,[30,20,-4],[4,.5,-9]],[10,[8,28,32],[.3,2.5,-.6]]];
 st.run=function(t){
  // caminhão: da névoa (z −16) ao ponto de descarga (z 0) e de volta, três vezes
  var tz;if(t<.8)tz=lerp(-16,0,ramp(t,.2,.8));else if(t<3)tz=0;else if(t<3.6)tz=lerp(0,16,ramp(t,3,3.6));else if(t<4.2)tz=lerp(-16,0,ramp(t,3.6,4.2));
