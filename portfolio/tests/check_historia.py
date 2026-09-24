@@ -931,8 +931,8 @@ def checar_reduzido_real():
 
 def checar_evicao():
     """Despejo pelo navegador (WebKit sob pressão de memória, simulado por removeAttribute('src')+load() de fora): depois de
-    .viva, o clipe da cena ativa recarrega sozinho; despejado logo depois de receber src (antes ou logo depois dos metadados),
-    também recarrega — o 'emptied' do nosso próprio load() não é confundido com o do navegador."""
+    .viva, o clipe da cena ativa recarrega sozinho; despejado antes dos metadados (rede lenta emulada pelo CDP), também
+    recarrega — o 'emptied' do nosso próprio load() não é confundido com o do navegador."""
     with chromium(390, altura=844) as ws:
         ws.comando("Page.enable")
         ws.comando("Page.addScriptToEvaluateOnNewDocument", source=ESPIAO)
@@ -944,11 +944,21 @@ def checar_evicao():
                              "return f.classList.contains('viva')&&!!f.querySelector('video').getAttribute('src');})()", 3)
         c = ler_clipe(ws, "icamento")
         check(voltou, f"despejado depois de .viva, o clipe ativo recarrega e volta a .viva em ≤ 3 s (estado: {c})")
-        rolar_ate(ws, "casa", 0.4)  # despejo logo depois de o src ser atribuído
+        # despejo ANTES dos metadados: com a rede a 20 KB/s os metadados demoram ~1 s; o src já está atribuído e readyState ainda é 0
+        # o salto até o içamento às vezes carrega a casa de passagem (e a FOLGA a mantém): longe dela primeiro, e sem cache, para os dados não voltarem de graça
+        rolar_ate(ws, "zip", 0.5)
+        check(esperar(ws, "!document.querySelector('figure.clipe[data-passo=\"casa\"] video').getAttribute('src')", 3), "a casa descarrega antes do despejo com rede lenta")
+        ws.comando("Network.enable")
+        ws.comando("Network.setCacheDisabled", cacheDisabled=True)
+        ws.comando("Network.emulateNetworkConditions", offline=False, latency=0, downloadThroughput=20480, uploadThroughput=-1)
+        rolar_ate(ws, "casa", 0.4)
         esperar(ws, "!!document.querySelector('figure.clipe[data-passo=\"casa\"] video').getAttribute('src')", 5)
+        antes = ler_clipe(ws, "casa")
+        check(antes["src"] is not None and antes["ready"] == 0, f"o despejo tem de acontecer antes dos metadados (src {antes['src']!r}, readyState {antes['ready']})")
         ws.avaliar("(function(){var v=document.querySelector('figure.clipe[data-passo=\"casa\"] video');v.removeAttribute('src');v.load();})()")
+        ws.comando("Network.emulateNetworkConditions", offline=False, latency=0, downloadThroughput=-1, uploadThroughput=-1)
         voltou = esperar(ws, "document.querySelector('figure.clipe[data-passo=\"casa\"]').classList.contains('viva')", 5)
-        check(voltou, f"despejado logo depois do src, o clipe ativo recarrega e chega a .viva em ≤ 5 s (estado: {ler_clipe(ws, 'casa')})")
+        check(voltou, f"despejado antes dos metadados, o clipe ativo recarrega e chega a .viva em ≤ 5 s (estado: {ler_clipe(ws, 'casa')})")
         e = ler_clipes(ws)
         check(len(e["comDados"]) <= 2 and e["erros"] == [], f"depois dos despejos: ≤ 2 vídeos com dados ({e['comDados']}) e console limpo ({e['erros']})")
 

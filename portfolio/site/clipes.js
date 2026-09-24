@@ -44,7 +44,7 @@ figs.forEach(function(fig){
   }
   function noBuffer(t){for(var i=0;i<v.buffered.length;i++)if(t>=v.buffered.start(i)&&t<=v.buffered.end(i))return true;return false;}
   function congelar(){api.morto=true;descarregar();arrumar();}            // plano B: pôster, sem mais seeks nesta figura; libera a vaga
-  function recarregar(){if(v.networkState!==0)esperados++;v.load();}    // load() só enfileira 'emptied' se havia algo (networkState ≠ EMPTY)
+  function recarregar(){esperados=v.networkState!==0?1:0;v.load();}     // load() descarta o 'emptied' pendente do load() anterior e enfileira no máximo um (só se networkState ≠ EMPTY)
   function carregar(){
     if(api.pronto||api.morto||reduzir.matches)return;
     if(todas.filter(function(a){return a.pronto;}).length>=MAXIMO)return;  // trava de segurança: arrumar() já desocupou a vaga antes de chamar
