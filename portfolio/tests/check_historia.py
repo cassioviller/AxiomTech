@@ -500,6 +500,23 @@ def checar_js():
     check("fps" not in js.lower() and "matar" not in js, "historia.js não duplica a guarda de desempenho do maquetes.js")
 
 
+def checar_clipes_js():
+    caminho = SITE / "clipes.js"
+    check(caminho.exists(), "portfolio/site/clipes.js não existe")
+    if not caminho.exists():
+        return
+    js = re.sub(r"//[^\n]*", "", caminho.read_text(encoding="utf-8"))  # comentários não contam
+    for proibido in ("play(", "autoplay", "loop", "fastSeek", "requestAnimationFrame", "fetch(", "createObjectURL",
+                     "scrollTo", "scrollBy", "scrollIntoView", "preventDefault", "'wheel'", "'touchmove'", "aria-live"):
+        check(proibido not in js, f"clipes.js não pode usar {proibido}")
+    for exigido in ("canPlayType", "'seeked'", "seekable", "rootMargin:'600px", "preload='auto'", ".load()", "removeAttribute('src')",
+                    "prefers-reduced-motion: reduce", "'change'", "saveData", "clipes=nao", "readyState", "'load'",
+                    "TETO=250", "LENTOS=3", "VOO=600", "MAXIMO=2", "fig.__clipe=api"):
+        check(exigido in js, f"clipes.js precisa de {exigido}")
+    check("(Math.round(t*FPS)+0.5)/FPS" in js, "clipes.js: seek quantizado ao quadro, (round(t·24)+0,5)/24")
+    check("v.currentTime=" in js and js.count("currentTime=") == 1, "clipes.js: o tempo do vídeo só muda por currentTime, num lugar só")
+
+
 def checar_maquetes_js():
     js = (SITE / "maquetes.js").read_text(encoding="utf-8")
     check("dur:sc.dur" in js, "maquetes.js precisa expor a duração da cena em fig.__maquete.dur")
@@ -718,6 +735,7 @@ def main():
         checar_regua(pagina)
         checar_filme(pagina)
         checar_js()
+        checar_clipes_js()
         checar_maquetes_js()
         checar_servidor()
         if "--navegador" in sys.argv:
