@@ -217,7 +217,7 @@ def checar_cenas_portadas(passos):
     """Com o Chromium (SwiftShader) no film.html?limpo: a classe .limpo esconde a legenda; cada cena portada existe e responde a renderCena."""
     import shutil
     from playwright.sync_api import sync_playwright
-    from render_clipes import ARGS
+    from render_clipes import ARGS, PRONTO_COM_PRAZO
     erros = []
     with sync_playwright() as p:
         exe = shutil.which("chromium")
@@ -226,7 +226,7 @@ def checar_cenas_portadas(passos):
         pg.on("pageerror", lambda e: erros.append(str(e)))
         pg.goto(FILME.as_uri() + "?limpo")
         pg.wait_for_timeout(2000)
-        pg.evaluate("PRONTO")
+        pg.evaluate(PRONTO_COM_PRAZO)
         check(pg.evaluate("document.documentElement.classList.contains('limpo')"), "?limpo não ligou a classe .limpo")
         check(pg.evaluate("getComputedStyle(document.getElementById('cap')).display") == "none", ".limpo não escondeu a legenda")
         for passo in passos:
@@ -358,6 +358,12 @@ def checar_readme():
         check(trecho in readme, f"README do filme: \"Como enviar\" sem {trecho!r}")
 
 
+def checar_render_clipes():
+    """render_clipes.py espera as texturas (PRONTO) com prazo: sem ele, uma textura que nunca resolve trava o render em silêncio."""
+    src = (ROOT / "filme" / "render_clipes.py").read_text(encoding="utf-8")
+    check("Promise.race([PRONTO" in src and "20000" in src, "render_clipes.py: PRONTO precisa de prazo (Promise.race com 20000 ms)")
+
+
 def checar_clipes(passos):
     check(set(passos) <= set(CLIPES), f"passos desconhecidos: {sorted(set(passos) - set(CLIPES))}")
     with tempfile.TemporaryDirectory() as tmp:
@@ -383,6 +389,7 @@ def main():
         checar_texto(filme, (SITE / "portfolio.html").read_text(encoding="utf-8"), (SITE / "index.html").read_text(encoding="utf-8"))
         checar_limpo(filme)
         checar_readme()
+        checar_render_clipes()
         checar_portadas(filme, list(PORTADAS))  # estático e instantâneo: sempre
         if "--cenas" in sys.argv:  # conteúdo das cenas portadas no Chromium (~20 s)
             passos = passos_de("--cenas") or list(PORTADAS)

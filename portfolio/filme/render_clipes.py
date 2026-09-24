@@ -132,6 +132,10 @@ def ajustar_soma(crfs):
         print(f"soma > 8 MB: {maior} reencodado com crf {crfs[maior]}", flush=True)
 
 
+PRONTO_COM_PRAZO = ("Promise.race([PRONTO, new Promise(function(_, falha){setTimeout(function(){"
+                    "falha(new Error('PRONTO: 20 s sem resolver (textura das cenas portadas?)'));}, 20000);})])")
+
+
 def main():
     if "--so" in sys.argv:  # confere o passo antes de abrir o Chromium
         i = sys.argv.index("--so") + 1
@@ -150,7 +154,7 @@ def main():
         pagina.on("pageerror", lambda e: erros.append(str(e)))
         pagina.goto((AQUI / "film.html").as_uri() + "?limpo")
         pagina.wait_for_timeout(2500)
-        pagina.evaluate("PRONTO")  # texturas das cenas portadas (a planta real) carregadas
+        pagina.evaluate(PRONTO_COM_PRAZO)  # texturas das cenas portadas (a planta real): com prazo, para o render nunca travar em silêncio
         if erros:
             sys.exit(f"erro de JavaScript ao carregar film.html?limpo: {'; '.join(erros)}")
         for passo in passos:
