@@ -277,8 +277,7 @@ def checar_texto(pagina, portfolio):
     mas = sum(1 for c in ROTEIRO for w in re.findall(r"\w+", c["frase"].lower()) if w == "mas")
     check(mas == 1, f"\"mas\" deve aparecer uma vez só entre as frases grandes (achei {mas})")
     t = limpo(corpo(pagina))
-    d = duracao_video()
-    extras = numeros(t) - numeros(limpo(corpo(portfolio))) - ({str(round(d))} if d else set())  # a duração do filme vem do próprio vídeo
+    extras = numeros(t) - numeros(limpo(corpo(portfolio)))
     check(not extras, f"números que o portfólio não sustenta: {sorted(extras)}")
     base_datas = limpo(corpo(portfolio)).lower() + " " + (" ".join(CURRICULO_TXT.read_text(encoding="utf-8").split()).lower() if CURRICULO_TXT.exists() else "")
     datas_novas = sorted({d for d in datas(t) if d not in base_datas and d not in DATAS_CONFIRMADAS})
@@ -375,48 +374,6 @@ def checar_regua(pagina):
     check(re.search(r"\.regua a\{[^}]*min-width:28px", css) is not None, "cada marco da régua precisa de pelo menos 28 px de largura (alvo de toque)")
     check(re.search(r"\.regua ol\{[^}]*overflow-x:auto", css) is not None, "quando não couber, a régua rola sozinha — nunca a página")
     check(".regua a:focus-visible{outline-offset:-3px}" in css, "o anel de foco da régua fica por dentro do marco (a lista rolável cortaria o anel de fora)")
-
-
-VIDEO = SITE / "video" / "historia.mp4"
-
-
-def duracao_video():
-    """Duração real do trailer (ffprobe), ou None se o vídeo ainda não foi gerado."""
-    if not VIDEO.exists():
-        return None
-    saida = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(VIDEO)],
-                           capture_output=True, text=True, check=True).stdout
-    return float(saida)
-
-
-def checar_filme(pagina):
-    """O trailer fica depois da história, toca só por clique e vem com a transcrição das legendas."""
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from check_filme import CAPITULOS
-    sec = re.search(r'<section class="filme" id="filme" aria-labelledby="filme-titulo">(.*?)</section>', pagina, re.S)
-    check(sec is not None, "falta a seção do filme (<section class=\"filme\" id=\"filme\" aria-labelledby=\"filme-titulo\">)")
-    if not sec:
-        return
-    pos = pagina.index('<section class="filme"')
-    check(pagina.index("</main>") < pos < pagina.index('<section class="ficha"'), "o filme fica depois da história e antes da ficha")
-    s = sec.group(1)
-    d = duracao_video()
-    titulo = re.search(r'<h2 id="filme-titulo">(.*?)</h2>', s, re.S)
-    check(titulo is not None and d is not None and limpo(titulo.group(1)) == f"A história em {round(d)} segundos",
-          f"o título do filme diz a duração real do vídeo ({d} s)")
-    v = re.search(r"<video ([^>]*)>", s)
-    check(v is not None, "falta <video>")
-    if v:
-        for attr in ("controls", 'preload="none"', 'poster="video/historia.jpg"', 'width="960"', 'height="540"', "playsinline"):
-            check(attr in v.group(1), f"<video> sem {attr}")
-        check("autoplay" not in v.group(1) and "loop" not in v.group(1), "o filme só toca por clique (sem autoplay nem loop)")
-    check('<source src="video/historia.mp4" type="video/mp4">' in s, "falta <source src=\"video/historia.mp4\" type=\"video/mp4\">")
-    check("<summary>Transcrição do filme (o vídeo não tem áudio)</summary>" in s, "falta a transcrição do filme")
-    itens = [limpo(x) for x in re.findall(r"<li>(.*?)</li>", s, re.S)]
-    esperado = [" ".join(p for p in (f"{k} — {f}", a, r) if p) for k, f, a, r, _dur in CAPITULOS]
-    check(itens == esperado, "a transcrição precisa repetir as legendas do filme, capítulo por capítulo")
-    ultima = cenas(pagina)[-1][3] if cenas(pagina) else ""
-    check('href="#filme"' in ultima, "o convite também leva ao filme (href=\"#filme\")")
 
 
 PORTA = 5056
@@ -695,9 +652,8 @@ def checar_maquete_real():
     check(not estado.get("erros"), f"erros ao montar a maquete: {estado.get('erros')}")
 
 
-def checar_fim_do_palco():
-    """O palco é sticky com margin-bottom:-100vh: não pode passar do fim da história e cobrir o que vem depois.
-    Clica em "Assistir ao filme ↓" e confere o título abaixo da barra e o vídeo à vista; rola até o fim e confere a ficha."""
+def checar_ficha_a_vista():
+    """O palco é sticky com margin-bottom:-100vh: não pode passar do fim da história e cobrir a ficha no fim da página."""
     ver = ("(function(sel){var r=document.querySelector(sel).getBoundingClientRect();"
            "var topo=Math.max(r.top,0),base=Math.min(r.bottom,innerHeight);if(base<=topo)return 'fora';"
            "var e=document.elementFromPoint(innerWidth/2,(topo+base)/2);"
@@ -706,17 +662,20 @@ def checar_fim_do_palco():
         with chromium(largura, ("--disable-3d-apis",)) as ws:
             ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/site/index.html")
             time.sleep(1.5)
-            ws.avaliar("document.querySelector('#convite a[href=\"#filme\"]').click()")
-            time.sleep(1)
-            filme = ws.avaliar(ver + "('#filme video')")
-            titulo = ws.avaliar("document.getElementById('filme-titulo').getBoundingClientRect().top>="
-                                "document.querySelector('.barra').getBoundingClientRect().bottom")
             ws.avaliar("window.scrollTo(0,document.documentElement.scrollHeight)")
             time.sleep(1)
             ficha = ws.avaliar(ver + "('.ficha')")
-        check(titulo is True, f"{largura} px: depois de \"Assistir ao filme ↓\", o título do filme fica abaixo da barra")
-        check(filme == "visivel", f"{largura} px: depois de \"Assistir ao filme ↓\", o vídeo precisa estar à vista ({filme})")
         check(ficha == "visivel", f"{largura} px: no fim da página, a ficha precisa estar à vista ({ficha})")
+
+
+def checar_sem_trailer(pagina):
+    """O trailer saiu da página (F-14): nada aponta para ele; o convite tem 3 botões."""
+    for trecho in ('class="filme"', 'id="filme"', 'href="#filme"', "transcricao", "Assistir ao filme", "A história em",
+                   "Transcrição do filme", "historia.mp4", "historia.jpg"):
+        check(trecho not in pagina, f"o trailer saiu da página: ainda há {trecho!r}")
+    ultima = cenas(pagina)[-1][3] if cenas(pagina) else ""
+    check(ultima.count('<a class="btn') == 3, "o convite tem exatamente 3 botões")
+    check(not (SITE / "video" / "historia.mp4").exists() and not (SITE / "video" / "historia.jpg").exists(), "site/video/historia.* saem do site")
 
 
 def main():
@@ -733,7 +692,7 @@ def main():
         checar_scripts(pagina)
         checar_curriculo(pagina)
         checar_regua(pagina)
-        checar_filme(pagina)
+        checar_sem_trailer(pagina)
         checar_js()
         checar_clipes_js()
         checar_maquetes_js()
@@ -741,7 +700,7 @@ def main():
         if "--navegador" in sys.argv:
             checar_navegador()
             checar_maquete_real()
-            checar_fim_do_palco()
+            checar_ficha_a_vista()
     if FALHAS:
         print("FALHOU:")
         for f in FALHAS:

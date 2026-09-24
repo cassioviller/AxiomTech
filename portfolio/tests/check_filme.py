@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Checagens do filme (portfolio/filme/film.html) e do vídeo gerado (portfolio/site/video/).
+"""Checagens do filme (portfolio/filme/film.html) e do clipes (portfolio/site/video/cena-*) e trailer de envio (portfolio/filme/saida/).
 
 O texto do trailer segue as mesmas regras de honestidade da página: nenhum número que o
 portfólio não sustente, nenhuma ressalva apagada, nada inventado com cara de dado, legendas
@@ -18,8 +18,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]  # portfolio/
 FILME = ROOT / "filme" / "film.html"
 SITE = ROOT / "site"
-VIDEO = SITE / "video" / "historia.mp4"
-CAPA = SITE / "video" / "historia.jpg"
+TRAILER = ROOT / "filme" / "saida" / "historia-960.mp4"
+CAPA = ROOT / "filme" / "saida" / "historia-960.jpg"
 FALHAS = []
 
 sys.path.insert(0, str(ROOT / "filme"))
@@ -257,25 +257,22 @@ def ffprobe(caminho):
     return json.loads(saida)
 
 
-def checar_video():
-    """Só roda depois do render (Task 3): vídeo leve, sem áudio, com a duração do filme, e capa."""
-    check(VIDEO.exists(), "falta portfolio/site/video/historia.mp4 (rode python3 portfolio/filme/render.py)")
-    check(CAPA.exists(), "falta portfolio/site/video/historia.jpg (capa do vídeo)")
-    if not VIDEO.exists():
+def checar_trailer():
+    """Trailer de envio (WhatsApp/LinkedIn), fora do site: só se render.py já rodou. H.264 960×540, 85 s, ≤ 16 MB, moov antes."""
+    if not TRAILER.exists():
+        print("trailer de envio ausente (python3 portfolio/filme/render.py): pulado")
         return
-    info = ffprobe(VIDEO)
+    info = ffprobe(TRAILER)
     videos = [s for s in info["streams"] if s["codec_type"] == "video"]
     check(len(videos) == 1 and videos[0]["codec_name"] == "h264" and (videos[0]["width"], videos[0]["height"]) == (960, 540),
-          f"vídeo deve ser H.264 960×540 (achei {videos})")
-    check(not [s for s in info["streams"] if s["codec_type"] == "audio"], "o filme não tem áudio: sem faixa de som")
+          f"trailer deve ser H.264 960×540 (achei {videos})")
+    check(not [s for s in info["streams"] if s["codec_type"] == "audio"], "o trailer não tem áudio: sem faixa de som")
     total = sum(c[4] for c in CAPITULOS) + FIM
     check(abs(float(info["format"]["duration"]) - total) <= 0.5, f"duração {info['format']['duration']} s ≠ {total} s")
-    check(int(info["format"]["size"]) <= 12 * 1024 * 1024, "vídeo acima de 12 MB")
-    dados = VIDEO.read_bytes()
+    check(int(info["format"]["size"]) <= 16 * 1024 * 1024, "trailer acima de 16 MB (o WhatsApp não manda como mídia)")
+    dados = TRAILER.read_bytes()
     check(0 <= dados.find(b"moov") < dados.find(b"mdat"), "o índice (moov) precisa vir antes dos dados: -movflags +faststart")
-    if CAPA.exists():
-        capa = ffprobe(CAPA)["streams"][0]
-        check((capa["width"], capa["height"]) == (960, 540), "capa do vídeo em 960×540")
+    check(CAPA.exists() and tuple(ffprobe(CAPA)["streams"][0][k] for k in ("width", "height")) == (960, 540), "capa do trailer em 960×540")
 
 
 def ffprobe_json(caminho, entradas):
@@ -350,12 +347,22 @@ def checar_clipe(passo, tmp):
     return tamanho
 
 
+def checar_readme():
+    readme = (ROOT / "filme" / "README.md").read_text(encoding="utf-8")
+    check("## Como enviar" in readme, "README do filme sem a seção \"Como enviar\"")
+    for trecho in ("7º semestre", "CLT ou PJ", "85 s", "sem áudio", "16 MB"):
+        check(trecho in readme, f"README do filme: \"Como enviar\" sem {trecho!r}")
+
+
 def checar_clipes(passos):
     check(set(passos) <= set(CLIPES), f"passos desconhecidos: {sorted(set(passos) - set(CLIPES))}")
     with tempfile.TemporaryDirectory() as tmp:
         soma = sum(checar_clipe(p, Path(tmp)) for p in passos if p in CLIPES)
     if set(passos) == set(CLIPES):
         check(soma <= 8 * 1024 * 1024, f"soma dos clipes {soma / 1024 / 1024:.2f} MB > 8 MB")
+        publicados = sorted(subprocess.run(["git", "ls-files", "site/video"], cwd=ROOT, capture_output=True, text=True).stdout.split())
+        esperados = sorted(f"site/video/cena-{p}.{e}" for p in CLIPES for e in ("mp4", "webp"))
+        check(publicados == esperados, f"git ls-files site/video ≠ os 22 arquivos dos clipes: {publicados}")
 
 
 def main():
@@ -364,6 +371,7 @@ def main():
         filme = FILME.read_text(encoding="utf-8")
         checar_texto(filme, (SITE / "portfolio.html").read_text(encoding="utf-8"), (SITE / "index.html").read_text(encoding="utf-8"))
         checar_limpo(filme)
+        checar_readme()
         if "--cenas" in sys.argv:
             passos = [a for a in sys.argv[sys.argv.index("--cenas") + 1:] if not a.startswith("--")] or list(PORTADAS)
             checar_portadas(filme, passos)
@@ -372,7 +380,7 @@ def main():
     if "--video" in sys.argv:
         passos = [a for a in sys.argv[sys.argv.index("--video") + 1:] if not a.startswith("--")]
         checar_clipes(passos or list(CLIPES))
-        checar_video()
+        checar_trailer()
     if FALHAS:
         print("FALHOU:")
         for f in FALHAS:
