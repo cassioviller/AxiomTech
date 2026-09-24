@@ -25,7 +25,7 @@ function arrumar(){
 
 figs.forEach(function(fig){
   var v=fig.querySelector('video'),cena=fig.closest('.cena')||fig,src=fig.dataset.clipe,dur=parseFloat(fig.dataset.dur)||0;
-  var alvo=-1,pedido=-1,emVoo=0,vivo=false,lentos=0,tinha=false,ligado=false,esperados=0; // esperados: 'emptied' que os nossos load() ainda vão disparar
+  var alvo=-1,pedido=-1,emVoo=0,vivo=false,lentos=0,tinha=false,ligado=false,esperados=0,desde=0; // esperados: 'emptied' que os nossos load() ainda vão disparar; desde: hora dos metadados da carga atual (0: nenhuma)
   var ultimo=Math.round(dur*FPS)-1;                                         // índice do último quadro: o fim da cena pede este quadro, nunca além
   function quadro(t){return (Math.min(Math.round(t*FPS),ultimo)+0.5)/FPS;}
   var api={dur:dur,frozen:false,pronto:false,morto:false,perto:false,dist:dist,carregar:carregar,
@@ -37,14 +37,14 @@ figs.forEach(function(fig){
   function dist(){var r=cena.getBoundingClientRect();return Math.abs(r.top+r.height/2-innerHeight/2);}
   function viver(sim){vivo=sim;fig.classList.toggle('viva',sim);}
   function pedir(){
-    if(!api.pronto||api.morto||reduzir.matches||alvo<0||v.readyState<1)return;   // nunca antes dos metadados: o alvo fica guardado
+    if(!api.pronto||api.morto||reduzir.matches||alvo<0||v.readyState<1||!temRange())return;   // nunca antes dos metadados nem sem seekable completo: o alvo fica guardado
     if(emVoo){if(performance.now()-emVoo<VOO)return;emVoo=0;}            // um seek em voo por vez; 600 ms sem 'seeked' = perdido, libera
     if(alvo===pedido&&(vivo||emVoo))return;                               // o quadro-alvo não mudou
     pedido=alvo;tinha=noBuffer(alvo);emVoo=performance.now();v.currentTime=alvo;
   }
   function noBuffer(t){for(var i=0;i<v.buffered.length;i++)if(t>=v.buffered.start(i)&&t<=v.buffered.end(i))return true;return false;}
   function congelar(){api.morto=true;descarregar();arrumar();}            // plano B: pôster, sem mais seeks nesta figura; libera a vaga
-  function recarregar(){esperados=v.networkState!==0?1:0;v.load();}     // load() descarta o 'emptied' pendente do load() anterior e enfileira no máximo um (só se networkState ≠ EMPTY)
+  function recarregar(){desde=0;esperados=v.networkState!==0?1:0;v.load();}     // load() descarta o 'emptied' pendente do load() anterior e enfileira no máximo um (só se networkState ≠ EMPTY)
   function carregar(){
     if(api.pronto||api.morto||reduzir.matches)return;
     if(todas.filter(function(a){return a.pronto;}).length>=MAXIMO)return;  // trava de segurança: arrumar() já desocupou a vaga antes de chamar
@@ -56,18 +56,18 @@ figs.forEach(function(fig){
     api.pronto=false;pedido=-1;emVoo=0;viver(false);v.removeAttribute('src');recarregar();
   }
   function temRange(){return v.seekable.length>0&&v.seekable.end(0)>=dur-0.5;}
-  function conferirRange(ini){                                              // sem Range o Chrome diz seekable [0,0] e ignora todo seek em silêncio;
-    if(!api.pronto)return;                                                  // o Safari pode preencher seekable só depois: espera ESPERA_RANGE antes de desistir
-    if(temRange()){pedir();return;}
+  function conferirRange(ini){                                              // sem Range o Chrome diz seekable [0,0] (um seek cai no quadro 0);
+    if(!api.pronto||ini!==desde)return;                                     // o Safari pode preencher seekable só depois: espera ESPERA_RANGE antes de desistir;
+    if(temRange()){pedir();return;}                                         // a cadeia morre se a figura descarregou ou recarregou (desde mudou)
     if(performance.now()-ini>ESPERA_RANGE){congelar();return;}
     setTimeout(function(){conferirRange(ini);},250);
   }
-  v.addEventListener('loadedmetadata',function(){esperados=0;conferirRange(performance.now());});
+  v.addEventListener('loadedmetadata',function(){esperados=0;conferirRange(desde=performance.now());});
   v.addEventListener('loadeddata',function(){                               // o 1º 'seeked' pode chegar sem quadro (readyState<2): agora há
     if(vivo||alvo<0)return;
     if(!emVoo&&pedido===alvo&&pedido===v.currentTime)viver(true);else pedir(); // já está no quadro pedido: só mostra; senão pedir() busca de novo
   });
-  v.addEventListener('progress',function(){if(!vivo&&alvo>=0&&!emVoo&&v.readyState>=2)pedir();}); // Safari: 'seeked' sem quadro e os dados chegam depois
+  v.addEventListener('progress',function(){if(!vivo&&alvo>=0&&v.readyState>=2)pedir();}); // Safari: 'seeked' sem quadro e os dados chegam depois
   v.addEventListener('seeked',function(){
     var nosso=emVoo>0,levou=nosso?performance.now()-emVoo:0;emVoo=0;
     if(v.readyState<2){viver(false);return;}

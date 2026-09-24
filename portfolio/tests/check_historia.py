@@ -549,7 +549,7 @@ def checar_clipes_js():
     for exigido in ("canPlayType", "'seeked'", "seekable", "rootMargin:'600px", "preload='auto'", ".load()", "removeAttribute('src')",
                     "prefers-reduced-motion: reduce", "'change'", "saveData", "clipes=nao", "readyState", "'load'",
                     "TETO=250", "LENTOS=3", "VOO=600", "MAXIMO=2", "fig.__clipe=api", "'progress'", "'emptied'", "networkState", "esperados",
-                    "ESPERA_RANGE=1500", "temRange", "Math.min(Math.round(t*FPS),ultimo)"):
+                    "ESPERA_RANGE=1500", "temRange", "desde", "||!temRange()", "Math.min(Math.round(t*FPS),ultimo)"):
         check(exigido in js, f"clipes.js precisa de {exigido}")
     check("(Math.min(Math.round(t*FPS),ultimo)+0.5)/FPS" in js, "clipes.js: seek quantizado ao quadro e nunca além do último, (min(round(t·24), round(dur·24)−1)+0,5)/24")
     check("v.currentTime=" in js and js.count("currentTime=") == 1, "clipes.js: o tempo do vídeo só muda por currentTime, num lugar só")
@@ -739,7 +739,9 @@ ESPIAO = (
     "new PerformanceObserver(function(l){l.getEntries().forEach(function(e){__lcp=(e.element&&e.element.tagName||'?')+' '+(e.url||'');});})"
     ".observe({type:'largest-contentful-paint',buffered:true});"
     "new PerformanceObserver(function(l){l.getEntries().forEach(function(e){if(!e.hadRecentInput)__cls+=e.value;});})"
-    ".observe({type:'layout-shift',buffered:true});")
+    ".observe({type:'layout-shift',buffered:true});"
+    "window.__vivas=0;new MutationObserver(function(ms){ms.forEach(function(m){if(m.target.classList&&m.target.classList.contains('viva'))window.__vivas++;});})"
+    ".observe(document,{attributes:true,attributeFilter:['class'],subtree:true});")  # document: o documentElement ainda é null aqui
 # troca o clipe do whatsapp por um arquivo que não existe (404) antes de o clipes.js rodar: o leitor tem de ver o pôster
 TROCA_404 = ("window.__troca='tarde';new MutationObserver(function(ms,o){var f=document.querySelector('figure.clipe[data-passo=\"whatsapp\"]');"
              "if(f){f.dataset.clipe='video/nao-existe.mp4';window.__troca=window.Historia?'tarde':'antes';o.disconnect();}})"
@@ -888,6 +890,7 @@ def checar_clipe_real():
         c, e = ler_clipe(ws, "icamento"), ler_clipes(ws)
         check(e["vivas"] == [] and c["img"] == "visible" and c["src"] is None and c["ready"] == 0,
               f"servidor sem Range: nenhuma .viva, pôster visível, vídeo descarregado (estado: {c}, vivas {e['vivas']})")
+        check(ws.avaliar("window.__vivas") == 0, f"servidor sem Range: .viva nunca pode aparecer, nem por instantes (apareceu {ws.avaliar('window.__vivas')}×)")
         check(e["erros"] == [], f"servidor sem Range: console limpo ({e['erros']})")
 
 
@@ -930,16 +933,16 @@ def checar_reduzido_real():
 
 
 def checar_evicao():
-    """Despejo pelo navegador (WebKit sob pressão de memória, simulado por removeAttribute('src')+load() de fora): depois de
-    .viva, o clipe da cena ativa recarrega sozinho; despejado antes dos metadados (rede lenta emulada pelo CDP), também
-    recarrega — o 'emptied' do nosso próprio load() não é confundido com o do navegador."""
+    """Despejo pelo navegador (WebKit sob pressão de memória esvazia o vídeo e mantém o src; simulado reatribuindo o mesmo src com
+    preload='none'): depois de .viva, o clipe da cena ativa recarrega sozinho; despejado antes dos metadados (rede lenta emulada
+    pelo CDP), também recarrega — o 'emptied' do nosso próprio load() não é confundido com o do navegador."""
     with chromium(390, altura=844) as ws:
         ws.comando("Page.enable")
         ws.comando("Page.addScriptToEvaluateOnNewDocument", source=ESPIAO)
         navegar(ws)
         rolar_ate(ws, "icamento", 0.4)
         check(esperar(ws, "document.querySelector('figure.clipe[data-passo=\"icamento\"]').classList.contains('viva')", 25), "içamento .viva antes do despejo")
-        ws.avaliar(VIDEO_ICAMENTO + ".removeAttribute('src');" + VIDEO_ICAMENTO + ".load()")  # o navegador "esvaziou" o vídeo
+        ws.avaliar(VIDEO_ICAMENTO + ".preload='none';" + VIDEO_ICAMENTO + ".setAttribute('src'," + VIDEO_ICAMENTO + ".getAttribute('src'))")  # o navegador "esvaziou" o vídeo (o WebKit mantém o src)
         voltou = esperar(ws, "(function(){var f=document.querySelector('figure.clipe[data-passo=\"icamento\"]');"
                              "return f.classList.contains('viva')&&!!f.querySelector('video').getAttribute('src');})()", 3)
         c = ler_clipe(ws, "icamento")
@@ -955,7 +958,8 @@ def checar_evicao():
         esperar(ws, "!!document.querySelector('figure.clipe[data-passo=\"casa\"] video').getAttribute('src')", 5)
         antes = ler_clipe(ws, "casa")
         check(antes["src"] is not None and antes["ready"] == 0, f"o despejo tem de acontecer antes dos metadados (src {antes['src']!r}, readyState {antes['ready']})")
-        ws.avaliar("(function(){var v=document.querySelector('figure.clipe[data-passo=\"casa\"] video');v.removeAttribute('src');v.load();})()")
+        # o WebKit esvazia sem tirar o src: o mesmo src reatribuído com preload='none' esvazia o elemento e não baixa nada sozinho
+        ws.avaliar("(function(){var v=document.querySelector('figure.clipe[data-passo=\"casa\"] video');v.preload='none';v.setAttribute('src',v.getAttribute('src'));})()")
         ws.comando("Network.emulateNetworkConditions", offline=False, latency=0, downloadThroughput=-1, uploadThroughput=-1)
         voltou = esperar(ws, "document.querySelector('figure.clipe[data-passo=\"casa\"]').classList.contains('viva')", 5)
         check(voltou, f"despejado antes dos metadados, o clipe ativo recarrega e chega a .viva em ≤ 5 s (estado: {ler_clipe(ws, 'casa')})")
