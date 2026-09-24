@@ -413,7 +413,7 @@ def checar_evicao():
         navegar(ws)
         rolar_ate(ws, "icamento", 0.4)
         check(esperar(ws, "document.querySelector('figure.clipe[data-passo=\"icamento\"]').classList.contains('viva')", 25), "içamento .viva antes do despejo")
-        ws.avaliar(VIDEO_ICAMENTO + ".removeAttribute('src');" + VIDEO_ICAMENTO + ".load()")  # o navegador "esvaziou" o vídeo
+        ws.avaliar(VIDEO_ICAMENTO + ".preload='none';" + VIDEO_ICAMENTO + ".setAttribute('src'," + VIDEO_ICAMENTO + ".getAttribute('src'))")  # o navegador "esvaziou" o vídeo (o WebKit mantém o src)
         voltou = esperar(ws, "(function(){var f=document.querySelector('figure.clipe[data-passo=\"icamento\"]');"
                              "return f.classList.contains('viva')&&!!f.querySelector('video').getAttribute('src');})()", 3)
         c = ler_clipe(ws, "icamento")
@@ -425,7 +425,8 @@ def checar_evicao():
         esperar(ws, "!!document.querySelector('figure.clipe[data-passo=\"casa\"] video').getAttribute('src')", 5)
         antes = ler_clipe(ws, "casa")
         check(antes["src"] is not None and antes["ready"] == 0, f"o despejo tem de acontecer antes dos metadados (src {antes['src']!r}, readyState {antes['ready']})")
-        ws.avaliar("(function(){var v=document.querySelector('figure.clipe[data-passo=\"casa\"] video');v.removeAttribute('src');v.load();})()")
+        # o WebKit esvazia sem tirar o src: o mesmo src reatribuído com preload='none' esvazia o elemento e não baixa nada sozinho
+        ws.avaliar("(function(){var v=document.querySelector('figure.clipe[data-passo=\"casa\"] video');v.preload='none';v.setAttribute('src',v.getAttribute('src'));})()")
         ws.comando("Network.emulateNetworkConditions", offline=False, latency=0, downloadThroughput=-1, uploadThroughput=-1)
         voltou = esperar(ws, "document.querySelector('figure.clipe[data-passo=\"casa\"]').classList.contains('viva')", 5)
         check(voltou, f"despejado antes dos metadados, o clipe ativo recarrega e chega a .viva em ≤ 5 s (estado: {ler_clipe(ws, 'casa')})")
@@ -530,9 +531,19 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Modify: `portfolio/site/clipes.js`
 - Modify: `portfolio/tests/check_historia.py` (`checar_clipes_js`)
 
-- [ ] **Step 1: Teste que falha**
+- [ ] **Step 1: Testes que falham**
 
-Em `checar_clipes_js`, acrescentar `"ESPERA_RANGE=1500"` e `"temRange"` à tupla `exigido`.
+Em `checar_clipes_js`, acrescentar `"ESPERA_RANGE=1500"`, `"temRange"`, `"desde"` e `"||!temRange()"` à tupla `exigido`.
+
+Em `ESPIAO`, acrescentar um contador de `.viva` que nunca zera (para provar que sem Range a classe **nunca** apareceu, não só que não está lá no fim):
+```python
+    "window.__vivas=0;new MutationObserver(function(ms){ms.forEach(function(m){if(m.target.classList&&m.target.classList.contains('viva'))window.__vivas++;});})"
+    ".observe(document.documentElement,{attributes:true,attributeFilter:['class'],subtree:true});"
+```
+e no bloco "sem Range" de `checar_clipe_real`, depois da leitura `c, e = …`, acrescentar:
+```python
+        check(ws.avaliar("window.__vivas") == 0, f"servidor sem Range: .viva nunca pode aparecer, nem por instantes (apareceu {ws.avaliar('window.__vivas')}×)")
+```
 
 - [ ] **Step 2: Ver falhar**
 
@@ -547,14 +558,22 @@ Trocar o ouvinte de `loadedmetadata` (Task 5) por:
 
 ```js
   function temRange(){return v.seekable.length>0&&v.seekable.end(0)>=dur-0.5;}
-  function conferirRange(ini){                                              // sem Range o Chrome diz seekable [0,0] e ignora todo seek em silêncio;
-    if(!api.pronto)return;                                                  // o Safari pode preencher seekable só depois: espera ESPERA_RANGE antes de desistir
-    if(temRange()){pedir();return;}
+  function conferirRange(ini){                                              // sem Range o Chrome diz seekable [0,0] (um seek cai no quadro 0);
+    if(!api.pronto||ini!==desde)return;                                     // o Safari pode preencher seekable só depois: espera ESPERA_RANGE antes de desistir;
+    if(temRange()){pedir();return;}                                         // a cadeia morre se a figura descarregou ou recarregou (desde mudou)
     if(performance.now()-ini>ESPERA_RANGE){congelar();return;}
     setTimeout(function(){conferirRange(ini);},250);
   }
-  v.addEventListener('loadedmetadata',function(){esperados=0;conferirRange(performance.now());});
+  v.addEventListener('loadedmetadata',function(){esperados=0;conferirRange(desde=performance.now());});
 ```
+
+Na linha das variáveis por figura, acrescentar `desde=0` (`…,esperados=0,desde=0;`), e em `recarregar()` zerar: `function recarregar(){desde=0;esperados=v.networkState!==0?1:0;v.load();}`.
+
+Em `pedir()`, a primeira guarda ganha `||!temRange()`:
+`if(!api.pronto||api.morto||reduzir.matches||alvo<0||v.readyState<1||!temRange())return;   // nunca antes dos metadados nem sem seekable completo: o alvo fica guardado`
+(sem isso, `loadeddata`/`progress` fazem um seek durante a espera, o Chrome sem Range o leva ao quadro 0 e a figura fica `.viva` no quadro errado por 1,5 s).
+
+No ouvinte de `progress` (Task 5), tirar o `!emVoo` — `pedir()` já aplica o prazo `VOO` a um seek perdido: `v.addEventListener('progress',function(){if(!vivo&&alvo>=0&&v.readyState>=2)pedir();});`
 
 - [ ] **Step 4: Ver passar**
 
