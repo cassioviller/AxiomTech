@@ -390,7 +390,7 @@ EOF
 
 - [ ] **Step 4: Ver passar, e conferir que o zip reproduz o arquivo commitado**
 
-Run: `cd /home/runner/workspace && python3 portfolio/tests/check_filme.py && S=/tmp/claude-1000/-home-runner-workspace/172e4c0c-c99e-4283-99c9-4b60c1ed6c4b/scratchpad/zip && rm -rf $S && mkdir -p $S && unzip -q -o filme-codigo-fonte.zip -d $S && cp portfolio/filme/corrigir_filme.py $S/ && python3 $S/corrigir_filme.py && cmp $S/film.html portfolio/filme/film.html && echo IDENTICO`
+Run: `cd /home/runner/workspace && python3 portfolio/tests/check_filme.py && S=/tmp/claude-1000/-home-runner-workspace/c9bf4b0c-c619-406c-a269-51b67b788219/scratchpad/zip && rm -rf $S && mkdir -p $S && unzip -q -o filme-codigo-fonte.zip -d $S && cp portfolio/filme/corrigir_filme.py $S/ && python3 $S/corrigir_filme.py && cmp $S/film.html portfolio/filme/film.html && echo IDENTICO`
 Expected: `OK`, `film.html corrigido`, `IDENTICO`.
 
 - [ ] **Step 5: Commit**
@@ -753,7 +753,7 @@ Expected: `origem: 192 quadros`, `origem: NNN KB (crf 28)` com NNN ≤ 921, `OK`
 - [ ] **Step 9: Conferir quadros**
 
 ```bash
-cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/172e4c0c-c99e-4283-99c9-4b60c1ed6c4b/scratchpad && mkdir -p $S && for N in 0 60 120 191; do ffmpeg -y -loglevel error -i portfolio/site/video/cena-origem.mp4 -vf "select='eq(n,$N)'" -vframes 1 -update 1 $S/origem-$N.png; done && magick $S/origem-{0,60,120,191}.png -resize 50% +append $S/origem.png
+cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/c9bf4b0c-c619-406c-a269-51b67b788219/scratchpad && mkdir -p $S && for N in 0 60 120 191; do ffmpeg -y -loglevel error -i portfolio/site/video/cena-origem.mp4 -vf "select='eq(n,$N)'" -vframes 1 -update 1 $S/origem-$N.png; done && magick $S/origem-{0,60,120,191}.png -resize 50% +append $S/origem.png
 ```
 
 Abrir `origem.png` com a ferramenta Read. Expected: quatro quadros do escritório **sem** tarja, legenda, HUD, contador ou vinheta; o último com a moeda ao lado do teclado e a tela em "confere"; calendário sem os dias 32–35.
@@ -949,7 +949,7 @@ Expected: `OK`, `casa: 240 quadros`, `casa: NNN KB (crf 28)`, `OK`.
 Se `check_filme.py --cenas casa` reprovar `conteúdo [...] ≠ [True, True, True, True]`, o caminhão ou o telhado estão fora do quadro numa das chaves: ajuste **só** `st.cam` (afaste a câmera ou mova o alvo para o objeto) e rode de novo. Não mexa nos tempos.
 
 ```bash
-cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/172e4c0c-c99e-4283-99c9-4b60c1ed6c4b/scratchpad && mkdir -p $S && for N in 8 40 100 170 200 239; do ffmpeg -y -loglevel error -i portfolio/site/video/cena-casa.mp4 -vf "select='eq(n,$N)'" -vframes 1 -update 1 $S/casa-$N.png; done && magick $S/casa-{8,40,100}.png -resize 50% +append $S/casa-a.png && magick $S/casa-{170,200,239}.png -resize 50% +append $S/casa-b.png
+cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/c9bf4b0c-c619-406c-a269-51b67b788219/scratchpad && mkdir -p $S && for N in 8 40 100 170 200 239; do ffmpeg -y -loglevel error -i portfolio/site/video/cena-casa.mp4 -vf "select='eq(n,$N)'" -vframes 1 -update 1 $S/casa-$N.png; done && magick $S/casa-{8,40,100}.png -resize 50% +append $S/casa-a.png && magick $S/casa-{170,200,239}.png -resize 50% +append $S/casa-b.png
 ```
 
 Abrir `casa-a.png` e `casa-b.png` com a ferramenta Read. Expected: caminhão chegando com a caixa 1 (viga laranja à vista na face aberta); caixa no ar pelo guindaste; segunda caixa pousada ao lado; kit do telhado no pátio com os três montadores; telhado subindo inteiro; casa pronta com o telhado gambrel, caminhão saindo. Nada escrito em parte alguma. Se a composição deixar a casa colada na borda direita ou o pátio fora do quadro, ajustar `st.cam` e renderizar de novo.
@@ -1012,7 +1012,7 @@ Run: `cd /home/runner/workspace && python3 portfolio/tests/check_filme.py --cena
 Expected: `OK`, `icamento: 192 quadros`, `icamento: NNN KB (crf 28)`, `OK`.
 
 ```bash
-cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/172e4c0c-c99e-4283-99c9-4b60c1ed6c4b/scratchpad && mkdir -p $S && for N in 8 60 100 150 191; do ffmpeg -y -loglevel error -i portfolio/site/video/cena-icamento.mp4 -vf "select='eq(n,$N)'" -vframes 1 -update 1 $S/ica-$N.png; done && magick $S/ica-{8,60,100,150,191}.png -resize 40% +append $S/ica.png
+cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/c9bf4b0c-c619-406c-a269-51b67b788219/scratchpad && mkdir -p $S && for N in 8 60 100 150 191; do ffmpeg -y -loglevel error -i portfolio/site/video/cena-icamento.mp4 -vf "select='eq(n,$N)'" -vframes 1 -update 1 $S/ica-$N.png; done && magick $S/ica-{8,60,100,150,191}.png -resize 40% +append $S/ica.png
 ```
 
 Abrir `ica.png`. Expected: módulo na carreta (cavalo laranja); subindo com o balancim amarelo e os quatro cabos verticais; no ar a caminho do radier; descendo; pousado no radier com os cabos frouxos. Balancim e cabos dentro do quadro em todos.
@@ -1086,7 +1086,7 @@ Run: `cd /home/runner/workspace && python3 portfolio/tests/check_filme.py --cena
 Expected: `OK` (com `SC.length == 12` e `st.walls.count > 100`), `zip: 240 quadros`, `zip: NNN KB (crf 28)`, `OK`.
 
 ```bash
-cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/172e4c0c-c99e-4283-99c9-4b60c1ed6c4b/scratchpad && mkdir -p $S && for N in 8 40 110 180 239; do ffmpeg -y -loglevel error -i portfolio/site/video/cena-zip.mp4 -vf "select='eq(n,$N)'" -vframes 1 -update 1 $S/zip-$N.png; done && magick $S/zip-{8,40,110,180,239}.png -resize 40% +append $S/zip.png
+cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/c9bf4b0c-c619-406c-a269-51b67b788219/scratchpad && mkdir -p $S && for N in 8 40 110 180 239; do ffmpeg -y -loglevel error -i portfolio/site/video/cena-zip.mp4 -vf "select='eq(n,$N)'" -vframes 1 -update 1 $S/zip-$N.png; done && magick $S/zip-{8,40,110,180,239}.png -resize 40% +append $S/zip.png
 ```
 
 Abrir `zip.png`. Expected: planta cinza vista de cima, pacote kraft caindo na mesa; cota laranja começando à esquerda com as primeiras paredes de papel de pé; meio da varredura, paredes em primeiro plano, relógio perto das 11:53; varredura no fim, relógio em 12:11; planta pronta com a pilha de 7 páginas. **Nenhum texto** além do que a própria planta publicada traz.
@@ -1114,7 +1114,7 @@ Expected: `FALHOU:` com 7 linhas `falta cena-<passo>.mp4 ou …` (obra, veks, fe
 
 - [ ] **Step 2: Render completo (~10 min; rodar em segundo plano e esperar)**
 
-Run: `cd /home/runner/workspace && python3 portfolio/filme/render_clipes.py 2>&1 | tee /tmp/claude-1000/-home-runner-workspace/172e4c0c-c99e-4283-99c9-4b60c1ed6c4b/scratchpad/render.log`
+Run: `cd /home/runner/workspace && python3 portfolio/filme/render_clipes.py 2>&1 | tee /tmp/claude-1000/-home-runner-workspace/c9bf4b0c-c619-406c-a269-51b67b788219/scratchpad/render.log`
 Expected: uma linha `<passo>: N quadros` e uma `<passo>: NNN KB (crf 28|29|30)` por clipe, depois `soma dos clipes: X.XX MB` com X ≤ 8, e `pronto: …/site/video`. Se algum clipe passar de 0,9 MB com crf 30, o script para com o nome dele: relatar; não subir o teto.
 
 - [ ] **Step 3: Ver passar**
@@ -1125,7 +1125,7 @@ Expected: `OK`; total ≤ 8,0M; 22 arquivos `cena-*` (mais `historia.mp4`/`histo
 - [ ] **Step 4: Conferir o último quadro de cada clipe (o pôster) contra a tabela da spec**
 
 ```bash
-cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/172e4c0c-c99e-4283-99c9-4b60c1ed6c4b/scratchpad && mkdir -p $S && magick portfolio/site/video/cena-{origem,obra,veks,ferramentas}.webp -resize 45% +append $S/posters-a.png && magick portfolio/site/video/cena-{sige,escala,whatsapp,recuperado}.webp -resize 45% +append $S/posters-b.png && magick portfolio/site/video/cena-{casa,icamento,zip}.webp -resize 45% +append $S/posters-c.png
+cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/c9bf4b0c-c619-406c-a269-51b67b788219/scratchpad && mkdir -p $S && magick portfolio/site/video/cena-{origem,obra,veks,ferramentas}.webp -resize 45% +append $S/posters-a.png && magick portfolio/site/video/cena-{sige,escala,whatsapp,recuperado}.webp -resize 45% +append $S/posters-b.png && magick portfolio/site/video/cena-{casa,icamento,zip}.webp -resize 45% +append $S/posters-c.png
 ```
 
 Abrir os três PNG. Expected (coluna "Pôster" da spec): origem = tela "confere", moeda na mesa · obra = 5 cartões "MESMO DADO", treliça no alto · veks = guia e montantes de pé (sem as placas) · ferramentas = placas na parede, "PLANO DE CORTE" no chão · sige = 8 andares acesos, placa "EM USO" · escala = restaurante pronto e as 12 miniaturas · whatsapp = celular "Obra galpões", quadro **sem** balão chegando · recuperado = quadro com barras verdes · casa = telhado pousado, caminhão saindo · icamento = módulo no radier, cabos frouxos · zip = paredes de pé, relógio em 12:11, pilha de páginas. Nenhum pôster com tarja, legenda ou HUD.
@@ -1626,10 +1626,10 @@ Expected: `OK` três vezes. No harness (`--navegador`): `cena casa ativa=casa fu
 - [ ] **Step 7: Olhar a página**
 
 ```bash
-cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/172e4c0c-c99e-4283-99c9-4b60c1ed6c4b/scratchpad && mkdir -p $S && python3 - <<'EOF'
+cd /home/runner/workspace && S=/tmp/claude-1000/-home-runner-workspace/c9bf4b0c-c619-406c-a269-51b67b788219/scratchpad && mkdir -p $S && python3 - <<'EOF'
 import sys, time, base64
 sys.path.insert(0, 'portfolio/tests'); import check_historia as ch
-S='/tmp/claude-1000/-home-runner-workspace/172e4c0c-c99e-4283-99c9-4b60c1ed6c4b/scratchpad'; import os; os.makedirs(S, exist_ok=True)
+S='/tmp/claude-1000/-home-runner-workspace/c9bf4b0c-c619-406c-a269-51b67b788219/scratchpad'; import os; os.makedirs(S, exist_ok=True)
 for largura, altura, passo, nome in ((390, 844, 'icamento', 'fone'), (1366, 768, 'zip', 'larga')):
     with ch.chromium(largura, ("--enable-unsafe-swiftshader",), altura=altura) as ws:
         ws.comando("Page.navigate", url=f"http://127.0.0.1:{ch.PORTA}/site/index.html"); time.sleep(2.5)
