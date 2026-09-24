@@ -216,7 +216,8 @@ ENQUADRAMENTOS = {  # no último quadro do trecho, o assunto inteiro dentro do q
     "escala": ("(function(){renderCena(7,10);return SC[7].minis.every(function(m){var p=m.position.clone();p.y+=1.2;p.project(cam);"
                "return Math.abs(p.x)<.98&&p.y>-.94&&p.y<.98;})&&[-8,8].every(function(x){var p=new THREE.Vector3(x,0,5.5).project(cam);"
                "return Math.abs(p.x)<.98&&p.y>-.94;});})()", True),
-    "icamento": ("(function(){var st=SC[10];renderCena(10,10);var p=st.cavalo.position.clone();p.project(cam);return p.x<.9&&Math.abs(p.y)<.95;})()", True),
+    # icamento: a borda direita do cavalo (meia largura 1,2), não o centro, com folga para o recorte a 68 % da página
+    "icamento": ("(function(){var st=SC[10];renderCena(10,10);var p=st.cavalo.position.clone();p.x+=1.2;p.project(cam);return p.x<.88&&Math.abs(p.y)<.95;})()", True),
 }
 
 

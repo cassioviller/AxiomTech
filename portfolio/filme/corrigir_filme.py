@@ -164,7 +164,7 @@ st.bal=new THREE.Group();g.add(st.bal);box(L,.25,.25,0xE8B53E,0,0,cz,st.bal);box
 var gancho=new THREE.Mesh(new THREE.TorusGeometry(.3,.08,8,20),P(0x4A4E55));g.add(gancho);
 st.cabos=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x2a2622}));st.cabos.frustumCulled=false;g.add(st.cabos);
 tree(-14,-9,1.2,g);tree(13,-10,1,g);tree(-12,9,.9,g);tree(16,7,1.1,g);
-st.cam=[[0,[24,13,24],[6,3.5,0]],[3.3,[21,16,22],[5,6.5,0]],[6.6,[-4,17,26],[-3,6.5,0]],[10,[-19,12,24],[-2,3,0]]];
+st.cam=[[0,[24,13,24],[6,3.5,0]],[3.3,[21,16,22],[5,6.5,0]],[6.6,[-4,17,26],[-3,6.5,0]],[10,[-19,12,24],[0,3,0]]];
 st.run=function(t){var x=lerp(XC,XR,ramp(t,3.75,6.75)),y=t<6.75?lerp(1.2,TOPO,ramp(t,.75,3.75)):lerp(TOPO,.5,ramp(t,6.75,9));
  st.mod.position.set(x,y,0);var bY=y+H+2.2,hY=bY+2.6,pts=[];st.bal.position.set(x,bY,0);gancho.position.set(x,hY,0);
  cantos.forEach(function(c){pts.push(x+c[0],bY,c[1],x+c[0],y+CH+.05,c[1]);pts.push(x+c[0],bY,c[1],x,hY,0);}); // cabo vertical balancim→olhal; eslinga balancim→gancho
