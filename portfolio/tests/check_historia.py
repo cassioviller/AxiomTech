@@ -883,6 +883,7 @@ def checar_clipe_real():
         check(e["pedidos404"] >= 1, f"o clipe trocado para 404 tem de ter sido pedido ({e['pedidos404']} pedidos a nao-existe.mp4)")
         check(not c["viva"] and c["img"] == "visible" and c["src"] is None and c["ready"] == 0,
               f"clipe inexistente (404): fica o pôster, sem .viva e sem src (estado: {c})")
+        check(e["erros"] == [], f"console limpo com um clipe em 404: {e['erros']}")
         # ?clipes=nao na mesma página: nenhum vídeo, pôster visível, API presente (o historia.js continua chamando seek)
         navegar(ws, "site/index.html?clipes=nao")
         rolar_ate(ws, "icamento", 0.4)

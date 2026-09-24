@@ -190,8 +190,6 @@ function cenaCasa(fig){
   return Object.assign(api,st);
 }
 
-// ---------- CENA: o módulo sobe pelo balancim (16 s: sai da carreta, sobe com os cabos na vertical, anda e pousa no radier) ----------
-// Com o balancim, os cabos descem verticais: o módulo recebe só tração nos olhais e a parede não é comprimida.
 var CENAS={'36min':cena36,'casa-viaja':cenaCasa};
 
 // ---------- ciclo de vida de cada figura ----------
