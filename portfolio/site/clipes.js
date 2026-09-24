@@ -9,7 +9,7 @@
 'use strict';
 var figs=[].slice.call(document.querySelectorAll('figure.clipe'));
 if(!figs.length||!('IntersectionObserver' in window))return;
-var FPS=24,TETO=250,LENTOS=3,VOO=600,MAXIMO=2,FOLGA=100; // ms de um seek lento; lentos seguidos até congelar; ms sem 'seeked' = seek perdido; vídeos com dados; px de vantagem de quem já carregou
+var FPS=24,TETO=250,LENTOS=3,VOO=600,MAXIMO=2,FOLGA=100,ESPERA_RANGE=1500; // ms de um seek lento; lentos seguidos até congelar; ms sem 'seeked' = seek perdido; vídeos com dados; px de vantagem de quem já carregou; ms de espera por um seekable completo antes de congelar
 var v0=document.createElement('video'),con=navigator.connection||{};
 var PODE=!/[?&]clipes=nao\b/.test(location.search)&&v0.canPlayType('video/mp4; codecs="avc1.64001F"')!==''
   &&!con.saveData&&!/^(slow-)?2g$/.test(con.effectiveType||'');
@@ -54,11 +54,14 @@ figs.forEach(function(fig){
     if(!api.pronto)return;
     api.pronto=false;pedido=-1;emVoo=0;viver(false);v.removeAttribute('src');recarregar();
   }
-  v.addEventListener('loadedmetadata',function(){
-    esperados=0;                                                          // todo 'emptied' nosso já chegou (ou foi descartado por um load() seguinte)
-    if(!v.seekable.length||v.seekable.end(0)<dur-0.5){congelar();return;} // servidor sem Range: não dá para buscar; fica o pôster
-    pedir();
-  });
+  function temRange(){return v.seekable.length>0&&v.seekable.end(0)>=dur-0.5;}
+  function conferirRange(ini){                                              // sem Range o Chrome diz seekable [0,0] e ignora todo seek em silêncio;
+    if(!api.pronto)return;                                                  // o Safari pode preencher seekable só depois: espera ESPERA_RANGE antes de desistir
+    if(temRange()){pedir();return;}
+    if(performance.now()-ini>ESPERA_RANGE){congelar();return;}
+    setTimeout(function(){conferirRange(ini);},250);
+  }
+  v.addEventListener('loadedmetadata',function(){esperados=0;conferirRange(performance.now());});
   v.addEventListener('loadeddata',function(){                               // o 1º 'seeked' pode chegar sem quadro (readyState<2): agora há
     if(vivo||alvo<0)return;
     if(!emVoo&&pedido===alvo&&pedido===v.currentTime)viver(true);else pedir(); // já está no quadro pedido: só mostra; senão pedir() busca de novo

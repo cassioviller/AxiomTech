@@ -548,7 +548,8 @@ def checar_clipes_js():
         check(proibido not in js, f"clipes.js não pode usar {proibido}")
     for exigido in ("canPlayType", "'seeked'", "seekable", "rootMargin:'600px", "preload='auto'", ".load()", "removeAttribute('src')",
                     "prefers-reduced-motion: reduce", "'change'", "saveData", "clipes=nao", "readyState", "'load'",
-                    "TETO=250", "LENTOS=3", "VOO=600", "MAXIMO=2", "fig.__clipe=api", "'progress'", "'emptied'", "networkState", "esperados"):
+                    "TETO=250", "LENTOS=3", "VOO=600", "MAXIMO=2", "fig.__clipe=api", "'progress'", "'emptied'", "networkState", "esperados",
+                    "ESPERA_RANGE=1500", "temRange"):
         check(exigido in js, f"clipes.js precisa de {exigido}")
     check("(Math.round(t*FPS)+0.5)/FPS" in js, "clipes.js: seek quantizado ao quadro, (round(t·24)+0,5)/24")
     check("v.currentTime=" in js and js.count("currentTime=") == 1, "clipes.js: o tempo do vídeo só muda por currentTime, num lugar só")
