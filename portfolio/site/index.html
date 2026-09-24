@@ -88,7 +88,7 @@ footer a{color:var(--ink)}
 /* modo cenas: historia.js liga .js-historia no <html> e leva cada .fundo para o .palco */
 /* overflow:clip corta o palco (sticky, margin-bottom:-100vh) no fim da história: sem ele, o palco cobre a ficha */
 .js-historia .historia{max-width:none;padding:0;position:relative;background:var(--tinta);overflow:clip}
-.js-historia .palco{display:block;position:sticky;top:var(--barra,0px);height:calc(100vh - var(--barra,0px));height:calc(100svh - var(--barra,0px));margin-bottom:calc(-100vh + var(--barra,0px));margin-bottom:calc(-100svh + var(--barra,0px));overflow:hidden;background:var(--tinta)}
+.js-historia .palco{display:block;position:sticky;top:var(--barra,0px);height:calc(100vh - var(--barra,0px));margin-bottom:calc(-100vh + var(--barra,0px));overflow:hidden;background:var(--tinta)}
 .js-historia .palco .fundo{position:absolute;inset:0;margin:0;opacity:0;transition:opacity .6s ease}
 .js-historia .palco .fundo.ativo{opacity:1}
 .js-historia .palco .fundo img{width:100%;height:100%;max-height:none;object-fit:cover;border:0;filter:brightness(.6) saturate(.85)}
@@ -102,7 +102,9 @@ footer a{color:var(--ink)}
 .js-historia .palco .fundo.viva img{visibility:hidden;transition:visibility 0s .4s}
 .js-historia .cena{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:96px 16px;border:0}
 .js-historia .cena.longa{min-height:200vh;min-height:200svh;align-items:flex-start}
-.js-historia .cena.longa .texto{position:sticky;top:max(28vh,calc(var(--barra,0px) + 8px));top:max(28svh,calc(var(--barra,0px) + 8px))}
+.js-historia .cena.longa .texto{position:sticky;top:max(28vh,calc(var(--barra,0px) + 8px))}
+/* svh só onde existe: com var() dentro, uma declaração svh inválida não cai no parse e anularia a vh */
+@supports (height:100svh){.js-historia .palco{height:calc(100svh - var(--barra,0px));margin-bottom:calc(-100svh + var(--barra,0px))}.js-historia .cena.longa .texto{top:max(28svh,calc(var(--barra,0px) + 8px))}}
 .js-historia .texto{max-width:960px;text-align:center;background:var(--scrim);padding:22px 24px}
 .js-historia .frase{color:var(--texto-cena);font-size:clamp(2.2rem,7vw,5rem);max-width:18ch;margin:0 auto}
 .js-historia .ressalva{color:var(--ressalva-cena);margin:14px auto 0}

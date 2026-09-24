@@ -351,8 +351,8 @@ def checar_css(pagina):
           "no modo cenas o fundo da história é tinta: sem faixa clara quando a barra do navegador recolhe (svh < lvh)")
     check(".cena{scroll-margin-top:9rem}" in css, "o título do capítulo não pode ficar atrás da barra ao chegar por salto")
     check(re.search(r"\.js-historia \.palco\{display:block;position:sticky;top:var\(--barra,0px\);height:calc\(100vh - var\(--barra,0px\)\);"
-                    r"height:calc\(100svh - var\(--barra,0px\)\);margin-bottom:calc\(-100vh \+ var\(--barra,0px\)\);margin-bottom:calc\(-100svh \+ var\(--barra,0px\)\);", css) is not None,
-          "modo cenas: o palco gruda abaixo da barra fixa (top:var(--barra,0px)) e perde a altura dela; sem isso a barra cobre o alto de cada cena")
+                    r"margin-bottom:calc\(-100vh \+ var\(--barra,0px\)\);", css) is not None,
+          "modo cenas: o palco gruda abaixo da barra fixa (top:var(--barra,0px)) e perde a altura dela (base em vh)")
     m = re.search(r"--scrim:\s*rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)", css)
     check(m is not None, "falta --scrim: rgba(...)")
     if not m:
@@ -380,8 +380,12 @@ def checar_css(pagina):
     check(re.search(r"\.js-historia \.palco \.fundo img\{[^}]*filter:brightness\(\.6\) saturate\(\.85\)", css) is not None,
           "as fotos dos capítulos sem clipe mantêm brightness(.6) saturate(.85)")
     check(".js-historia .palco .fundo.clipe img{filter:none;object-position:68% 50%}" in css, "o pôster do clipe fica igual ao vídeo: sem filtro e com o mesmo recorte 68% 50% (crossfade entre dois quadros iguais)")
-    check(".js-historia .cena.longa .texto{position:sticky;top:max(28vh,calc(var(--barra,0px) + 8px));top:max(28svh,calc(var(--barra,0px) + 8px))}" in css,
-          "capítulos longos: a faixa fixa nunca fica atrás da barra (28svh ou a barra + 8 px, o maior)")
+    check(".js-historia .cena.longa .texto{position:sticky;top:max(28vh,calc(var(--barra,0px) + 8px))}" in css,
+          "capítulos longos: a faixa fixa nunca fica atrás da barra (28vh ou a barra + 8 px, o maior)")
+    suporta = bloco_css(css, "@supports (height:100svh){")
+    check(".js-historia .palco{height:calc(100svh - var(--barra,0px));margin-bottom:calc(-100svh + var(--barra,0px))}" in suporta
+          and ".js-historia .cena.longa .texto{top:max(28svh,calc(var(--barra,0px) + 8px))}" in suporta,
+          "as versões svh do palco e da faixa longa vivem num @supports (height:100svh): com var() dentro, uma svh inválida anularia a vh")
     check(".js-historia .palco .fundo.foco-alto video,.js-historia .palco .fundo.foco-alto img{object-position:68% 0%}" in css
           and ".js-historia .palco .fundo.foco-baixo video,.js-historia .palco .fundo.foco-baixo img{object-position:68% 100%}" in css,
           "foco vertical por clipe: .foco-alto recorta pelo pé e .foco-baixo pelo alto (janela mais larga que 16:9); vídeo e pôster iguais")
@@ -397,6 +401,7 @@ def checar_css(pagina):
     paisagem = bloco_css(css, "@media (orientation:landscape) and (max-height:520px){")
     check(".js-historia .texto{max-width:min(560px,54vw);margin-left:16px;text-align:left;padding:12px 16px}" in paisagem
           and ".js-historia .frase{font-size:clamp(1.4rem,6.5vh,2.4rem);margin:0}" in paisagem
+          and ".js-historia .palco .fundo.tipo{justify-content:flex-end;padding:0 4vw 3vh 0}" in paisagem
           and ".js-historia .palco .fundo.tipo .ano{font-size:clamp(4rem,11vw,20rem)}" in paisagem,
           "celular deitado (≤ 520 px de altura): faixa à esquerda, mais estreita e com o título menor, para o clipe continuar à mostra")
     for sumido in (".hud", ".pausa", "canvas"):
@@ -964,7 +969,7 @@ def checar_evicao():
                              "return f.classList.contains('viva')&&!!f.querySelector('video').getAttribute('src');})()", 3)
         c = ler_clipe(ws, "icamento")
         check(voltou, f"despejado depois de .viva, o clipe ativo recarrega e volta a .viva em ≤ 3 s (estado: {c})")
-        # despejo ANTES dos metadados: com a rede a 20 KB/s os metadados demoram ~1 s; o src já está atribuído e readyState ainda é 0
+        # despejo ANTES dos metadados: com a rede a 20 KB/s os metadados demoram ~1,7 s; o src já está atribuído e readyState ainda é 0
         # o salto até o içamento às vezes carrega a casa de passagem (e a FOLGA a mantém): longe dela primeiro, e sem cache, para os dados não voltarem de graça
         rolar_ate(ws, "zip", 0.5)
         check(esperar(ws, "!document.querySelector('figure.clipe[data-passo=\"casa\"] video').getAttribute('src')", 3), "a casa descarrega antes do despejo com rede lenta")
