@@ -52,8 +52,12 @@ TABELA = [["Área de projeção (UPA)", "328", "m²", "medido"], ["Ambientes", "
           ["Placa de gesso por m²", "2,11", "m²", "derivado"], ["Montante por m²", "2,91", "m", "derivado"],
           ["Aço da casa 8 × 6 m", "541", "kg", "derivado"], ["Pé-direito", "—", "m", "a confirmar"]]
 PROIBIDOS = ["26 anos", "155.000", "150.500", "Cassio", "orçadas", "perdidos", "389,04", "422,04", "11.480", "9,90",
-             "a obra digitava", "no centavo"]
-EXIGIDOS = ["Cássio Viller", "No estudo", "Pré-dimensionado", "numa cópia", "a carga ainda não foi aplicada"]
+             "a obra digitava", "no centavo",
+             # rodada 4: nada no quadro que o portfólio não sustente (o clipe não tem legenda para ressalvar)
+             "OUTRO DADO", "barras de 3 m", "LICENCIADO", "COMPRAS", "756", "CONSTRUIR E DEMOLIR", "ESC 1:"]
+EXIGIDOS = ["Cássio Viller", "No estudo", "Pré-dimensionado", "numa cópia", "a carga ainda não foi aplicada",
+            "MESMO DADO", "PLANO DE CORTE", "EM USO", "DESENHO", "PLANTA"]
+ANDARES = ["PROPOSTA", "OBRA", "CRONOGRAMA", "DIÁRIO", "MEDIÇÃO", "COBRANÇA", "CAIXA", "PORTAL DO CLIENTE"]  # = #sige .flow do portfólio
 WPM_MAX = 200  # leitura confortável; o apoio fica visível em ~76% do capítulo
 
 
@@ -124,6 +128,21 @@ def checar_texto(filme, portfolio, historia):
     for nome, pagina in (("index.html", historia), ("portfolio.html", portfolio)):
         check(FRASE_CONTABILIDADE.rstrip(".") in limpo(pagina), f"{nome} sem a frase da contabilidade")
         check("centavo, não na parede" not in pagina, f"{nome} ainda usa a frase do centavo")
+    # SIGE: 8 andares com os nomes do fluxo do portfólio, sem numerais; placa "EM USO"
+    flow = re.search(r'<div class="flow"[^>]*>(.*?)</div>', portfolio[portfolio.index('id="sige"'):], re.S)
+    check(flow is not None and [limpo(s).upper() for s in re.findall(r"<span[^>]*>(.*?)</span>", flow.group(1))] == ANDARES,
+          "os andares do SIGE no filme têm de ser os <span> de #sige .flow do portfólio")
+    names = re.search(r"var names=\[([^\]]*)\];", filme)
+    check(names is not None and [js_str(x) for x in re.findall(r"'((?:[^'\\]|\\.)*)'", names.group(1))] == ANDARES,
+          f"var names do SIGE ≠ {ANDARES}")
+    sige = filme[filme.index("CENA 4 · prédio SIGE"):filme.index("CENA 6 · 36 minutos")]
+    check("padStart" not in sige, "SIGE: sem numeral nos andares (7 numerados leem-se como 7 áreas; o site diz 6)")
+    check("st.cam=[[0,[7,1.6,10],[0,1.4,0]],[7.5,[7,9.8,10],[0,8.8,0]],[10,[12.5,10,17.5],[0,5.4,0]]];" in sige,
+          "SIGE: chaves de câmera do 8º andar")
+    check("if(r*7+k<31)" in filme, "escritório: calendário com até 31 dias")
+    rua = filme[filme.index("CENA 2 · duas construtoras"):filme.index("CENA 3 · WhatsApp")]
+    check("c.fillText('MESMO DADO',20,120);" in rua and "moveTo(16,106)" not in rua, "rua: os 5 cartões dizem MESMO DADO, sem risco")
+    check("m.rotation.z=i==4?Math.sin(t*9)*.08*cl(t-7.2):0" in rua, "rua: o 5º cartão continua tremendo")
 
 
 def ffprobe(caminho):

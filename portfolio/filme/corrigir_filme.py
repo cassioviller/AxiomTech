@@ -36,12 +36,45 @@ TROCAS = [
     ("c.fillStyle=i==4?'#C23B22':'#1E1A17';c.font='bold 44px sans-serif';c.fillText(i==4?'R$ 150.500':'R$ 155.000',20,120);",
      "c.fillStyle=i==4?'#C23B22':'#1E1A17';c.font='bold 34px sans-serif';c.fillText(i==4?'OUTRO DADO':'MESMO DADO',20,120);"),
 ]
+# Rodada 4 (o filme vira fundo da história, sem legenda para ressalvar): nada no quadro que o portfolio.html não sustente.
+TROCAS_RODADA_4 = [
+    # rua: os 5 cartões dizem MESMO DADO; sai o "OUTRO DADO" e o risco (o 5º continua vermelho e tremendo)
+    ("c.fillText(i==4?'OUTRO DADO':'MESMO DADO',20,120);if(i==4){c.strokeStyle='#C23B22';c.lineWidth=5;c.beginPath();c.moveTo(16,106);c.lineTo(300,106);c.stroke();}",
+     "c.fillText('MESMO DADO',20,120);"),
+    # VEKS: o portfólio não fala de barras de 3 m
+    ("'PLANO DE CORTE · barras de 3 m'", "'PLANO DE CORTE'"),
+    # SIGE: 8 andares = #sige .flow do portfólio, sem numerais; a placa diz EM USO; tudo sobe 1,2 (um andar)
+    ("var names=['PROPOSTA','OBRA','CRONOGRAMA','DIÁRIO','COMPRAS','MEDIÇÃO','CAIXA'];",
+     "var names=['PROPOSTA','OBRA','CRONOGRAMA','DIÁRIO','MEDIÇÃO','COBRANÇA','CAIXA','PORTAL DO CLIENTE'];"),
+    ("c.fillStyle='#fff';c.font='bold 50px sans-serif';c.fillText(nm,24,66);c.fillStyle='#D9541E';c.fillText(String(i+1).padStart(2,'0'),420,66);",
+     "c.fillStyle='#fff';c.font='bold 40px sans-serif';c.fillText(nm,24,64);"),
+    ("st.tube=box(.3,8.6,.3,ORANGE,-2.3,4.3,2.12,g);st.tube.geometry.translate(0,4.3,0);",
+     "st.tube=box(.3,9.8,.3,ORANGE,-2.3,4.9,2.12,g);st.tube.geometry.translate(0,4.9,0);"),
+    ("c.fillText('LICENCIADO',70,76);", "c.fillText('EM USO',140,76);"),
+    ("st.lic=plane(2.8,.6,lic,0,9.3,0,g);box(.1,.8,.1,0x55606B,-1,8.7,0,g);box(.1,.8,.1,0x55606B,1,8.7,0,g);",
+     "st.lic=plane(2.8,.6,lic,0,10.5,0,g);box(.1,.8,.1,0x55606B,-1,9.9,0,g);box(.1,.8,.1,0x55606B,1,9.9,0,g);"),
+    ("st.cam=[[0,[7,1.6,10],[0,1.4,0]],[7.5,[7,8.6,10],[0,7.6,0]],[10,[11.5,9,16],[0,4.8,0]]];",
+     "st.cam=[[0,[7,1.6,10],[0,1.4,0]],[7.5,[7,9.8,10],[0,8.8,0]],[10,[12.5,10,17.5],[0,5.4,0]]];"),
+    ("st.tube.scale.y=Math.max(.01,ramp(t,.5,7.6));st.lic.visible=t>7.8;st.lic.scale.setScalar(Math.max(.001,back((t-7.8)/.5)));",
+     "st.tube.scale.y=Math.max(.01,ramp(t,.5,8.0));st.lic.visible=t>8.2;st.lic.scale.setScalar(Math.max(.001,back((t-8.2)/.5)));"),
+    # restaurante: o cubo é o desenho que entra, não um tamanho de arquivo
+    ("c.font='bold 64px sans-serif';c.fillText('756',60,120);c.font='bold 44px sans-serif';c.fillText('MB',86,180);",
+     "c.font='bold 44px sans-serif';c.fillText('DESENHO',26,146);"),
+    # 36 min (só no trailer): sem título de prancha nem escala
+    ("'PLANTA CONSTRUIR E DEMOLIR · ESC 1:100'", "'PLANTA'"),
+    # escritório: calendário com 31 dias, não 35
+    ("for(var r=0;r<5;r++)for(var k=0;k<7;k++)c.fillText(String(r*7+k+1),14+k*34,110+r*40);",
+     "for(var r=0;r<5;r++)for(var k=0;k<7;k++)if(r*7+k<31)c.fillText(String(r*7+k+1),14+k*34,110+r*40);"),
+]
 
 
 def main():
     s = FILME.read_text(encoding="utf-8")
     for velho, novo in TROCAS:
         assert s.count(velho) == 1, f"trecho não encontrado (ou repetido): {velho[:60]!r}"
+        s = s.replace(velho, novo)
+    for velho, novo in TROCAS_RODADA_4:
+        assert s.count(velho) == 1, f"trecho da rodada 4 não encontrado (ou repetido): {velho[:60]!r}"
         s = s.replace(velho, novo)
     s, n = re.subn(r"var rows=\[.*?\]\];", lambda m: TABELA, s, count=1, flags=re.S)
     assert n == 1, "tabela da abertura não encontrada"
