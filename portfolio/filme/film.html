@@ -417,8 +417,8 @@ var CX=PW/2+2.4,CY=2.1,CZ=PH/2+.2;box(.5,CY-.6,.5,0xC9B79A,CX,(CY-.6)/2,CZ,g);va
 for(var q=0;q<12;q++){var tk=box(.05,.14,.02,0x1E1A17,CX+Math.sin(q*Math.PI/6)*.72,CY+Math.cos(q*Math.PI/6)*.72,CZ+.06,g,true);tk.rotation.z=-q*Math.PI/6;}
 st.hm=box(.08,.48,.03,0x1E1A17,CX,CY,CZ+.09,g,true);st.hm.geometry.translate(0,.24,0);st.mm=box(.05,.72,.03,ORANGE,CX,CY,CZ+.11,g,true);st.mm.geometry.translate(0,.36,0);
 tree(-PW/2-3.5,-PH/2-1,.9,g);tree(PW/2+4,-PH/2-2,.8,g);
-st.cam=[[0,[3,28,8],[3,0,1.5]],[2.5,[-10,5,18],[3.5,1,1]],[7,[1,7,21],[6,1,1.5]],[10,[14,9,18],[5,1,2]]];
-st.run=function(t){var p=cl((t-1.2)/6.8),sx=lerp(-PW/2-.4,PW/2+2.6,p);st.sweep.position.x=sx;sweepTop.position.x=sx;st.sweep.visible=sweepTop.visible=t>1&&t<8.3;
+st.cam=[[0,[3,28,8],[3,0,1.5]],[2.5,[-10,5,18],[3.5,1,1]],[7,[-4,7,22],[9,1,1.5]],[10,[17,8,17],[6,1,2]]];
+st.run=function(t){var p=cl((t-1.2)/6.8),sx=lerp(-PW/2-.4,PW/2+2.6,p);var lx=Math.min(sx,PW/2+.4);st.sweep.position.x=lx;sweepTop.position.x=lx;st.sweep.visible=sweepTop.visible=t>1&&t<8.3;
  if(st.walls){for(var i=0;i<wx.length;i++){var hh=Math.max(.001,ease((sx-wx[i][0])/2.5)*HW);dummy.position.set(wx[i][0],.01+hh/2,wx[i][1]);dummy.scale.set(1,hh,1);dummy.updateMatrix();st.walls.setMatrixAt(i,dummy.matrix);}st.walls.instanceMatrix.needsUpdate=true;}
  st.zip.position.y=lerp(6,1.43,ramp(t,.3,.9));
  var mm=35+36*p;st.mm.rotation.z=-(mm/60)*Math.PI*2;st.hm.rotation.z=-((11+mm/60)/12)*Math.PI*2; // 11:35 → 12:11, linear com a varredura
