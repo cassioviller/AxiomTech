@@ -368,8 +368,8 @@ def checar_css(pagina):
             check(cr >= 4.5, f"{var} sobre a faixa: {cr:.2f}:1 no pior caso (mín. 4,5)")
     relogio = re.search(r"--relogio:\s*#([0-9A-Fa-f]{6})", css)
     check(relogio is not None and contraste(tuple(int(relogio.group(1)[i:i + 2], 16) for i in (0, 2, 4)), fundo) >= 3.0,
-          "--relogio (o .ano dos fundos tipográficos) (texto grande, negrito) sobre a faixa: mínimo 3:1 no pior caso")
-    check(".fundo video{display:none}" in css, "modo empilhado: o vídeo não existe, fica a imagem")
+          "--relogio, o .ano dos fundos tipográficos (texto grande, negrito), sobre a faixa: mínimo 3:1 no pior caso")
+    check(re.search(r"(^|[}\n])\.fundo video\{display:none\}", css) is not None, "modo empilhado: a regra .fundo video{display:none} (a do movimento reduzido não vale por ela)")
     pv = re.search(r"\.js-historia \.palco \.fundo video\{([^}]*)\}", css)
     check(pv is not None and all(x in pv.group(1) for x in ("display:block", "object-fit:cover", "object-position:68% 50%", "opacity:0", "transition:opacity .4s")),
           "modo cenas: o vídeo cobre o palco (object-fit:cover; object-position:68% 50%), começa invisível e aparece em .4s")
@@ -659,7 +659,7 @@ def chromium(largura, extra=(), altura=800, com_range=True):
             nav.wait()
 
 
-def navegador(largura=390, extra=("--disable-3d-apis",)):
+def navegador(largura=390, extra=()):
     """Roda o harness e devolve as linhas do <pre id="resultado"> (espera até 150 s pelo FIM)."""
     with chromium(largura, extra) as ws:
         ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/tests/historia_teste.html")
@@ -744,14 +744,15 @@ ESPIAO = (
     ".observe(document,{attributes:true,attributeFilter:['class'],subtree:true});")  # document: o documentElement ainda é null aqui
 # troca o clipe do whatsapp por um arquivo que não existe (404) antes de o clipes.js rodar: o leitor tem de ver o pôster
 TROCA_404 = ("window.__troca='tarde';new MutationObserver(function(ms,o){var f=document.querySelector('figure.clipe[data-passo=\"whatsapp\"]');"
-             "if(f){f.dataset.clipe='video/nao-existe.mp4';window.__troca=window.Historia?'tarde':'antes';o.disconnect();}})"
+             "if(f){f.dataset.clipe='video/nao-existe.mp4';window.__troca=f.__clipe?'tarde':'antes';o.disconnect();}})"
              ".observe(document,{childList:true,subtree:true});")
 LER_CLIPES = (
     "JSON.stringify((function(){var figs=[].slice.call(document.querySelectorAll('figure.clipe'));"
     "var res=performance.getEntriesByType('resource'),nav=performance.getEntriesByType('navigation')[0];"
     "var mp4=res.filter(function(e){return /\\.mp4/.test(e.name);});"
     "function passos(f){return f.map(function(x){return x.dataset.passo;});}"
-    "return {mp4:mp4.length,mp4AntesDoLoad:mp4.filter(function(e){return e.startTime<nav.loadEventStart;}).length,"
+    "return {mp4:mp4.length,pedidos404:res.filter(function(e){return /nao-existe\\.mp4/.test(e.name);}).length,"
+    "mp4AntesDoLoad:mp4.filter(function(e){return e.startTime<nav.loadEventStart;}).length,"
     "three:res.filter(function(e){return /three/i.test(e.name);}).length,"
     "comDados:passos(figs.filter(function(f){return f.querySelector('video').readyState>0;})),"
     "comSrc:passos(figs.filter(function(f){return f.querySelector('video').hasAttribute('src');})),"
@@ -760,19 +761,28 @@ LER_CLIPES = (
     "ativa:(window.Historia||{}).ativa,jsHistoria:document.documentElement.classList.contains('js-historia')};})())")
 
 
+VAZIO_CLIPES = {"mp4": 0, "pedidos404": 0, "mp4AntesDoLoad": 0, "three": 0, "comDados": [], "comSrc": [], "vivas": [], "pausados": False,
+                "plays": 0, "erros": ["exceção ao ler o estado dos clipes"], "ativa": None, "jsHistoria": False}
+VAZIO_CLIPE = {"viva": False, "frozen": False, "dur": None, "ready": -1, "seekEnd": -1, "t": -1, "img": "?", "video": "?", "opacidade": "?", "src": None, "paused": None}
+
+
 def ler_clipes(ws):
     """Resumo dos clipes da página: requisições .mp4 (e se alguma veio antes do load), vídeos com dados/src, .viva, play(), erros."""
-    return json.loads(ws.avaliar(LER_CLIPES))
+    bruto = ws.avaliar(LER_CLIPES)
+    check(bruto is not None, "a página lançou uma exceção ao ler o estado dos clipes (LER_CLIPES não devolveu nada)")
+    return json.loads(bruto) if bruto else dict(VAZIO_CLIPES)
 
 
 def ler_clipe(ws, passo):
     """Estado de uma figure de clipe: .viva, API, readyState, seekable, currentTime, visibilidade da imagem e do vídeo."""
-    return json.loads(ws.avaliar(
+    bruto = ws.avaliar(
         "JSON.stringify((function(p){var f=document.querySelector('figure.clipe[data-passo=\"'+p+'\"]'),v=f.querySelector('video'),a=f.__clipe;"
         "return {viva:f.classList.contains('viva'),frozen:!!a&&a.frozen===true,dur:a?a.dur:null,ready:v.readyState,"
         "seekEnd:v.seekable.length?v.seekable.end(0):-1,t:v.currentTime,img:getComputedStyle(f.querySelector('img')).visibility,"
         "video:getComputedStyle(v).display,opacidade:getComputedStyle(v).opacity,src:v.getAttribute('src'),paused:v.paused};})("
-        + json.dumps(passo) + "))"))
+        + json.dumps(passo) + "))")
+    check(bruto is not None, f"a página lançou uma exceção ao ler o clipe {passo}")
+    return json.loads(bruto) if bruto else dict(VAZIO_CLIPE)
 
 
 def esperar(ws, expressao, prazo):
@@ -821,7 +831,8 @@ def checar_clipe_real():
         check(e["mp4AntesDoLoad"] == 0 and e["three"] == 0,
               f"nenhum .mp4 antes do load nem three.js ({e['mp4AntesDoLoad']} mp4 antes do load, {e['three']} three)")
         check(len(e["comDados"]) <= 2, f"em scrollY=0, no máximo 2 vídeos com dados (achei {e['comDados']})")
-        check(ws.avaliar("window.__troca") == "antes", "o espião do 404 precisa trocar data-clipe antes de o clipes.js rodar")
+        troca = ws.avaliar("window.__troca")
+        check(troca == "antes", f"o espião do 404 precisa trocar data-clipe antes de o clipes.js rodar (__troca={troca!r})")
         # 40 % do içamento: carrega, busca o quadro do progresso e mostra o vídeo
         rolar_ate(ws, "icamento", 0.4)
         pronto = esperar(ws, "(function(){var f=document.querySelector('figure.clipe[data-passo=\"icamento\"]');"
@@ -867,11 +878,11 @@ def checar_clipe_real():
             check(len(e["comDados"]) <= 2, f"parada em {passo}: {e['comDados']} vídeos com dados (máx. 2)")
         # 404: o clipe do whatsapp não existe no servidor — pôster, sem .viva, sem src, sem erro não tratado
         rolar_ate(ws, "whatsapp", 0.5)
-        time.sleep(3)
+        esperar(ws, "(function(){var f=document.querySelector('figure.clipe[data-passo=\"whatsapp\"]');return !!f.__clipe&&f.__clipe.morto===true;})()", 5)
         c, e = ler_clipe(ws, "whatsapp"), ler_clipes(ws)
+        check(e["pedidos404"] >= 1, f"o clipe trocado para 404 tem de ter sido pedido ({e['pedidos404']} pedidos a nao-existe.mp4)")
         check(not c["viva"] and c["img"] == "visible" and c["src"] is None and c["ready"] == 0,
               f"clipe inexistente (404): fica o pôster, sem .viva e sem src (estado: {c})")
-        check(e["erros"] == [], f"console limpo com um clipe em 404: {e['erros']}")
         # ?clipes=nao na mesma página: nenhum vídeo, pôster visível, API presente (o historia.js continua chamando seek)
         navegar(ws, "site/index.html?clipes=nao")
         rolar_ate(ws, "icamento", 0.4)
@@ -929,7 +940,8 @@ def checar_reduzido_real():
               f"com movimento reduzido ligado, nenhum clipe novo baixa em 2 s de rolagem ({antes} → {e['mp4']}, src em {e['comSrc']})")
         ws.comando("Emulation.setEmulatedMedia", features=[{"name": "prefers-reduced-motion", "value": "no-preference"}])
         voltou = esperar(ws, "document.querySelector('figure.clipe[data-passo=\"casa\"] video').readyState>=1", 2)
-        check(voltou and ler_clipes(ws)["ativa"] == "casa", "ao desligar o movimento reduzido, o clipe ativo (casa) recarrega em ≤ 2 s")
+        c, e = ler_clipe(ws, "casa"), ler_clipes(ws)
+        check(voltou and e["ativa"] == "casa", f"ao desligar o movimento reduzido, o clipe ativo (casa) recarrega em ≤ 2 s (readyState {c['ready']}, ativa {e['ativa']!r})")
 
 
 def checar_evicao():
@@ -982,7 +994,7 @@ def checar_dados():
             else:
                 time.sleep(3)
             c, e = ler_clipe(ws, "icamento"), ler_clipes(ws)
-            check(e["jsHistoria"], f"navigator.connection={conexao}: o modo cenas continua")
+            check(e["jsHistoria"], f"navigator.connection={conexao}: o modo cenas continua (js-historia={e['jsHistoria']})")
             check((e["mp4"] > 0) == baixa, f"navigator.connection={conexao}: esperava {'algum' if baixa else 'nenhum'} .mp4, achei {e['mp4']}")
             if not baixa:
                 check(c["img"] == "visible" and not c["viva"], f"navigator.connection={conexao}: fica o pôster (estado: {c})")
@@ -993,7 +1005,7 @@ def checar_foco():
     with chromium(390, altura=844) as ws:
         navegar(ws)
         rolar_ate(ws, "icamento", 0.4)
-        esperar(ws, "document.querySelector('figure.clipe[data-passo=\"icamento\"]').classList.contains('viva')", 25)
+        check(esperar(ws, "document.querySelector('figure.clipe[data-passo=\"icamento\"]').classList.contains('viva')", 25), "içamento .viva antes do Tab (o teste vale com clipe carregado)")
         ws.avaliar("document.querySelector('a.pular').focus({preventScroll:true})")
         caminho = []
         for _ in range(60):
@@ -1022,8 +1034,8 @@ def checar_layout():
                 topo = json.loads(ws.avaliar("JSON.stringify((function(){var b=document.querySelector('.barra').getBoundingClientRect(),"
                                              "f=document.querySelector('.palco figure.ativo').getBoundingClientRect();return {barra:b.bottom,fundo:f.top};})())"))
                 check(abs(topo["fundo"] - topo["barra"]) <= 1, f"{largura}×{altura}: o fundo ativo começa em {topo['fundo']:.1f} px, e o pé da barra está em {topo['barra']:.1f} px (têm de coincidir: nem vão nem sobreposição)")
-                direita = ws.avaliar(f"document.querySelector('#{passo} .texto').getBoundingClientRect().right/innerWidth")
-                check(direita <= 0.54, f"{largura}×{altura}: a faixa de texto de {passo} termina em {direita:.2f} da largura (máx. 0,54)")
+                r = json.loads(ws.avaliar(f"JSON.stringify((function(){{var r=document.querySelector('#{passo} .texto').getBoundingClientRect();return {{w:r.width,direita:r.right/innerWidth}};}})())"))
+                check(r["w"] > 0 and r["direita"] <= 0.54, f"{largura}×{altura}: a faixa de texto de {passo} termina em {r['direita']:.2f} da largura (máx. 0,54; largura {r['w']:.0f})")
     curtos = [c["passo"] for c in ROTEIRO if c["fundo"] and c["fundo"][0] == "clipe" and c["passo"] not in LONGAS]
     with chromium(390, altura=844) as ws:
         navegar(ws)
@@ -1038,8 +1050,8 @@ def checar_layout():
                                          "f=document.querySelector('.palco figure.ativo').getBoundingClientRect();return {barra:b.bottom,fundo:f.top};})())"))
             check(abs(topo["fundo"] - topo["barra"]) <= 1, f"390×844 em {passo}: o fundo começa em {topo['fundo']:.1f} px, e o pé da barra está em {topo['barra']:.1f} px (têm de coincidir)")
             r = json.loads(ws.avaliar(f"JSON.stringify((function(){{var r=document.querySelector('#{passo} .texto').getBoundingClientRect();"
-                                      f"return {{h:r.height/innerHeight,cima:r.top/innerHeight,baixo:1-r.bottom/innerHeight}};}})())"))
-            check(r["h"] <= 0.75, f"390×844: a faixa de {passo} ocupa {r['h']:.0%} da altura (máx. 75 %)")
+                                      f"return {{w:r.width,h:r.height/innerHeight,cima:r.top/innerHeight,baixo:1-r.bottom/innerHeight}};}})())"))
+            check(r["w"] > 0 and r["h"] <= 0.75, f"390×844: a faixa de {passo} ocupa {r['h']:.0%} da altura (máx. 75 %)")
             check(max(r["cima"], r["baixo"]) >= 0.1, f"390×844: a faixa de {passo} não deixa 10 % de clipe à mostra acima ou abaixo ({r})")
     with chromium(700, altura=900) as ws:  # as fontes web chegam depois da primeira medida, e a barra quebra em mais linhas ao estreitar: --barra acompanha
         navegar(ws)
@@ -1159,7 +1171,10 @@ def main():
             checar_layout()
             checar_desempenho()
     if "--origem" in sys.argv:
-        checar_origem(sys.argv[sys.argv.index("--origem") + 1])
+        i = sys.argv.index("--origem") + 1
+        if i >= len(sys.argv) or sys.argv[i].startswith("--"):
+            sys.exit("--origem pede a URL da origem publicada, por exemplo: --origem https://exemplo.com")
+        checar_origem(sys.argv[i])
     if FALHAS:
         print("FALHOU:")
         for f in FALHAS:

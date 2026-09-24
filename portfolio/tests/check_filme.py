@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Checagens do filme (portfolio/filme/film.html) e do clipes (portfolio/site/video/cena-*) e trailer de envio (portfolio/filme/saida/).
+"""Checagens do filme (portfolio/filme/film.html), dos clipes de fundo (portfolio/site/video/cena-*) e do trailer de envio (portfolio/filme/saida/).
 
 O texto do trailer segue as mesmas regras de honestidade da página: nenhum número que o
 portfólio não sustente, nenhuma ressalva apagada, nada inventado com cara de dado, legendas
@@ -250,9 +250,12 @@ def checar_reproducao():
     with tempfile.TemporaryDirectory() as tmp:
         subprocess.run(["unzip", "-q", "-o", str(ZIP), "-d", tmp], check=True)
         shutil.copy(ROOT / "filme" / "corrigir_filme.py", tmp)
-        subprocess.run([sys.executable, str(Path(tmp) / "corrigir_filme.py")], check=True, capture_output=True)
-        check((Path(tmp) / "film.html").read_bytes() == FILME.read_bytes(),
-              "corrigir_filme.py não reproduz o film.html commitado a partir do zip (F-02)")
+        r = subprocess.run([sys.executable, str(Path(tmp) / "corrigir_filme.py")], capture_output=True, text=True)
+        ultima = r.stderr.strip().splitlines()[-1] if r.stderr.strip() else "sem mensagem"
+        check(r.returncode == 0, f"corrigir_filme.py falhou sobre o zip: {ultima}")
+        if r.returncode == 0:
+            check((Path(tmp) / "film.html").read_bytes() == FILME.read_bytes(),
+                  "corrigir_filme.py não reproduz o film.html commitado a partir do zip (F-02)")
 
 
 def ffprobe(caminho):
