@@ -30,6 +30,7 @@ sys.path.insert(0, str(ROOT / "filme"))
 from render_clipes import CLIPES  # noqa: E402  (mapa capítulo → cena → trecho: a fonte da verdade)
 
 LONGAS = {"casa", "icamento", "zip"}  # capítulos de 200 svh (10 s, 8 s e 10 s de clipe, mas com mais a dizer)
+FOCO = {"obra": "alto", "casa": "alto", "whatsapp": "alto", "icamento": "alto", "escala": "baixo"}  # assunto encostado no alto / no pé do quadro 16:9
 SITE = ROOT / "site"
 PAGINA = SITE / "index.html"
 PORTFOLIO = SITE / "portfolio.html"
@@ -188,6 +189,8 @@ def checar_fundo(passo, i, fundo, miolo):
     fa, fmiolo = atributos(figs[0][0]), figs[0][1]
     tipo = fundo[0]
     classe = {"img": "fundo", "ano": "fundo tipo", "clipe": "fundo clipe"}[tipo]
+    if tipo == "clipe" and passo in FOCO:
+        classe += " foco-" + FOCO[passo]
     check(fa.get("class") == classe, f"cena {passo}: classe da figura {fa.get('class')!r}, esperava {classe!r}")
     check(fa.get("aria-hidden") == "true", f"cena {passo}: figura de fundo sem aria-hidden=\"true\"")
     check(fa.get("data-passo") == passo, f"cena {passo}: figura com data-passo {fa.get('data-passo')!r}")
@@ -377,6 +380,9 @@ def checar_css(pagina):
     check(re.search(r"\.js-historia \.palco \.fundo img\{[^}]*filter:brightness\(\.6\) saturate\(\.85\)", css) is not None,
           "as fotos dos capítulos sem clipe mantêm brightness(.6) saturate(.85)")
     check(".js-historia .palco .fundo.clipe img{filter:none;object-position:68% 50%}" in css, "o pôster do clipe fica igual ao vídeo: sem filtro e com o mesmo recorte 68% 50% (crossfade entre dois quadros iguais)")
+    check(".js-historia .palco .fundo.foco-alto video,.js-historia .palco .fundo.foco-alto img{object-position:68% 0%}" in css
+          and ".js-historia .palco .fundo.foco-baixo video,.js-historia .palco .fundo.foco-baixo img{object-position:68% 100%}" in css,
+          "foco vertical por clipe: .foco-alto recorta pelo pé e .foco-baixo pelo alto (janela mais larga que 16:9); vídeo e pôster iguais")
     reduzido = bloco_css(css, "@media (prefers-reduced-motion: reduce){")
     check(".js-historia .palco .fundo video{display:none}" in reduzido and ".js-historia .palco .fundo.viva img{visibility:visible}" in reduzido,
           "movimento reduzido em tempo real: o CSS esconde o vídeo e mostra a imagem sem JS")
@@ -995,6 +1001,13 @@ def checar_layout():
         time.sleep(0.6)
         m = json.loads(ws.avaliar(MEDIDA))
         check(abs(m["barra"] - m["var"]) <= 1, f"depois de estreitar a janela para 500 px, --barra ({m['var']}) ≠ altura da barra ({m['barra']:.2f})")
+    with chromium(2560, altura=1080) as ws:  # 21:9: o palco recorta ~40 % da altura do 16:9; o foco por clipe mantém o assunto
+        navegar(ws)
+        for passo, esperado in (("obra", "68% 0%"), ("escala", "68% 100%"), ("sige", "68% 50%")):
+            rolar_ate(ws, passo, 0.5)
+            time.sleep(0.5)
+            pos = ws.avaliar(f"getComputedStyle(document.querySelector('figure.clipe[data-passo=\"{passo}\"] video')).objectPosition")
+            check(pos == esperado, f"2560×1080: object-position de {passo} é {pos!r}, esperava {esperado!r}")
     alturas = {}
     for largura in (390, 1280):
         with chromium(largura) as ws:  # a altura padrão (800) é a da linha de base

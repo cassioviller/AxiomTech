@@ -93,6 +93,9 @@ footer a{color:var(--ink)}
 .js-historia .palco .fundo.ativo{opacity:1}
 .js-historia .palco .fundo img{width:100%;height:100%;max-height:none;object-fit:cover;border:0;filter:brightness(.6) saturate(.85)}
 .js-historia .palco .fundo.clipe img{filter:none;object-position:68% 50%}
+/* quando a janela é mais larga que 16:9 (o palco perde a altura da barra), o recorte vertical favorece o lado onde está o assunto */
+.js-historia .palco .fundo.foco-alto video,.js-historia .palco .fundo.foco-alto img{object-position:68% 0%}
+.js-historia .palco .fundo.foco-baixo video,.js-historia .palco .fundo.foco-baixo img{object-position:68% 100%}
 /* o clipe cobre o palco sem filtro (paleta do filme); a imagem (pôster = último quadro) só some quando há quadro pronto (.viva) */
 .js-historia .palco .fundo video{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:68% 50%;opacity:0;transition:opacity .4s}
 .js-historia .palco .fundo.viva video{opacity:1}
@@ -184,7 +187,7 @@ footer a{color:var(--ink)}
   </section>
 
   <section class="cena" id="obra" data-passo="obra">
-    <figure class="fundo clipe" data-passo="obra" data-dur="8" data-clipe="video/cena-obra.mp4" aria-hidden="true">
+    <figure class="fundo clipe foco-alto" data-passo="obra" data-dur="8" data-clipe="video/cena-obra.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
       <img src="video/cena-obra.webp" alt="" width="960" height="540">
     </figure>
@@ -246,7 +249,7 @@ footer a{color:var(--ink)}
   </section>
 
   <section class="cena" id="escala" data-passo="escala">
-    <figure class="fundo clipe" data-passo="escala" data-dur="8.5" data-clipe="video/cena-escala.mp4" aria-hidden="true">
+    <figure class="fundo clipe foco-baixo" data-passo="escala" data-dur="8.5" data-clipe="video/cena-escala.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
       <img src="video/cena-escala.webp" alt="" width="960" height="540">
     </figure>
@@ -269,7 +272,7 @@ footer a{color:var(--ink)}
   </section>
 
   <section class="cena longa" id="casa" data-passo="casa">
-    <figure class="fundo clipe" data-passo="casa" data-dur="10" data-clipe="video/cena-casa.mp4" aria-hidden="true">
+    <figure class="fundo clipe foco-alto" data-passo="casa" data-dur="10" data-clipe="video/cena-casa.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
       <img src="video/cena-casa.webp" alt="" width="960" height="540">
     </figure>
@@ -282,7 +285,7 @@ footer a{color:var(--ink)}
   </section>
 
   <section class="cena longa" id="icamento" data-passo="icamento">
-    <figure class="fundo clipe" data-passo="icamento" data-dur="8" data-clipe="video/cena-icamento.mp4" aria-hidden="true">
+    <figure class="fundo clipe foco-alto" data-passo="icamento" data-dur="8" data-clipe="video/cena-icamento.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
       <img src="video/cena-icamento.webp" alt="" width="960" height="540">
     </figure>
@@ -295,7 +298,7 @@ footer a{color:var(--ink)}
   </section>
 
   <section class="cena" id="whatsapp" data-passo="whatsapp">
-    <figure class="fundo clipe" data-passo="whatsapp" data-dur="8" data-clipe="video/cena-whatsapp.mp4" aria-hidden="true">
+    <figure class="fundo clipe foco-alto" data-passo="whatsapp" data-dur="8" data-clipe="video/cena-whatsapp.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
       <img src="video/cena-whatsapp.webp" alt="" width="960" height="540">
     </figure>
