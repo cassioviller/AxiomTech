@@ -39,7 +39,7 @@ document.documentElement.classList.add('js-historia');
 
 // a barra (nome, cargo, botões e régua) é sticky no topo: --barra é a altura dela, para o fundo do palco começar abaixo
 var barra=document.querySelector('.barra');
-function medirBarra(){if(barra)document.documentElement.style.setProperty('--barra',Math.round(barra.getBoundingClientRect().height)+'px');}
+function medirBarra(){if(barra)document.documentElement.style.setProperty('--barra',barra.getBoundingClientRect().height.toFixed(2)+'px');} // sem arredondar: o palco grudado tem de medir o mesmo que em fluxo (senão a LCP oscila entre a tese e o pôster seguinte)
 medirBarra();
 addEventListener('resize',function(){clearTimeout(medirBarra.t);medirBarra.t=setTimeout(medirBarra,150);});
 
