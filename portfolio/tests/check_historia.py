@@ -542,6 +542,13 @@ def checar_maquetes_js():
     check("'icamento':cenaIcamento" in js, "maquetes.js precisa registrar a cena 3D do içamento em CENAS")
 
 
+def checar_readme():
+    """O README do portfólio explica o servidor com Range e como gerar os clipes (F-16)."""
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    for trecho in ("servir.py", "206", "render_clipes.py", "--origem", "clipes.js"):
+        check(trecho in readme, f"README do portfólio sem {trecho!r}")
+
+
 class WS:
     """Cliente WebSocket mínimo (mensagens de texto) para falar com o Chromium pelo DevTools Protocol."""
 
@@ -1038,6 +1045,7 @@ def main():
         checar_js()
         checar_clipes_js()
         checar_maquetes_js()
+        checar_readme()
         checar_servidor()
         if "--navegador" in sys.argv:
             checar_navegador()

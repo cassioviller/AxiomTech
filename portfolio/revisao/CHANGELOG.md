@@ -180,3 +180,17 @@ Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO
 - `tests/check_filme.py` (texto do filme e vídeo) e `check_historia.py` (seção do trailer; vídeo e ficha à vista depois do palco).
 - Próximo passo (plano separado): dioramas ao vivo como fundo dos capítulos, com um renderizador compartilhado.
 - Em aberto (Cássio): idade; UNIFEI 2020 ou 2022; estágio/júnior; versão curta do trailer para o LinkedIn.
+
+---
+
+# Rodada 8 — o filme como fundo da história, avançado pela rolagem, 24/09/2026
+
+- Pesquisa das 5 personas (rodada 4) em `docs/superpowers/research/2026-09-23-filme-fundo/`; spec em `docs/superpowers/specs/2026-09-23-filme-fundo-design.md`; plano em `docs/superpowers/plans/2026-09-24-filme-fundo.md`.
+- 11 capítulos ganham um clipe curto de vídeo ao fundo (960×540, 24 fps, H.264 com GOP 4, sem texto, ≤ 0,9 MB cada e ≤ 8 MB na soma), cujo tempo é o progresso da rolagem: `site/clipes.js` (seek só por `currentTime`, quantizado ao quadro, um em voo por vez; carga depois do `load` e a 600 px da cena; no máximo 2 vídeos com dados; pôster = último quadro como plano B). `historia.js` só trocou `maquete` por `clipe`.
+- As três maquetes three.js da página (casa, içamento, 36 min) foram portadas para o `film.html` no estilo do filme (`SC[9..11]`) e renderizadas como clipes: a história não roda mais WebGL; `maquetes.js` segue só no portfólio completo.
+- `film.html`: `?limpo` (só o canvas) e `renderCena(i, t)`; texto pintado corrigido pela regra "nada que o portfólio não sustente" (MESMO DADO, PLANO DE CORTE, EM USO, andares do SIGE iguais ao `.flow`, DESENHO, PLANTA, calendário ≤ 31). `render_clipes.py` gera mestre, versão web e pôster de cada clipe, reencodando até os tetos.
+- O trailer saiu da página: `render.py` grava `filme/saida/historia-960.mp4` (fora do site, fora do git); README do filme com "Como enviar" (WhatsApp/LinkedIn).
+- Página: sem `filter` no vídeo (paleta do filme); pôster do clipe sem filtro e com o mesmo recorte do vídeo (crossfade entre dois quadros iguais); em tela larga a faixa de texto vai para a esquerda; no celular, recorte `68% 50%`; linha de crédito dos dioramas na ficha; comprimento da história inalterado.
+- `portfolio/servir.py`: servidor estático com Range (206) no `.replit` e nos testes — sem ele o navegador ignora todo seek.
+- Testes: `check_filme.py --video` (texto pintado, cenas portadas, clipes: peso, GOP, pontas paradas, pôster); `check_historia.py --navegador` (marcação e CSS dos clipes; harness; clipe real com Range e sem Range; 404; `?clipes=nao`; movimento reduzido ligado no meio; economia de dados; foco; composição; LCP/CLS/TaskDuration contra `tests/baseline.json`).
+- Em aberto: iPhone real (latência de seek, `preload` sem gesto, recorte em retrato → render 9:16 se houver "tiras"); URL do deploy para `--origem`; do Cássio: idade; UNIFEI 2020 ou 2022; estágio/júnior; versão vertical do trailer.

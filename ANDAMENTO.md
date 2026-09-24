@@ -1,6 +1,6 @@
 # ANDAMENTO — registro para retomar se a sessão cair
 
-Atualizado em 22/09/2026, ~01:40. Leia de cima para baixo; o último bloco é o estado atual.
+Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado atual.
 
 ## Onde está cada coisa
 - `PLANO.md` — plano geral (fases 0–5). Fases 0–4 feitas.
@@ -45,3 +45,10 @@ Atualizado em 22/09/2026, ~01:40. Leia de cima para baixo; o último bloco é o 
 | "Estruturas metálicas" (Estruturas do Vale) | MANTER — BRIEF cena 3 ("canteiro de estruturas metálicas"). |
 | "redigi contratos de empreitada e de mão de obra" | CORRIGIR: "revisei contrato de empreitada e redigi contrato de mão de obra". |
 | Carimbo "Jul–Set/2026" (já corrigido para "VEKS · 2026" na Correção 2) | OK. |
+
+## Estado em 24/09/2026 — rodada 8 (o filme como fundo da história) CONCLUÍDA
+- Branch `historia-scrollytelling`; spec `docs/superpowers/specs/2026-09-23-filme-fundo-design.md`; plano `docs/superpowers/plans/2026-09-24-filme-fundo.md` (12 tarefas, um commit por tarefa mais os de correção); changelog `portfolio/revisao/CHANGELOG.md`, rodada 8.
+- Site no ar: `python3 portfolio/servir.py 5000 --bind 0.0.0.0 --directory portfolio/site` (o Run do `.replit`; precisa de Range).
+- Regenerar os clipes: `python3 portfolio/filme/render_clipes.py`; trailer de envio: `python3 portfolio/filme/render.py` → `portfolio/filme/saida/historia-960.mp4`.
+- Conferir tudo: `python3 portfolio/tests/check_historia.py --navegador && python3 portfolio/tests/check_filme.py --video && python3 portfolio/tests/check_site.py`.
+- Próximos passos: merge de `historia-scrollytelling` em `main` e deploy; `check_historia.py --origem <URL>` na origem publicada; testar num iPhone real; pendências do Cássio (idade, UNIFEI, estágio/júnior, trailer vertical).
