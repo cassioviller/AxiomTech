@@ -394,7 +394,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 - Consumes: o contrato `fig.__clipe = {dur, frozen, seek, descarregar, pronto, morto, perto, dist, carregar}` (inalterado).
 - Produces: `esperados` (contador dos `emptied` que o nosso próprio `load()` enfileira) e `recarregar()`; a variável `meta` sai.
 
-Fundamento (HTML, algoritmo de carga do media element): `load()` **enfileira** um `emptied` só quando `networkState !== NETWORK_EMPTY (0)`; um `load()` seguinte descarta as tarefas pendentes do elemento. Logo: contar, antes de cada `load()` nosso, se um `emptied` vai vir; no `loadedmetadata` zerar o contador (todo `emptied` nosso já chegou ou foi descartado). Qualquer `emptied` fora da conta é do navegador.
+Fundamento (HTML, algoritmo de carga do media element): `load()` **enfileira** um `emptied` só quando `networkState !== NETWORK_EMPTY (0)`, e antes disso **descarta** as tarefas pendentes do elemento (inclusive um `emptied` ainda não disparado do `load()` anterior). Logo, depois de cada `load()` nosso há **no máximo um** `emptied` nosso a caminho: `esperados` é atribuído (1 ou 0), nunca incrementado; no `loadedmetadata` zera (o `emptied` nosso já chegou ou foi descartado). Qualquer `emptied` fora da conta é do navegador.
 
 - [ ] **Step 1: Testes que falham**
 
@@ -405,8 +405,8 @@ Depois de `checar_reduzido_real` (antes de `checar_dados`):
 ```python
 def checar_evicao():
     """Despejo pelo navegador (WebKit sob pressão de memória, simulado por removeAttribute('src')+load() de fora): depois de
-    .viva, o clipe da cena ativa recarrega sozinho; despejado logo depois de receber src (antes ou logo depois dos metadados),
-    também recarrega — o 'emptied' do nosso próprio load() não é confundido com o do navegador."""
+    .viva, o clipe da cena ativa recarrega sozinho; despejado antes dos metadados (rede lenta emulada pelo CDP), também
+    recarrega — o 'emptied' do nosso próprio load() não é confundido com o do navegador."""
     with chromium(390, altura=844) as ws:
         ws.comando("Page.enable")
         ws.comando("Page.addScriptToEvaluateOnNewDocument", source=ESPIAO)
@@ -418,11 +418,17 @@ def checar_evicao():
                              "return f.classList.contains('viva')&&!!f.querySelector('video').getAttribute('src');})()", 3)
         c = ler_clipe(ws, "icamento")
         check(voltou, f"despejado depois de .viva, o clipe ativo recarrega e volta a .viva em ≤ 3 s (estado: {c})")
-        rolar_ate(ws, "casa", 0.4)  # despejo logo depois de o src ser atribuído
+        # despejo ANTES dos metadados: com a rede a 20 KB/s os metadados demoram ~1 s; o src já está atribuído e readyState ainda é 0
+        ws.comando("Network.enable")
+        ws.comando("Network.emulateNetworkConditions", offline=False, latency=0, downloadThroughput=20480, uploadThroughput=-1)
+        rolar_ate(ws, "casa", 0.4)
         esperar(ws, "!!document.querySelector('figure.clipe[data-passo=\"casa\"] video').getAttribute('src')", 5)
+        antes = ler_clipe(ws, "casa")
+        check(antes["src"] is not None and antes["ready"] == 0, f"o despejo tem de acontecer antes dos metadados (src {antes['src']!r}, readyState {antes['ready']})")
         ws.avaliar("(function(){var v=document.querySelector('figure.clipe[data-passo=\"casa\"] video');v.removeAttribute('src');v.load();})()")
+        ws.comando("Network.emulateNetworkConditions", offline=False, latency=0, downloadThroughput=-1, uploadThroughput=-1)
         voltou = esperar(ws, "document.querySelector('figure.clipe[data-passo=\"casa\"]').classList.contains('viva')", 5)
-        check(voltou, f"despejado logo depois do src, o clipe ativo recarrega e chega a .viva em ≤ 5 s (estado: {ler_clipe(ws, 'casa')})")
+        check(voltou, f"despejado antes dos metadados, o clipe ativo recarrega e chega a .viva em ≤ 5 s (estado: {ler_clipe(ws, 'casa')})")
         e = ler_clipes(ws)
         check(len(e["comDados"]) <= 2 and e["erros"] == [], f"depois dos despejos: ≤ 2 vídeos com dados ({e['comDados']}) e console limpo ({e['erros']})")
 ```
@@ -444,7 +450,7 @@ por
 Trocar `carregar` e `descarregar` por:
 
 ```js
-  function recarregar(){if(v.networkState!==0)esperados++;v.load();}    // load() só enfileira 'emptied' se havia algo (networkState ≠ EMPTY)
+  function recarregar(){esperados=v.networkState!==0?1:0;v.load();}     // load() descarta o 'emptied' pendente do load() anterior e enfileira no máximo um (só se networkState ≠ EMPTY)
   function carregar(){
     if(api.pronto||api.morto||reduzir.matches)return;
     if(todas.filter(function(a){return a.pronto;}).length>=MAXIMO)return;  // trava de segurança: arrumar() já desocupou a vaga antes de chamar
