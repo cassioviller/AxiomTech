@@ -1,5 +1,5 @@
 modules = ["python-3.12", "web"]
-run = "python3 -m http.server 5000 --bind 0.0.0.0 --directory portfolio/site"
+run = "python3 portfolio/servir.py 5000 --bind 0.0.0.0 --directory portfolio/site"
 hidden = [".config", ".git", "axiom"]
 
 [nix]
@@ -31,5 +31,5 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python3 -m http.server 5000 --bind 0.0.0.0 --directory portfolio/site"
+args = "python3 portfolio/servir.py 5000 --bind 0.0.0.0 --directory portfolio/site"
 waitForPort = 5000

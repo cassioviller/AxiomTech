@@ -423,6 +423,72 @@ PORTA = 5056
 PORTA_CDP = 9333
 
 
+@contextlib.contextmanager
+def servidor(porta, com_range=True):
+    """Servidor estático em portfolio/: servir.py (com Range → 206) ou, para o teste negativo, o http.server puro."""
+    base = [sys.executable, str(ROOT / "servir.py")] if com_range else [sys.executable, "-m", "http.server"]
+    srv = subprocess.Popen(base + [str(porta), "--bind", "127.0.0.1", "--directory", str(ROOT)],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        for _ in range(100):
+            try:
+                socket.create_connection(("127.0.0.1", porta), timeout=0.2).close()
+                break
+            except OSError:
+                time.sleep(0.05)
+        yield
+    finally:
+        srv.terminate()
+        srv.wait()
+
+
+def checar_servidor():
+    """servir.py responde 206 com Content-Range a um pedido com Range: sem isso o Chrome ignora todo seek no vídeo."""
+    check((ROOT / "servir.py").exists(), "portfolio/servir.py não existe")
+    if not (ROOT / "servir.py").exists():
+        return
+    with servidor(PORTA):
+        req = urllib.request.Request(f"http://127.0.0.1:{PORTA}/site/index.html", headers={"Range": "bytes=0-99"})
+        with urllib.request.urlopen(req) as r:
+            check(r.status == 206 and r.headers.get("Content-Range", "").startswith("bytes 0-99/") and len(r.read()) == 100,
+                  "servir.py: Range: bytes=0-99 deve responder 206, Content-Range e exatamente 100 bytes")
+        with urllib.request.urlopen(f"http://127.0.0.1:{PORTA}/site/index.html") as r:
+            check(r.status == 200 and r.headers.get("Accept-Ranges") == "bytes", "servir.py: sem Range, 200 com Accept-Ranges: bytes")
+
+
+BASELINE = ROOT / "tests" / "baseline.json"
+
+
+def metrica(ws, nome):
+    return next(m["value"] for m in ws.comando("Performance.getMetrics")["metrics"] if m["name"] == nome)
+
+
+def medir_desempenho(ws):
+    """Segundos de TaskDuration numa rolagem completa, capítulo a capítulo (0,6 s em cada), com a página já carregada."""
+    ws.comando("Performance.enable")
+    antes = metrica(ws, "TaskDuration")
+    n = ws.avaliar("document.querySelectorAll('.cena[data-passo]').length")
+    for i in range(n):
+        ws.avaliar(f"(function(){{var r=document.querySelectorAll('.cena[data-passo]')[{i}].getBoundingClientRect();"
+                   "window.scrollTo(0,scrollY+r.top+r.height/2-innerHeight/2);})()")
+        time.sleep(0.6)
+    return metrica(ws, "TaskDuration") - antes
+
+
+def gravar_baseline():
+    """Linha de base da página de hoje (maquetes WebGL por SwiftShader): F-17 compara a página com clipes a 2× isto."""
+    base = {"alturaMain": {}}
+    for largura in (390, 1280):
+        with chromium(largura, ("--enable-unsafe-swiftshader",)) as ws:
+            ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/site/index.html")
+            time.sleep(2.5)
+            if largura == 390:
+                base["taskDuration"] = round(medir_desempenho(ws), 3)
+            base["alturaMain"][str(largura)] = ws.avaliar("document.getElementById('historia').offsetHeight")
+    BASELINE.write_text(json.dumps(base, indent=1) + "\n", encoding="utf-8")
+    print("baseline:", base)
+
+
 def checar_js():
     caminho = SITE / "historia.js"
     check(caminho.exists(), "portfolio/site/historia.js não existe")
@@ -504,34 +570,31 @@ class WS:
 
 
 @contextlib.contextmanager
-def chromium(largura, extra=()):
-    """Servidor estático em portfolio/ + Chromium headless em tempo real, controlado pelo DevTools Protocol.
+def chromium(largura, extra=(), altura=800, com_range=True):
+    """servir.py (Range) em portfolio/ + Chromium headless em tempo real, controlado pelo DevTools Protocol.
     Não usar --virtual-time-budget: nele quase não há quadros, e sem quadros nem o IntersectionObserver nem o scroll disparam."""
-    srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORTA), "--bind", "127.0.0.1", "--directory", str(ROOT)],
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    nav = subprocess.Popen(["chromium", "--headless", "--no-sandbox", "--disable-gpu", "--hide-scrollbars",
-                            f"--window-size={largura},800", f"--remote-debugging-port={PORTA_CDP}", *extra, "about:blank"],
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    try:
-        alvos = []
-        for _ in range(100):
-            try:
-                alvos = json.load(urllib.request.urlopen(f"http://127.0.0.1:{PORTA_CDP}/json/list"))
-                break
-            except OSError:
-                time.sleep(0.1)
-        paginas = [a for a in alvos if a.get("type") == "page"]
-        if not paginas:
-            raise RuntimeError("o Chromium não abriu a porta do DevTools")
-        ws = WS(paginas[0]["webSocketDebuggerUrl"])
-        # o headless impõe janela mínima de ~500×657; o override garante exatamente largura × 800
-        ws.comando("Emulation.setDeviceMetricsOverride", width=largura, height=800, deviceScaleFactor=1, mobile=False)
-        yield ws
-    finally:
-        nav.terminate()
-        nav.wait()
-        srv.terminate()
-        srv.wait()
+    with servidor(PORTA, com_range):
+        nav = subprocess.Popen(["chromium", "--headless", "--no-sandbox", "--disable-gpu", "--hide-scrollbars",
+                                f"--window-size={largura},{altura}", f"--remote-debugging-port={PORTA_CDP}", *extra, "about:blank"],
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            alvos = []
+            for _ in range(100):
+                try:
+                    alvos = json.load(urllib.request.urlopen(f"http://127.0.0.1:{PORTA_CDP}/json/list"))
+                    break
+                except OSError:
+                    time.sleep(0.1)
+            paginas = [a for a in alvos if a.get("type") == "page"]
+            if not paginas:
+                raise RuntimeError("o Chromium não abriu a porta do DevTools")
+            ws = WS(paginas[0]["webSocketDebuggerUrl"])
+            # o headless impõe janela mínima de ~500×657; o override garante exatamente largura × altura
+            ws.comando("Emulation.setDeviceMetricsOverride", width=largura, height=altura, deviceScaleFactor=1, mobile=False)
+            yield ws
+        finally:
+            nav.terminate()
+            nav.wait()
 
 
 def navegador(largura=390, extra=("--disable-3d-apis",)):
@@ -640,6 +703,9 @@ def checar_fim_do_palco():
 
 
 def main():
+    if "--gravar-baseline" in sys.argv:
+        gravar_baseline()
+        return
     check(PAGINA.exists(), "portfolio/site/index.html (a história) não existe")
     if PAGINA.exists():
         pagina = PAGINA.read_text(encoding="utf-8")
@@ -653,6 +719,7 @@ def main():
         checar_filme(pagina)
         checar_js()
         checar_maquetes_js()
+        checar_servidor()
         if "--navegador" in sys.argv:
             checar_navegador()
             checar_maquete_real()
