@@ -55,5 +55,7 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 
 ## Estado em 24/09/2026 — rodada 9 (ajustes dos prints e da revisão) CONCLUÍDA
 - Branch `historia-rodada-9` integrado em `main`; plano `docs/superpowers/plans/2026-09-24-historia-rodada-9-ajustes.md` (12 tarefas); changelog rodada 9.
+- Foco vertical por clipe: `foco-alto` em obra, casa, whatsapp e içamento; `foco-baixo` fica disponível, hoje sem uso (o `escala` não usa foco).
+- O trailer de envio (`portfolio/filme/render.py`) não foi regerado e ainda tem a câmera antiga do restaurante: rodar `render.py` antes de enviar.
 - Conferir tudo: `python3 portfolio/tests/check_historia.py --navegador && python3 portfolio/tests/check_filme.py --video && python3 portfolio/tests/check_filme.py --cenas && python3 portfolio/tests/check_site.py`.
 - Próximo: o plano irmão `2026-09-24-historia-cenas-novas.md` (cinco cenas novas: mudança, galpões, precisão, método, convite); depois push, deploy, `--origem`, iPhone real.

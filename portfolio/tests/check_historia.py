@@ -30,7 +30,7 @@ sys.path.insert(0, str(ROOT / "filme"))
 from render_clipes import CLIPES  # noqa: E402  (mapa capítulo → cena → trecho: a fonte da verdade)
 
 LONGAS = {"casa", "icamento", "zip"}  # capítulos de 200 svh (10 s, 8 s e 10 s de clipe, mas com mais a dizer)
-FOCO = {"obra": "alto", "casa": "alto", "whatsapp": "alto", "icamento": "alto", "escala": "baixo"}  # assunto encostado no alto / no pé do quadro 16:9
+FOCO = {"obra": "alto", "casa": "alto", "whatsapp": "alto", "icamento": "alto"}  # assunto encostado no alto / no pé do quadro 16:9
 SITE = ROOT / "site"
 PAGINA = SITE / "index.html"
 PORTFOLIO = SITE / "portfolio.html"
@@ -380,6 +380,8 @@ def checar_css(pagina):
     check(re.search(r"\.js-historia \.palco \.fundo img\{[^}]*filter:brightness\(\.6\) saturate\(\.85\)", css) is not None,
           "as fotos dos capítulos sem clipe mantêm brightness(.6) saturate(.85)")
     check(".js-historia .palco .fundo.clipe img{filter:none;object-position:68% 50%}" in css, "o pôster do clipe fica igual ao vídeo: sem filtro e com o mesmo recorte 68% 50% (crossfade entre dois quadros iguais)")
+    check(".js-historia .cena.longa .texto{position:sticky;top:max(28vh,calc(var(--barra,0px) + 8px));top:max(28svh,calc(var(--barra,0px) + 8px))}" in css,
+          "capítulos longos: a faixa fixa nunca fica atrás da barra (28svh ou a barra + 8 px, o maior)")
     check(".js-historia .palco .fundo.foco-alto video,.js-historia .palco .fundo.foco-alto img{object-position:68% 0%}" in css
           and ".js-historia .palco .fundo.foco-baixo video,.js-historia .palco .fundo.foco-baixo img{object-position:68% 100%}" in css,
           "foco vertical por clipe: .foco-alto recorta pelo pé e .foco-baixo pelo alto (janela mais larga que 16:9); vídeo e pôster iguais")
@@ -391,9 +393,11 @@ def checar_css(pagina):
           "tela larga: a faixa de texto vai para a esquerda, como no filme")
     check(".js-historia .palco .fundo.tipo{justify-content:flex-end;padding:0 4vw 3vh 0}" in larga,
           "tela larga: o marco tipográfico (.ano) vai para a direita, longe da faixa de texto à esquerda")
+    check(".js-historia .palco .fundo.tipo .ano{font-size:clamp(5rem,13vw,20rem)}" in larga, "tela larga: o marco tipográfico cabe à direita da faixa (13vw) sem passar por baixo dela")
     paisagem = bloco_css(css, "@media (orientation:landscape) and (max-height:520px){")
     check(".js-historia .texto{max-width:min(560px,54vw);margin-left:16px;text-align:left;padding:12px 16px}" in paisagem
-          and ".js-historia .frase{font-size:clamp(1.4rem,6.5vh,2.4rem);margin:0}" in paisagem,
+          and ".js-historia .frase{font-size:clamp(1.4rem,6.5vh,2.4rem);margin:0}" in paisagem
+          and ".js-historia .palco .fundo.tipo .ano{font-size:clamp(4rem,11vw,20rem)}" in paisagem,
           "celular deitado (≤ 520 px de altura): faixa à esquerda, mais estreita e com o título menor, para o clipe continuar à mostra")
     for sumido in (".hud", ".pausa", "canvas"):
         check(sumido not in css, f"CSS sem {sumido}")
@@ -548,7 +552,7 @@ def checar_clipes_js():
         check(proibido not in js, f"clipes.js não pode usar {proibido}")
     for exigido in ("canPlayType", "'seeked'", "seekable", "rootMargin:'600px", "preload='auto'", ".load()", "removeAttribute('src')",
                     "prefers-reduced-motion: reduce", "'change'", "saveData", "clipes=nao", "readyState", "'load'",
-                    "TETO=250", "LENTOS=3", "VOO=600", "MAXIMO=2", "fig.__clipe=api", "'progress'", "'emptied'", "networkState", "esperados",
+                    "TETO=250", "LENTOS=3", "VOO=600", "MAXIMO=2", "fig.__clipe=api", "'progress'", "'canplay'", "'emptied'", "networkState", "esperados",
                     "ESPERA_RANGE=1500", "temRange", "desde", "||!temRange()", "Math.min(Math.round(t*FPS),ultimo)"):
         check(exigido in js, f"clipes.js precisa de {exigido}")
     check("(Math.min(Math.round(t*FPS),ultimo)+0.5)/FPS" in js, "clipes.js: seek quantizado ao quadro e nunca além do último, (min(round(t·24), round(dur·24)−1)+0,5)/24")
@@ -966,6 +970,7 @@ def checar_evicao():
         check(esperar(ws, "!document.querySelector('figure.clipe[data-passo=\"casa\"] video').getAttribute('src')", 3), "a casa descarrega antes do despejo com rede lenta")
         ws.comando("Network.enable")
         ws.comando("Network.setCacheDisabled", cacheDisabled=True)
+        # 20 KB/s: o Chromium só demuxa depois de completar blocos de 32 KB, por isso readyState fica 0 por ~1,7 s mesmo com o moov de ~2 KB — não "corrigir" a taxa para cima
         ws.comando("Network.emulateNetworkConditions", offline=False, latency=0, downloadThroughput=20480, uploadThroughput=-1)
         rolar_ate(ws, "casa", 0.4)
         esperar(ws, "!!document.querySelector('figure.clipe[data-passo=\"casa\"] video').getAttribute('src')", 5)
@@ -1066,7 +1071,7 @@ def checar_layout():
         check(abs(m["barra"] - m["var"]) <= 1, f"depois de estreitar a janela para 500 px, --barra ({m['var']}) ≠ altura da barra ({m['barra']:.2f})")
     with chromium(2560, altura=1080) as ws:  # 21:9: o palco recorta ~40 % da altura do 16:9; o foco por clipe mantém o assunto
         navegar(ws)
-        for passo, esperado in (("obra", "68% 0%"), ("escala", "68% 100%"), ("sige", "68% 50%")):
+        for passo, esperado in (("obra", "68% 0%"), ("escala", "68% 50%"), ("sige", "68% 50%")):
             rolar_ate(ws, passo, 0.5)
             time.sleep(0.5)
             pos = ws.avaliar(f"getComputedStyle(document.querySelector('figure.clipe[data-passo=\"{passo}\"] video')).objectPosition")

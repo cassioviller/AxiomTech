@@ -68,6 +68,7 @@ figs.forEach(function(fig){
     if(!emVoo&&pedido===alvo&&pedido===v.currentTime)viver(true);else pedir(); // já está no quadro pedido: só mostra; senão pedir() busca de novo
   });
   v.addEventListener('progress',function(){if(!vivo&&alvo>=0&&v.readyState>=2)pedir();}); // Safari: 'seeked' sem quadro e os dados chegam depois
+  v.addEventListener('canplay',function(){if(!vivo&&alvo>=0&&v.readyState>=2)pedir();}); // Safari: 'seeked' sem quadro num clipe já todo em buffer não dispara 'progress'
   v.addEventListener('seeked',function(){
     var nosso=emVoo>0,levou=nosso?performance.now()-emVoo:0;emVoo=0;
     if(v.readyState<2){viver(false);return;}

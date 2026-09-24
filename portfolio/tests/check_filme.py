@@ -246,9 +246,12 @@ def checar_cenas_portadas(passos):
                 achado = pg.evaluate(exp)
                 check(achado == esperado, f"cena portada {passo}: conteúdo {achado} ≠ {esperado}")
             if passo in ENQUADRAMENTOS:
-                exp, esperado = ENQUADRAMENTOS[passo]
-                achado = pg.evaluate(exp)
-                check(achado == esperado, f"enquadramento {passo}: {achado} ≠ {esperado} (assunto fora do quadro no último quadro)")
+                if pg.evaluate(f"!!SC[{idx}]"):
+                    exp, esperado = ENQUADRAMENTOS[passo]
+                    achado = pg.evaluate(exp)
+                    check(achado == esperado, f"enquadramento {passo}: {achado} ≠ {esperado} (assunto fora do quadro no último quadro)")
+                else:
+                    check(False, f"SC[{idx}] ({passo}) não existe para o enquadramento")
         if set(PORTADAS) <= set(passos):  # o --cenas sem passos também leva o escala: a contagem continua valendo
             check(pg.evaluate("SC.length") == 12, "SC deve ter 12 cenas (9 do filme + 3 portadas)")
         nav.close()

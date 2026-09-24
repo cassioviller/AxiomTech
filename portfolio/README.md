@@ -20,7 +20,7 @@ build.sh     regenera todos os PDFs e copia para site/
   (precisa de um servidor **com Range**: o `python3 -m http.server` responde 200 sem `Accept-Ranges`, o navegador ignora
   todo seek e a história fica só com os pôsteres; abrir o arquivo direto bloqueia o three.js do portfólio).
 - Gerar os clipes de fundo da história: `python3 portfolio/filme/render_clipes.py` (~10 min); conferir: `python3 portfolio/tests/check_filme.py --video`. Detalhes em `filme/README.md`.
-- Clipe com o assunto encostado no alto ou no pé do 16:9: classe `foco-alto` / `foco-baixo` na `figure.clipe` (recorte vertical em janelas mais largas que 16:9). O palco começa abaixo da barra fixa (`--barra`, medida pelo `historia.js` por `ResizeObserver`: fontes, quebra de linha, janela).
+- Clipe com o assunto encostado no alto ou no pé do 16:9: classe `foco-alto` / `foco-baixo` na `figure.clipe` (recorte vertical em janelas mais largas que 16:9); `foco-alto` em obra, casa, whatsapp e içamento; `foco-baixo` fica disponível, hoje sem uso (o `escala` ficou sem foco: as miniaturas estão no terço de cima). O palco começa abaixo da barra fixa (`--barra`, medida pelo `historia.js` por `ResizeObserver`: fontes, quebra de linha, janela).
 - Conferir um quadro de uma maquete: `?maquete=forcar&t=12` na URL congela a cena no segundo 12 e ignora a guarda de fps.
 
 ## Antes de publicar
