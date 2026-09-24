@@ -47,7 +47,7 @@ Fora do escopo, com o porquê: CLS de 0,005 do `#tese` (dentro do limite 0,01, a
 
 1. **Janela 21:9 (2560×1080):** o palco recorta ~40 % da altura do 16:9; em `obra` o cartão de cima e em `escala` as miniaturas de baixo têm de continuar no quadro — teste em `checar_layout` (Task 2): `object-position` computado de `obra` = `68% 0%`, de `escala` = `68% 100%`, de `sige` = `68% 50%`.
 2. **Barra que quebra em mais linhas ao estreitar a janela** (tablet em pé, 500–700 px): `--barra` tem de acompanhar — teste em `checar_layout` (Task 1): depois de `Emulation.setDeviceMetricsOverride` para 500 px, `--barra` = altura da `.barra` (± 1 px).
-3. **Despejo pelo navegador antes dos metadados** (WebKit sob pressão de memória, simulado por `removeAttribute('src')+load()` de fora): a figura tem de recarregar sem esperar sair da faixa — `checar_evicao` (Task 5).
+3. **Despejo pelo navegador antes dos metadados** (WebKit sob pressão de memória, simulado de fora reatribuindo o mesmo `src` com `preload='none'`): a figura tem de recarregar sem esperar sair da faixa — `checar_evicao` (Task 5).
 4. **Origem sem Range num navegador que preenche `seekable` tarde:** com `ESPERA_RANGE` o pôster continua sendo o destino em ≤ 1,5 s + metadados — o bloco "sem Range" de `checar_clipe_real` (espera de 5 s) continua a passar (Task 6).
 5. **Celular deitado (844×390):** a faixa termina antes de 62 % da largura e ocupa ≤ 92 % da altura em `sige` e em `icamento` — `checar_layout` (Task 4).
 
@@ -404,7 +404,7 @@ Depois de `checar_reduzido_real` (antes de `checar_dados`):
 
 ```python
 def checar_evicao():
-    """Despejo pelo navegador (WebKit sob pressão de memória, simulado por removeAttribute('src')+load() de fora): depois de
+    """Despejo pelo navegador (WebKit sob pressão de memória, simulado de fora reatribuindo o mesmo src com preload='none'): depois de
     .viva, o clipe da cena ativa recarrega sozinho; despejado antes dos metadados (rede lenta emulada pelo CDP), também
     recarrega — o 'emptied' do nosso próprio load() não é confundido com o do navegador."""
     with chromium(390, altura=844) as ws:
