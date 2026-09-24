@@ -347,6 +347,9 @@ def checar_css(pagina):
     check(regra is not None and "background:var(--tinta)" in regra.group(1),
           "no modo cenas o fundo da história é tinta: sem faixa clara quando a barra do navegador recolhe (svh < lvh)")
     check(".cena{scroll-margin-top:9rem}" in css, "o título do capítulo não pode ficar atrás da barra ao chegar por salto")
+    check(re.search(r"\.js-historia \.palco\{display:block;position:sticky;top:var\(--barra,0px\);height:calc\(100vh - var\(--barra,0px\)\);"
+                    r"height:calc\(100svh - var\(--barra,0px\)\);margin-bottom:calc\(-100vh \+ var\(--barra,0px\)\);margin-bottom:calc\(-100svh \+ var\(--barra,0px\)\);", css) is not None,
+          "modo cenas: o palco gruda abaixo da barra fixa (top:var(--barra,0px)) e perde a altura dela; sem isso a barra cobre o alto de cada cena")
     m = re.search(r"--scrim:\s*rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)", css)
     check(m is not None, "falta --scrim: rgba(...)")
     if not m:
@@ -518,6 +521,8 @@ def checar_js():
     for proibido in ("scrollTo", "scrollBy", "scrollIntoView", "preventDefault", "'wheel'", "'touchmove'", "aria-live", "__maquete", "'maquete'"):
         check(proibido not in js, f"historia.js não pode usar {proibido}")
     check("fps" not in js.lower() and "matar" not in js, "historia.js não duplica a guarda de desempenho do maquetes.js")
+    for exigido in ("'--barra'", "'resize'", ".barra"):
+        check(exigido in js, f"historia.js precisa de {exigido}: mede a barra fixa para o palco começar abaixo dela")
 
 
 def checar_clipes_js():
@@ -958,18 +963,35 @@ def checar_layout():
             for passo in ("sige", "zip"):
                 rolar_ate(ws, passo, 0.5)
                 time.sleep(0.8)
+                topo = json.loads(ws.avaliar("JSON.stringify((function(){var b=document.querySelector('.barra').getBoundingClientRect(),"
+                                             "f=document.querySelector('.palco figure.ativo').getBoundingClientRect();return {barra:b.bottom,fundo:f.top};})())"))
+                check(topo["fundo"] >= topo["barra"] - 1, f"{largura}×{altura}: o fundo ativo começa em {topo['fundo']:.0f} px, acima do pé da barra ({topo['barra']:.0f} px)")
                 direita = ws.avaliar(f"document.querySelector('#{passo} .texto').getBoundingClientRect().right/innerWidth")
                 check(direita <= 0.54, f"{largura}×{altura}: a faixa de texto de {passo} termina em {direita:.2f} da largura (máx. 0,54)")
     curtos = [c["passo"] for c in ROTEIRO if c["fundo"] and c["fundo"][0] == "clipe" and c["passo"] not in LONGAS]
     with chromium(390, altura=844) as ws:
         navegar(ws)
+        vao = json.loads(ws.avaliar("JSON.stringify((function(){var b=document.querySelector('.barra').getBoundingClientRect(),"
+                                    "f=document.querySelector('.palco figure.ativo').getBoundingClientRect();return {barra:b.bottom,fundo:f.top,scroll:scrollY};})())"))
+        check(vao["scroll"] == 0 and abs(vao["fundo"] - vao["barra"]) <= 1,
+              f"390×844 em scrollY=0: o fundo da tese tem de encostar no pé da barra (barra {vao['barra']:.0f}, fundo {vao['fundo']:.0f}): sem vão, sem sobreposição")
         for passo in curtos:
             rolar_ate(ws, passo, 0.5)
             time.sleep(0.5)
+            topo = json.loads(ws.avaliar("JSON.stringify((function(){var b=document.querySelector('.barra').getBoundingClientRect(),"
+                                         "f=document.querySelector('.palco figure.ativo').getBoundingClientRect();return {barra:b.bottom,fundo:f.top};})())"))
+            check(topo["fundo"] >= topo["barra"] - 1, f"390×844 em {passo}: o fundo começa em {topo['fundo']:.0f} px, acima do pé da barra ({topo['barra']:.0f} px)")
             r = json.loads(ws.avaliar(f"JSON.stringify((function(){{var r=document.querySelector('#{passo} .texto').getBoundingClientRect();"
                                       f"return {{h:r.height/innerHeight,cima:r.top/innerHeight,baixo:1-r.bottom/innerHeight}};}})())"))
             check(r["h"] <= 0.75, f"390×844: a faixa de {passo} ocupa {r['h']:.0%} da altura (máx. 75 %)")
             check(max(r["cima"], r["baixo"]) >= 0.1, f"390×844: a faixa de {passo} não deixa 10 % de clipe à mostra acima ou abaixo ({r})")
+    with chromium(700, altura=900) as ws:  # a barra quebra em mais linhas quando a janela estreita: --barra acompanha (resize)
+        navegar(ws)
+        ws.comando("Emulation.setDeviceMetricsOverride", width=500, height=900, deviceScaleFactor=1, mobile=False)
+        time.sleep(0.6)
+        m = json.loads(ws.avaliar("JSON.stringify({barra:document.querySelector('.barra').getBoundingClientRect().height,"
+                                  "var:parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--barra'))})"))
+        check(abs(m["barra"] - m["var"]) <= 1, f"depois de estreitar a janela para 500 px, --barra ({m['var']}) ≠ altura da barra ({m['barra']:.0f})")
     alturas = {}
     for largura in (390, 1280):
         with chromium(largura) as ws:  # a altura padrão (800) é a da linha de base

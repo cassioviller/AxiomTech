@@ -37,6 +37,12 @@ cenas.forEach(function(c){
 });
 document.documentElement.classList.add('js-historia');
 
+// a barra (nome, cargo, botões e régua) é sticky no topo: --barra é a altura dela, para o fundo do palco começar abaixo
+var barra=document.querySelector('.barra');
+function medirBarra(){if(barra)document.documentElement.style.setProperty('--barra',Math.round(barra.getBoundingClientRect().height)+'px');}
+medirBarra();
+addEventListener('resize',function(){clearTimeout(medirBarra.t);medirBarra.t=setTimeout(medirBarra,150);});
+
 // clipe da cena ativa: o tempo do vídeo segue o scroll (seek congela o tempo), nunca anda sozinho
 function sincronizar(){
   var f=H.ativa&&fundos[H.ativa];
