@@ -67,9 +67,9 @@ figs.forEach(function(fig){
   v.addEventListener('error',function(){congelar();});
   v.addEventListener('emptied',function(){if(v.readyState===0)viver(false);}); // WebKit sob pressão de memória
   depoisDoLoad(function(){
-    new IntersectionObserver(function(es){api.perto=es[0].isIntersecting;arrumar();},
+    new IntersectionObserver(function(es){api.perto=es[es.length-1].isIntersecting;arrumar();}, // um observer por figure, um alvo só: vale a entrada mais nova do lote
       {rootMargin:'600px 0px'}).observe(cena);                             // a figure mora no palco sticky: observa-se a cena
   });
 });
-reduzir.addEventListener('change',arrumar);
+if(reduzir.addEventListener)reduzir.addEventListener('change',arrumar);else reduzir.addListener(arrumar); // Safari ≤ 13: só addListener(fn), sem o tipo
 })();

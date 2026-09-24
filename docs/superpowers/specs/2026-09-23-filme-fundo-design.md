@@ -64,9 +64,11 @@ Em comum: usam os utilitários do `film.html` (`P()`, `edge()`, `box`/`cyl`/`sla
 ```html
 <figure class="fundo clipe" data-passo="zip" data-dur="10" data-clipe="video/cena-zip.mp4" aria-hidden="true">
   <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-  <img src="video/cena-zip.webp" alt="" width="960" height="540" loading="lazy">
+  <img src="video/cena-zip.webp" alt="" width="960" height="540">
 </figure>
 ```
+(revisão final: sem loading="lazy" — o pôster tem de estar pronto para o crossfade e para os caminhos só-pôster)
+
 Sem `src` no HTML (o JS atribui na hora de carregar: nada baixa antes do `load` da janela e o Chrome não força `metadata` de 11 arquivos), sem `autoplay|loop|controls|poster|tabindex|<source>|<track>`. Os `<div class="hud">`, `<canvas>`, `data-cena`, `data-relogio` e `data-legenda` **saem** de `index.html` (o relógio dos 36 min já está pintado na cena e escrito na ressalva). `cena longa` fica só em `LONGAS = {casa, icamento, zip}`. Os capítulos `origem`, `obra`, `veks`, `ferramentas` perdem o `.ano`; `mudanca` e `galpoes` mantêm o `.tipo`.
 
 **JS**: `site/clipes.js` (novo, ~100 linhas) substitui `maquetes.js` na história: scripts exatamente `["clipes.js","historia.js"]`, `defer`, sem inline. `maquetes.js` **não muda** e continua só no `portfolio.html`. Contrato `fig.__clipe = {dur, seek(t), frozen}` (mesmo formato de `__maquete`; `dur` vem de `data-dur` antes de o vídeo carregar); `historia.js` muda só `maquete→clipe`/`__maquete→__clipe` (4 linhas + comentários). Regras de `clipes.js`:

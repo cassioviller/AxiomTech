@@ -8,7 +8,7 @@ abre tests/historia_teste.html em tempo real e confere a troca de cenas; depois,
 com os clipes de verdade e o servidor com Range, a carga sob demanda, o seek pela
 rolagem, o 404, movimento reduzido ligado no meio, economia de dados, foco,
 composição e desempenho.
-Uso: python3 portfolio/tests/check_historia.py [--navegador]
+Uso: python3 portfolio/tests/check_historia.py [--navegador] [--origem URL] [--gravar-baseline]
 """
 import base64
 import contextlib
@@ -226,6 +226,9 @@ def checar_fundo(passo, i, fundo, miolo):
         check(ia.get("width") == str(largura) and ia.get("height") == str(altura), f"cena {passo}: width/height devem ser {largura}×{altura}")
         if i == 1:
             check(ia.get("fetchpriority") == "high" and "loading" not in ia, "cena 1: imagem com fetchpriority=\"high\" e sem loading")
+        elif tipo == "clipe":  # pôster sem lazy: pronto para o crossfade e para os caminhos só-pôster (a figure fica hidden até a cena)
+            check(imgs[0] == f'src="{src}" alt="" width="960" height="540"',
+                  f"cena {passo}: pôster exatamente <img src=\"{src}\" alt=\"\" width=\"960\" height=\"540\"> (sem loading, sem fetchpriority)")
         else:
             check(ia.get("loading") == "lazy" and "fetchpriority" not in ia, f"cena {passo}: imagem com loading=\"lazy\" e sem fetchpriority")
 
@@ -365,8 +368,9 @@ def checar_css(pagina):
     check(pv is not None and all(x in pv.group(1) for x in ("display:block", "object-fit:cover", "object-position:68% 50%", "opacity:0", "transition:opacity .4s")),
           "modo cenas: o vídeo cobre o palco (object-fit:cover; object-position:68% 50%), começa invisível e aparece em .4s")
     check(re.search(r"video[^{}]*\{[^}]*filter", css) is None, "sem filter em seletor com video (a paleta do filme fica como está)")
-    check(".js-historia .palco .fundo.viva video{opacity:1}" in css and ".js-historia .palco .fundo.viva img{visibility:hidden}" in css,
-          "a imagem só some (.viva) quando há quadro pronto")
+    check(".js-historia .palco .fundo.viva video{opacity:1}" in css
+          and re.search(r"\.js-historia \.palco \.fundo\.viva img\{visibility:hidden;transition:visibility 0s \.4s\}", css) is not None,
+          "a imagem só some (.viva) quando há quadro pronto, e só depois do fade de .4s do vídeo (crossfade, sem piscar o palco escuro)")
     check(re.search(r"\.js-historia \.palco \.fundo img\{[^}]*filter:brightness\(\.6\) saturate\(\.85\)", css) is not None,
           "as fotos dos capítulos sem clipe mantêm brightness(.6) saturate(.85)")
     check(".js-historia .palco .fundo.clipe img{filter:none;object-position:68% 50%}" in css, "o pôster do clipe fica igual ao vídeo: sem filtro e com o mesmo recorte 68% 50% (crossfade entre dois quadros iguais)")

@@ -9,7 +9,7 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - `portfolio/revisao/CHANGELOG.md` — cada mudança do workflow, por agente e achado (inclui "Correção 1" e "Correção 2").
 - `portfolio/revisao/PENDENCIAS.md` — o que o Cássio precisa confirmar.
 - `portfolio/revisao/propostas/` — propostas dos agentes dono, colega, acess (ia, eng, hist, juridico caíram por erro de API 529/500; o integrador aplicou esses achados direto da REVISAO.md).
-- Site no ar: porta 5000 (`python3 -m http.server 5000 --directory portfolio/site`, também é o Run do `.replit`).
+- Site no ar: porta 5000 (`python3 portfolio/servir.py 5000 --bind 0.0.0.0 --directory portfolio/site`, servidor com Range; é o Run do `.replit`).
 - Axiom: movido para `axiom/` e fora do git (`.gitignore`). Nada commitado ainda além do `e28d9e3`.
 
 ## Feito nesta sessão (ordem cronológica)

@@ -20,6 +20,7 @@ Fonte: `filme-codigo-fonte.zip` (v4), corrigido pelas regras de honestidade da p
     python3 portfolio/filme/render_clipes.py         # ~10 min; os 11 clipes + pôsteres em site/video/
     python3 portfolio/filme/render_clipes.py --so zip
     python3 portfolio/tests/check_filme.py --video   # clipes (peso, GOP, pontas paradas, pôster) e trailer se existir
+    python3 portfolio/tests/check_filme.py --cenas   # ~20 s, Chromium: conteúdo das cenas portadas (SC[9..11]) e ?limpo
     python3 portfolio/filme/render.py                # ~13 min; trailer em filme/saida/historia-960.mp4 + .jpg
 
 O Chromium do Playwright não roda no Replit (faltam bibliotecas): os scripts usam o `chromium` do sistema.

@@ -4,7 +4,7 @@
 O texto do trailer segue as mesmas regras de honestidade da página: nenhum número que o
 portfólio não sustente, nenhuma ressalva apagada, nada inventado com cara de dado, legendas
 que dá para ler (≤ 200 palavras por minuto) e a mesma frase da contabilidade nos três lugares.
-Uso: python3 portfolio/tests/check_filme.py
+Uso: python3 portfolio/tests/check_filme.py [--cenas [passo ...]] [--video [passo ...]]
 """
 import html
 import json
@@ -372,9 +372,9 @@ def main():
         checar_texto(filme, (SITE / "portfolio.html").read_text(encoding="utf-8"), (SITE / "index.html").read_text(encoding="utf-8"))
         checar_limpo(filme)
         checar_readme()
-        if "--cenas" in sys.argv:
+        checar_portadas(filme, list(PORTADAS))  # estático e instantâneo: sempre
+        if "--cenas" in sys.argv:  # conteúdo das cenas portadas no Chromium (~20 s)
             passos = [a for a in sys.argv[sys.argv.index("--cenas") + 1:] if not a.startswith("--")] or list(PORTADAS)
-            checar_portadas(filme, passos)
             checar_cenas_portadas(passos)
         checar_reproducao()
     if "--video" in sys.argv:

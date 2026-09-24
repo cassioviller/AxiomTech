@@ -96,7 +96,7 @@ footer a{color:var(--ink)}
 /* o clipe cobre o palco sem filtro (paleta do filme); a imagem (pôster = último quadro) só some quando há quadro pronto (.viva) */
 .js-historia .palco .fundo video{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:68% 50%;opacity:0;transition:opacity .4s}
 .js-historia .palco .fundo.viva video{opacity:1}
-.js-historia .palco .fundo.viva img{visibility:hidden}
+.js-historia .palco .fundo.viva img{visibility:hidden;transition:visibility 0s .4s}
 .js-historia .cena{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:96px 16px;border:0}
 .js-historia .cena.longa{min-height:200vh;min-height:200svh;align-items:flex-start}
 .js-historia .cena.longa .texto{position:sticky;top:28vh;top:28svh}
@@ -163,7 +163,7 @@ footer a{color:var(--ink)}
   <section class="cena" id="origem" data-passo="origem">
     <figure class="fundo clipe" data-passo="origem" data-dur="8" data-clipe="video/cena-origem.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-origem.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-origem.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2017">2017</time> → <time datetime="2024">2024</time></p>
@@ -186,7 +186,7 @@ footer a{color:var(--ink)}
   <section class="cena" id="obra" data-passo="obra">
     <figure class="fundo clipe" data-passo="obra" data-dur="8" data-clipe="video/cena-obra.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-obra.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-obra.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2025-02">fev/2025</time> → <time datetime="2026-03">mar/2026</time></p>
@@ -199,7 +199,7 @@ footer a{color:var(--ink)}
   <section class="cena" id="veks" data-passo="veks">
     <figure class="fundo clipe" data-passo="veks" data-dur="8" data-clipe="video/cena-veks.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-veks.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-veks.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2026-03">mar/2026</time> → <time datetime="2026-09">set/2026</time></p>
@@ -212,7 +212,7 @@ footer a{color:var(--ink)}
   <section class="cena" id="ferramentas" data-passo="ferramentas">
     <figure class="fundo clipe" data-passo="ferramentas" data-dur="8" data-clipe="video/cena-ferramentas.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-ferramentas.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-ferramentas.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2026-03">mar</time> → <time datetime="2026-04">abr/2026</time></p>
@@ -225,7 +225,7 @@ footer a{color:var(--ink)}
   <section class="cena" id="sige" data-passo="sige">
     <figure class="fundo clipe" data-passo="sige" data-dur="8" data-clipe="video/cena-sige.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-sige.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-sige.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2026-05">mai</time> → <time datetime="2026-09">set/2026</time></p>
@@ -248,7 +248,7 @@ footer a{color:var(--ink)}
   <section class="cena" id="escala" data-passo="escala">
     <figure class="fundo clipe" data-passo="escala" data-dur="8.5" data-clipe="video/cena-escala.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-escala.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-escala.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2026-07-09">jul</time> → <time datetime="2026-09-21">set/2026</time></p>
@@ -271,7 +271,7 @@ footer a{color:var(--ink)}
   <section class="cena longa" id="casa" data-passo="casa">
     <figure class="fundo clipe" data-passo="casa" data-dur="10" data-clipe="video/cena-casa.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-casa.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-casa.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2026-08">ago/2026</time></p>
@@ -284,7 +284,7 @@ footer a{color:var(--ink)}
   <section class="cena longa" id="icamento" data-passo="icamento">
     <figure class="fundo clipe" data-passo="icamento" data-dur="8" data-clipe="video/cena-icamento.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-icamento.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-icamento.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2026-08">ago/2026</time></p>
@@ -297,7 +297,7 @@ footer a{color:var(--ink)}
   <section class="cena" id="whatsapp" data-passo="whatsapp">
     <figure class="fundo clipe" data-passo="whatsapp" data-dur="8" data-clipe="video/cena-whatsapp.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-whatsapp.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-whatsapp.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2026-08-11">ago/2026</time></p>
@@ -310,7 +310,7 @@ footer a{color:var(--ink)}
   <section class="cena" id="recuperado" data-passo="recuperado">
     <figure class="fundo clipe" data-passo="recuperado" data-dur="8" data-clipe="video/cena-recuperado.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-recuperado.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-recuperado.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2026-09">set/2026</time></p>
@@ -323,7 +323,7 @@ footer a{color:var(--ink)}
   <section class="cena longa" id="zip" data-passo="zip">
     <figure class="fundo clipe" data-passo="zip" data-dur="10" data-clipe="video/cena-zip.mp4" aria-hidden="true">
       <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-zip.webp" alt="" width="960" height="540" loading="lazy">
+      <img src="video/cena-zip.webp" alt="" width="960" height="540">
     </figure>
     <div class="texto">
       <p class="data"><time datetime="2026-09">set/2026</time></p>
