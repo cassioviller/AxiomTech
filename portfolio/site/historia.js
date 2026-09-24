@@ -54,7 +54,7 @@ function sincronizar(){
     return;
   }
   var r=document.querySelector('.cena[data-passo="'+H.ativa+'"]').getBoundingClientRect();
-  api.seek(progresso(r.top,r.height,innerHeight)*api.dur*0.999);
+  api.seek(progresso(r.top,r.height,innerHeight)*api.dur);
 }
 // "mai → set/2026" vira "mai/2026": o início do intervalo, com o ano do fim quando o início é só o mês
 function inicioDaData(texto){

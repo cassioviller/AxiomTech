@@ -14,7 +14,6 @@ var v0=document.createElement('video'),con=navigator.connection||{};
 var PODE=!/[?&]clipes=nao\b/.test(location.search)&&v0.canPlayType('video/mp4; codecs="avc1.64001F"')!==''
   &&!con.saveData&&!/^(slow-)?2g$/.test(con.effectiveType||'');
 var reduzir=matchMedia('(prefers-reduced-motion: reduce)'),todas=[];
-function quadro(t){return (Math.round(t*FPS)+0.5)/FPS;}
 function depoisDoLoad(fn){if(document.readyState==='complete')fn();else addEventListener('load',fn);}
 function chave(a){return a.dist()-(a.pronto?FOLGA:0);}
 function arrumar(){
@@ -27,6 +26,8 @@ function arrumar(){
 figs.forEach(function(fig){
   var v=fig.querySelector('video'),cena=fig.closest('.cena')||fig,src=fig.dataset.clipe,dur=parseFloat(fig.dataset.dur)||0;
   var alvo=-1,pedido=-1,emVoo=0,vivo=false,lentos=0,tinha=false,ligado=false,esperados=0; // esperados: 'emptied' que os nossos load() ainda vão disparar
+  var ultimo=Math.round(dur*FPS)-1;                                         // índice do último quadro: o fim da cena pede este quadro, nunca além
+  function quadro(t){return (Math.min(Math.round(t*FPS),ultimo)+0.5)/FPS;}
   var api={dur:dur,frozen:false,pronto:false,morto:false,perto:false,dist:dist,carregar:carregar,
     seek:function(t){api.frozen=true;alvo=quadro(Math.max(0,Math.min(dur,t)));if(ligado)arrumar();pedir();},
     descarregar:descarregar};

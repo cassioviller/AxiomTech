@@ -530,7 +530,7 @@ def checar_js():
     if not caminho.exists():
         return
     js = re.sub(r"//[^\n]*", "", caminho.read_text(encoding="utf-8"))  # comentários não contam
-    for proibido in ("scrollTo", "scrollBy", "scrollIntoView", "preventDefault", "'wheel'", "'touchmove'", "aria-live", "__maquete", "'maquete'"):
+    for proibido in ("scrollTo", "scrollBy", "scrollIntoView", "preventDefault", "'wheel'", "'touchmove'", "aria-live", "__maquete", "'maquete'", "*0.999"):
         check(proibido not in js, f"historia.js não pode usar {proibido}")
     check("fps" not in js.lower() and "matar" not in js, "historia.js não duplica a guarda de desempenho do maquetes.js")
     for exigido in ("'--barra'", "ResizeObserver", "'resize'", ".barra"):
@@ -549,9 +549,9 @@ def checar_clipes_js():
     for exigido in ("canPlayType", "'seeked'", "seekable", "rootMargin:'600px", "preload='auto'", ".load()", "removeAttribute('src')",
                     "prefers-reduced-motion: reduce", "'change'", "saveData", "clipes=nao", "readyState", "'load'",
                     "TETO=250", "LENTOS=3", "VOO=600", "MAXIMO=2", "fig.__clipe=api", "'progress'", "'emptied'", "networkState", "esperados",
-                    "ESPERA_RANGE=1500", "temRange"):
+                    "ESPERA_RANGE=1500", "temRange", "Math.min(Math.round(t*FPS),ultimo)"):
         check(exigido in js, f"clipes.js precisa de {exigido}")
-    check("(Math.round(t*FPS)+0.5)/FPS" in js, "clipes.js: seek quantizado ao quadro, (round(t·24)+0,5)/24")
+    check("(Math.min(Math.round(t*FPS),ultimo)+0.5)/FPS" in js, "clipes.js: seek quantizado ao quadro e nunca além do último, (min(round(t·24), round(dur·24)−1)+0,5)/24")
     check("v.currentTime=" in js and js.count("currentTime=") == 1, "clipes.js: o tempo do vídeo só muda por currentTime, num lugar só")
 
 
@@ -796,9 +796,9 @@ def rolar_ate(ws, passo, fracao):
                f"window.scrollTo(0,scrollY+r.top+r.height*{fracao}-innerHeight/2);}})()")
 
 
-def quadro(t):
-    """O quantizador do clipes.js: o meio do quadro mais próximo, a 24 fps (Math.round, para t ≥ 0)."""
-    return (int(t * 24 + 0.5) + 0.5) / 24
+def quadro(t, dur):
+    """O quantizador do clipes.js: o meio do quadro mais próximo a 24 fps, nunca além do último quadro do clipe."""
+    return (min(int(t * 24 + 0.5), int(round(dur * 24)) - 1) + 0.5) / 24
 
 
 VIDEO_ICAMENTO = "document.querySelector('figure.clipe[data-passo=\"icamento\"] video')"
@@ -828,14 +828,19 @@ def checar_clipe_real():
         c = ler_clipe(ws, "icamento")
         check(pronto, f"a 40 % do içamento, .viva e __clipe.frozen em ≤ 25 s (estado: {c})")
         check(c["ready"] >= 2 and c["seekEnd"] >= dur - 0.5, f"içamento: readyState {c['ready']} (≥ 2) e seekable até {c['seekEnd']} (≥ {dur - 0.5})")
-        check(abs(c["t"] - quadro(0.4 * dur)) <= 0.15, f"içamento a 40 %: currentTime {c['t']:.3f} ≠ quadro(0,4·{dur}) = {quadro(0.4 * dur):.3f}")
+        check(abs(c["t"] - quadro(0.4 * dur, dur)) <= 0.15, f"içamento a 40 %: currentTime {c['t']:.3f} ≠ quadro(0,4·{dur}) = {quadro(0.4 * dur, dur):.3f}")
         check(c["img"] == "hidden" and c["opacidade"] == "1",
               f"com quadro pronto, a imagem some e o vídeo aparece (img {c['img']}, opacity {c['opacidade']})")
         rolar_ate(ws, "icamento", 0.75)
-        alvo = quadro(0.75 * dur)
+        alvo = quadro(0.75 * dur, dur)
         esperar(ws, f"Math.abs({VIDEO_ICAMENTO}.currentTime-{alvo})<=0.15", 3)
         c = ler_clipe(ws, "icamento")
         check(abs(c["t"] - alvo) <= 0.15, f"içamento a 75 %: currentTime {c['t']:.3f} ≠ {alvo:.3f}")
+        rolar_ate(ws, "icamento", 1.0)  # o fim da cena pede o último quadro, nunca além da duração
+        alvo = quadro(dur, dur)
+        esperar(ws, f"Math.abs({VIDEO_ICAMENTO}.currentTime-{alvo})<=0.15", 3)
+        c = ler_clipe(ws, "icamento")
+        check(abs(c["t"] - alvo) <= 0.15 and c["t"] < dur, f"içamento a 100 %: currentTime {c['t']:.3f} ≠ último quadro {alvo:.3f} (nunca ≥ dur={dur})")
         # 30 seeks, um por rAF: intervalo entre seeked consecutivos (um seek em voo por vez; com pedido pendente, é a latência)
         ws.avaliar("window.__medida=null;(function(){var f=document.querySelector('figure.clipe[data-passo=\"icamento\"]'),v=f.querySelector('video'),"
                    "a=f.__clipe,ini=performance.now(),n=0,lat=[];function s(){var t=performance.now();lat.push(t-ini);ini=t;}v.addEventListener('seeked',s);"
@@ -845,7 +850,7 @@ def checar_clipe_real():
         m = json.loads(esperar(ws, "window.__medida&&JSON.stringify(window.__medida)", 10) or "null") or {}  # "null" é verdadeiro: espera o objeto
         check(m.get("n", 0) >= 20 and 0 <= m.get("mediana", -1) <= 40,
               f"30 seeks um por rAF: {m.get('n')} seeked (≥ 20), mediana {m.get('mediana')} ms (≤ 40) — GOP curto e seek por currentTime")
-        check(abs(m.get("t", -1) - quadro(1 + 29 * 0.2)) <= 0.15, f"o último pedido vence: currentTime {m.get('t')} ≠ {quadro(1 + 29 * 0.2):.3f}")
+        check(abs(m.get("t", -1) - quadro(1 + 29 * 0.2, dur)) <= 0.15, f"o último pedido vence: currentTime {m.get('t')} ≠ {quadro(1 + 29 * 0.2, dur):.3f}")
         t1 = ws.avaliar(VIDEO_ICAMENTO + ".currentTime")
         time.sleep(2)
         t2 = ws.avaliar(VIDEO_ICAMENTO + ".currentTime")
