@@ -968,7 +968,7 @@ Expected: `FALHOU:` com `README do portfólio sem 'foco-alto'`.
 - Clipe com o assunto encostado no alto ou no pé do 16:9: classe `foco-alto` / `foco-baixo` na `figure.clipe` (recorte vertical em janelas mais largas que 16:9). O fundo do palco começa em `--barra` (altura da barra fixa, medida pelo `historia.js`).
 ```
 
-`portfolio/DESIGN.md`, no fim da seção "## 2. Paleta de cores e papéis" (depois da linha dos clipes): `- **Palco**: começa abaixo da barra fixa (`--barra`, px, medida em tempo real); recorte vertical `68% 0%` (`foco-alto`), `68% 100%` (`foco-baixo`) ou `68% 50%`; em celular deitado a faixa vai à esquerda com `max-width:min(560px,58vw)`.`
+`portfolio/DESIGN.md`, no fim da seção "## 2. Paleta de cores e papéis" (depois da linha dos clipes): `- **Palco**: começa abaixo da barra fixa (`--barra`, px, medida em tempo real); recorte vertical `68% 0%` (`foco-alto`), `68% 100%` (`foco-baixo`) ou `68% 50%`; em celular deitado a faixa vai à esquerda com `max-width:min(560px,54vw)`.`
 
 `portfolio/revisao/CHANGELOG.md`, no fim:
 
