@@ -558,10 +558,10 @@ def checar_clipes_js():
 def checar_maquetes_js():
     js = (SITE / "maquetes.js").read_text(encoding="utf-8")
     check("dur:sc.dur" in js, "maquetes.js precisa expor a duração da cena em fig.__maquete.dur")
-    comprimento = re.search(r"function cenaIcamento\(fig\)\{.*?var DUR=16,L=([\d.]+)", js, re.S)
-    check(comprimento is not None and float(comprimento.group(1)) <= 8,
-          "módulo do içamento com no máximo 8 m: acima disso o estudo pede pontos intermediários, e a maquete só tem 4 olhais")
-    check("'icamento':cenaIcamento" in js, "maquetes.js precisa registrar a cena 3D do içamento em CENAS")
+    check("cenaIcamento" not in js and "'icamento'" not in js,
+          "maquetes.js: a cena do içamento vive só no film.html (SC[10], clipe cena-icamento); a página não roda mais WebGL na história")
+    check('data-cena="icamento"' not in PORTFOLIO.read_text(encoding="utf-8"), "portfolio.html não tem maquete do içamento")
+    check("var CENAS={'36min':cena36,'casa-viaja':cenaCasa};" in js, "CENAS do maquetes.js: só 36min e casa-viaja")
 
 
 def checar_readme():

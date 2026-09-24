@@ -192,47 +192,7 @@ function cenaCasa(fig){
 
 // ---------- CENA: o módulo sobe pelo balancim (16 s: sai da carreta, sobe com os cabos na vertical, anda e pousa no radier) ----------
 // Com o balancim, os cabos descem verticais: o módulo recebe só tração nos olhais e a parede não é comprimida.
-function cenaIcamento(fig){
-  var st=stage(fig,0xCFDDEA,30,110),S=st.S,mat=st.mat,box=st.box;
-  var DUR=16,L=8,C=3.2,H=2.9,CH=.3,TOPO=6.5,XC=6,XR=-6; // módulo 8 × 3,2 m (acima de ~8 m o estudo pede pontos intermediários); carreta em x=6, radier em x=-6
-  var AMARELO=0xE8A13C;
-  box(160,.6,160,mat(0x8A9A6A),0,-.3,0);                                 // terreno (grande: a borda some na névoa)
-  box(L+2,.5,C+1.6,mat(0xB9B4A8),XR,.25,0);                              // radier (topo em y=.5)
-  box(L+1,.5,C,mat(0x222831),XC,.55,0);                                  // chassi da carreta
-  box(L+1,.4,C+.6,mat(0x3D4A57),XC,1.0,0);                               // prancha (topo em y=1.2)
-  box(2.4,2.6,C+.4,mat(0xB5440E),XC+L/2+1.9,1.5,0);                      // cavalo
-  var mod=new THREE.Group();S.add(mod);
-  box(L,CH,C,mat(0x3D5568),0,CH/2,0,mod);                                // chassi do módulo
-  box(L-.1,H-CH,C-.1,mat(0xE9E4DA),0,CH+(H-CH)/2,0,mod);                 // corpo
-  box(L+.2,.14,C+.3,mat(0x5B6672),0,H+.07,0,mod);                        // cobertura
-  var cx=L/2-.2,cz=C/2+.05,cantos=[[-cx,-cz],[cx,-cz],[-cx,cz],[cx,cz]];
-  cantos.forEach(function(c){var o=new THREE.Mesh(new THREE.TorusGeometry(.16,.05,8,20),mat(0xF2B233));o.position.set(c[0],CH+.05,c[1]);mod.add(o);}); // olhais nos 4 cantos do chassi
-  var bal=new THREE.Group();S.add(bal);                                  // balancim: quadro de vigas acima do módulo
-  box(L,.25,.25,mat(AMARELO),0,0,cz,bal);box(L,.25,.25,mat(AMARELO),0,0,-cz,bal);
-  box(.25,.25,C+.1,mat(AMARELO),-cx,0,0,bal);box(.25,.25,C+.1,mat(AMARELO),cx,0,0,bal);
-  var gancho=new THREE.Mesh(new THREE.TorusGeometry(.3,.08,8,20),mat(0x333333));S.add(gancho);
-  var cabos=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x2A2F35}));cabos.frustumCulled=false;S.add(cabos);
-  function v(x,y,z){return new THREE.Vector3(x,y,z);}
-  var CAM=[[0,[27,15,27],[4,2,0]],[7,[21,18,24],[2,5,0]],[11,[-3,19,29],[-3,5,0]],[14,[-24,13,24],[-6,1.5,0]],[DUR,[-29,15,29],[-6,1.5,0]]];
-  var api={dur:DUR,update:function(t,wide){
-    var x=lerp(XC,XR,seg(t,7,11)),y=t<11?lerp(1.2,TOPO,seg(t,3,7)):lerp(TOPO,.5,seg(t,11,14));
-    mod.position.set(x,y,0);
-    var bY=y+H+2.2,hY=bY+2.6,pts=[];
-    bal.position.set(x,bY,0);gancho.position.set(x,hY,0);
-    cantos.forEach(function(c){
-      pts.push(v(x+c[0],bY,c[1]),v(x+c[0],y+CH+.05,c[1])); // cabo vertical: balancim → olhal
-      pts.push(v(x+c[0],bY,c[1]),v(x,hY,0));               // eslinga: balancim → gancho
-    });
-    pts.push(v(x,hY,0),v(x,hY+30,0));                     // cabo do guindaste
-    cabos.geometry.setFromPoints(pts);
-    st.camKeys(CAM,t,wide);
-    api.num='';
-    api.leg=t<11?'Cabos verticais: só tração nos olhais; a parede não é comprimida.':'Balancim de içamento e guindaste da classe certa: itens de regra no orçamento.';
-  }};
-  return Object.assign(api,st);
-}
-
-var CENAS={'36min':cena36,'casa-viaja':cenaCasa,'icamento':cenaIcamento};
+var CENAS={'36min':cena36,'casa-viaja':cenaCasa};
 
 // ---------- ciclo de vida de cada figura ----------
 function montar(fig){
