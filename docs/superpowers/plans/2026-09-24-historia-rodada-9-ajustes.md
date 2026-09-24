@@ -418,8 +418,12 @@ def checar_evicao():
                              "return f.classList.contains('viva')&&!!f.querySelector('video').getAttribute('src');})()", 3)
         c = ler_clipe(ws, "icamento")
         check(voltou, f"despejado depois de .viva, o clipe ativo recarrega e volta a .viva em ≤ 3 s (estado: {c})")
-        # despejo ANTES dos metadados: com a rede a 20 KB/s os metadados demoram ~1 s; o src já está atribuído e readyState ainda é 0
+        # despejo ANTES dos metadados: com a rede a 20 KB/s os metadados demoram ~1 s; o src já está atribuído e readyState ainda é 0.
+        # Antes: descarregar casa (ir ao zip até ela ficar sem src) e desligar o cache, senão casa pode já estar carregada (FOLGA) ou vir do cache
+        rolar_ate(ws, "zip", 0.5)
+        esperar(ws, "!document.querySelector('figure.clipe[data-passo=\"casa\"] video').hasAttribute('src')", 5)
         ws.comando("Network.enable")
+        ws.comando("Network.setCacheDisabled", cacheDisabled=True)
         ws.comando("Network.emulateNetworkConditions", offline=False, latency=0, downloadThroughput=20480, uploadThroughput=-1)
         rolar_ate(ws, "casa", 0.4)
         esperar(ws, "!!document.querySelector('figure.clipe[data-passo=\"casa\"] video').getAttribute('src')", 5)
@@ -538,7 +542,7 @@ Em `checar_clipes_js`, acrescentar `"ESPERA_RANGE=1500"`, `"temRange"`, `"desde"
 Em `ESPIAO`, acrescentar um contador de `.viva` que nunca zera (para provar que sem Range a classe **nunca** apareceu, não só que não está lá no fim):
 ```python
     "window.__vivas=0;new MutationObserver(function(ms){ms.forEach(function(m){if(m.target.classList&&m.target.classList.contains('viva'))window.__vivas++;});})"
-    ".observe(document.documentElement,{attributes:true,attributeFilter:['class'],subtree:true});"
+    ".observe(document,{attributes:true,attributeFilter:['class'],subtree:true});"  # document, não documentElement: quando o espião roda ainda não há <html>
 ```
 e no bloco "sem Range" de `checar_clipe_real`, depois da leitura `c, e = …`, acrescentar:
 ```python
