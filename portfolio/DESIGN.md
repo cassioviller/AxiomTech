@@ -84,7 +84,7 @@ Plano, como papel. Profundidade só por fio (1px `--rule`) e troca de superfíci
 - ≤720px: grades viram uma coluna (`.tres`, `.walk`, `.honest`, `.calc`); `.stats` vira 2×2; antes/depois ganha rótulos inline.
 - ≤560px: o carimbo quebra em duas linhas.
 - `prefers-reduced-motion`: sem maquete 3D (fica a imagem), sem animação da cota, rolagem sem suavização.
-- Imagens em WebP, `loading="lazy"`, `alt` descritivo com os números da tela.
+- Imagens em WebP, `loading="lazy"`, `alt` descritivo com os números da tela — exceto os 11 pôsteres dos clipes em index.html, que carregam sem lazy (têm de estar prontos para o crossfade e para os caminhos só-pôster; ver check_historia.py).
 
 ## 9. Guia para agentes
 

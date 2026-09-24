@@ -194,6 +194,10 @@ def checar_portadas(filme, passos):
                   f"cena portada {passo}: materiais por P(); só o filme translúcido e a textura da planta são MeshStandardMaterial")
         check(b.count("ORANGE") == (2 if passo == "zip" else 1), f"cena portada {passo}: exatamente 1 acento ORANGE (+ a linha de cota no zip)")
         check(re.search(r"0xE0622A", b, re.I) is None, f"cena portada {passo}: o laranja só entra como ORANGE")
+        if passo == "icamento":
+            comprimento = re.search(r"var L=([\d.]+),C=", b)
+            check(comprimento is not None and float(comprimento.group(1)) <= 8,
+                  "módulo do içamento com no máximo 8 m: acima disso o estudo pede pontos intermediários, e a maquete só tem 4 olhais")
 
 
 LEITURAS = {  # expressão avaliada no film.html?limpo → valor esperado (F-18: as cenas portadas preservam o conteúdo)
@@ -365,6 +369,13 @@ def checar_clipes(passos):
         check(publicados == esperados, f"git ls-files site/video ≠ os 22 arquivos dos clipes: {publicados}")
 
 
+def passos_de(opcao):
+    """Os passos depois de --cenas/--video, até a próxima opção --: `--cenas --video zip` não dá zip ao --cenas."""
+    resto = sys.argv[sys.argv.index(opcao) + 1:]
+    fim = next((i for i, a in enumerate(resto) if a.startswith("--")), len(resto))
+    return resto[:fim]
+
+
 def main():
     check(FILME.exists(), "portfolio/filme/film.html não existe")
     if FILME.exists():
@@ -374,12 +385,14 @@ def main():
         checar_readme()
         checar_portadas(filme, list(PORTADAS))  # estático e instantâneo: sempre
         if "--cenas" in sys.argv:  # conteúdo das cenas portadas no Chromium (~20 s)
-            passos = [a for a in sys.argv[sys.argv.index("--cenas") + 1:] if not a.startswith("--")] or list(PORTADAS)
-            checar_cenas_portadas(passos)
+            passos = passos_de("--cenas") or list(PORTADAS)
+            check(set(passos) <= set(PORTADAS), f"--cenas: passos desconhecidos: {sorted(set(passos) - set(PORTADAS))}")
+            validos = [p for p in passos if p in PORTADAS]
+            if validos:  # só os passos conhecidos; um passo errado vira FALHOU, não KeyError
+                checar_cenas_portadas(validos)
         checar_reproducao()
     if "--video" in sys.argv:
-        passos = [a for a in sys.argv[sys.argv.index("--video") + 1:] if not a.startswith("--")]
-        checar_clipes(passos or list(CLIPES))
+        checar_clipes(passos_de("--video") or list(CLIPES))
         checar_trailer()
     if FALHAS:
         print("FALHOU:")

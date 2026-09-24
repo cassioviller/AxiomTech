@@ -30,7 +30,7 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - [x] Níveis das ferramentas restaurados no currículo.
 - [x] `./build.sh` rodado; primeira tela e prints pixelados conferidos por screenshot.
 - [x] PENDENCIAS.md atualizado.
-- [ ] Commit — só quando o Cássio pedir. Sugestão: `git add -A && git commit -m "Revisão multiagente do portfólio"`.
+- [x] Commit — feito nas rodadas seguintes (ver CHANGELOG.md).
 - Próximos passos possíveis: responder as pendências A–H de `PENDENCIAS.md`; Fase 5 do PLANO.md (vídeo 45 s, PDFs longos); publicar (Deploy estático do Replit já configurado).
 
 ## As 9 falhas restantes do verificador "fatos" e a decisão
@@ -51,4 +51,4 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Site no ar: `python3 portfolio/servir.py 5000 --bind 0.0.0.0 --directory portfolio/site` (o Run do `.replit`; precisa de Range).
 - Regenerar os clipes: `python3 portfolio/filme/render_clipes.py`; trailer de envio: `python3 portfolio/filme/render.py` → `portfolio/filme/saida/historia-960.mp4`.
 - Conferir tudo: `python3 portfolio/tests/check_historia.py --navegador && python3 portfolio/tests/check_filme.py --video && python3 portfolio/tests/check_site.py`.
-- Próximos passos: merge de `historia-scrollytelling` em `main` e deploy; `check_historia.py --origem <URL>` na origem publicada; testar num iPhone real; pendências do Cássio (idade, UNIFEI, estágio/júnior, trailer vertical).
+- Próximos passos: o merge de `historia-scrollytelling` em `main` foi feito em 24/09/2026 (fast-forward, 54 commits, branch apagado); falta: push para o GitHub; deploy estático; `python3 portfolio/tests/check_historia.py --origem <URL>` na origem publicada; teste num iPhone real; pendências do Cássio (idade, UNIFEI, estágio/júnior, trailer vertical).

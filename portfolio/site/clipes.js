@@ -26,7 +26,7 @@ function arrumar(){
 
 figs.forEach(function(fig){
   var v=fig.querySelector('video'),cena=fig.closest('.cena')||fig,src=fig.dataset.clipe,dur=parseFloat(fig.dataset.dur)||0;
-  var alvo=-1,pedido=-1,emVoo=0,vivo=false,lentos=0,tinha=false,ligado=false;
+  var alvo=-1,pedido=-1,emVoo=0,vivo=false,lentos=0,tinha=false,ligado=false,meta=false; // meta: já houve 'loadedmetadata' desde o último carregar()
   var api={dur:dur,frozen:false,pronto:false,morto:false,perto:false,dist:dist,carregar:carregar,
     seek:function(t){api.frozen=true;alvo=quadro(Math.max(0,Math.min(dur,t)));if(ligado)arrumar();pedir();},
     descarregar:descarregar};
@@ -46,16 +46,20 @@ figs.forEach(function(fig){
   function carregar(){
     if(api.pronto||api.morto||reduzir.matches)return;
     if(todas.filter(function(a){return a.pronto;}).length>=MAXIMO)return;  // trava de segurança: arrumar() já desocupou a vaga antes de chamar
-    api.pronto=true;
+    api.pronto=true;meta=false;
     v.setAttribute('src',src);v.preload='auto';v.load();
   }
   function descarregar(){
     if(!api.pronto)return;
-    api.pronto=false;pedido=-1;emVoo=0;viver(false);v.removeAttribute('src');v.load();
+    api.pronto=false;meta=false;pedido=-1;emVoo=0;viver(false);v.removeAttribute('src');v.load();
   }
   v.addEventListener('loadedmetadata',function(){
     if(!v.seekable.length||v.seekable.end(0)<dur-0.5){congelar();return;} // servidor sem Range: não dá para buscar; fica o pôster
-    pedir();
+    meta=true;pedir();
+  });
+  v.addEventListener('loadeddata',function(){                               // o 1º 'seeked' pode chegar sem quadro (readyState<2): agora há
+    if(vivo||alvo<0)return;
+    if(!emVoo&&pedido===alvo&&pedido===v.currentTime)viver(true);else pedir(); // já está no quadro pedido: só mostra; senão pedir() busca de novo
   });
   v.addEventListener('seeked',function(){
     var nosso=emVoo>0,levou=nosso?performance.now()-emVoo:0;emVoo=0;
@@ -65,7 +69,12 @@ figs.forEach(function(fig){
     if(alvo>=0&&alvo!==pedido)pedir();                                    // o último pedido vence
   });
   v.addEventListener('error',function(){congelar();});
-  v.addEventListener('emptied',function(){if(v.readyState===0)viver(false);}); // WebKit sob pressão de memória
+  v.addEventListener('emptied',function(){                                  // WebKit sob pressão de memória esvazia o vídeo sozinho
+    if(v.readyState!==0)return;
+    viver(false);
+    if(!api.pronto||!(meta||v.getAttribute('src')!==src))return;            // foi o nosso descarregar() (pronto já é false) ou o load() de carregar()
+    api.pronto=false;meta=false;pedido=-1;emVoo=0;arrumar();                // foi o navegador: libera a vaga e recarrega quando voltar a estar entre os mais perto
+  });
   depoisDoLoad(function(){
     new IntersectionObserver(function(es){api.perto=es[es.length-1].isIntersecting;arrumar();}, // um observer por figure, um alvo só: vale a entrada mais nova do lote
       {rootMargin:'600px 0px'}).observe(cena);                             // a figure mora no palco sticky: observa-se a cena

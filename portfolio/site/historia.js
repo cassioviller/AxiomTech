@@ -82,8 +82,8 @@ function ativar(passo){
   var f=fundos[passo];
   if(f){
     clearTimeout(esconder[passo]);
-    if(f.hidden){f.hidden=false;dispatchEvent(new Event('resize'));} // o clipe volta a ser exibido antes da opacidade
-    void f.offsetWidth; // aplica o display antes da opacidade, senão não há transição
+    if(f.hidden)f.hidden=false; // o clipe volta a ser exibido antes da opacidade
+    void f.offsetWidth; // força o layout com o display já aplicado antes de trocar a opacidade, senão não há transição
     f.classList.add('ativo');
   }
   marcarRegua(passo);
