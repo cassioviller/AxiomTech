@@ -41,7 +41,8 @@ document.documentElement.classList.add('js-historia');
 var barra=document.querySelector('.barra');
 function medirBarra(){if(barra)document.documentElement.style.setProperty('--barra',barra.getBoundingClientRect().height.toFixed(2)+'px');} // sem arredondar: o palco grudado tem de medir o mesmo que em fluxo (senão a LCP oscila entre a tese e o pôster seguinte)
 medirBarra();
-addEventListener('resize',function(){clearTimeout(medirBarra.t);medirBarra.t=setTimeout(medirBarra,150);});
+if(barra&&'ResizeObserver' in window)new ResizeObserver(medirBarra).observe(barra); // fontes que chegam depois, quebra de linha, janela: qualquer mudança de altura
+else{addEventListener('resize',function(){clearTimeout(medirBarra.t);medirBarra.t=setTimeout(medirBarra,150);});if(document.fonts)document.fonts.addEventListener('loadingdone',medirBarra);}
 
 // clipe da cena ativa: o tempo do vídeo segue o scroll (seek congela o tempo), nunca anda sozinho
 function sincronizar(){
