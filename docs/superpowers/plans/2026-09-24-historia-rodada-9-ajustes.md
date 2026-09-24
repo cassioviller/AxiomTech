@@ -864,9 +864,11 @@ Em `check_filme.py`, depois de `LEITURAS = {…}`:
 
 ```python
 ENQUADRAMENTOS = {  # no último quadro do trecho, o assunto inteiro dentro do quadro (F-13; prints de 24/09)
-    "escala": ("(function(){renderCena(7,10);return SC[7].minis.every(function(m){var p=m.position.clone();p.y+=1.2;p.project(cam);"
-               "return Math.abs(p.x)<.98&&p.y>-.94&&p.y<.98;});})()", True),
-    "icamento": ("(function(){var st=SC[10];renderCena(10,10);var p=st.cavalo.position.clone();p.project(cam);return p.x<.9&&Math.abs(p.y)<.95;})()", True),
+    "escala": ("(function(){renderCena(7,10);var ok=SC[7].minis.every(function(m){var p=m.position.clone();p.y+=1.2;p.project(cam);"
+               "return Math.abs(p.x)<.98&&p.y>-.94&&p.y<.98;});"  # as 12 miniaturas
+               "return ok&&[[-8,-.2,5.5],[8,-.2,5.5]].every(function(c){var q=new THREE.Vector3(c[0],c[1],c[2]).project(cam);return Math.abs(q.x)<.98&&q.y>-.94;});})()",  # e a frente do lote (era o que saía pela borda de baixo)
+               True),
+    "icamento": ("(function(){var st=SC[10];renderCena(10,10);var p=st.cavalo.position.clone();p.x+=1.2;p.project(cam);return p.x<.88&&Math.abs(p.y)<.95;})()", True),  # a borda direita do cavalo (meia largura 1,2), não o centro
 }
 ```
 
@@ -894,7 +896,7 @@ por
 `st.cam=[[0,[7,8.5,13],[0,1.2,0]],[5,[1,10,14.5],[0,1,0]],[10,[-2,18.5,23],[0,.4,-2.6]]];`
 
 `SC[10]` (içamento, bloco portado): trocar `box(2.4,2.6,C+.4,ORANGE,XC+L/2+1.9,1.5,0,g);` por `st.cavalo=box(2.4,2.6,C+.4,ORANGE,XC+L/2+1.9,1.5,0,g);` e o `st.cam` por
-`st.cam=[[0,[24,13,24],[6,3.5,0]],[3.3,[21,16,22],[5,6.5,0]],[6.6,[-4,17,26],[-3,6.5,0]],[10,[-19,12,24],[-2,3,0]]];`
+`st.cam=[[0,[24,13,24],[6,3.5,0]],[3.3,[21,16,22],[5,6.5,0]],[6.6,[-4,17,26],[-3,6.5,0]],[10,[-19,12,24],[0,3,0]]];`
 
 `corrigir_filme.py`: em `CENA_ICAMENTO`, as mesmas duas trocas (a string tem de ficar idêntica ao bloco do `film.html`); e, depois de `TROCAS_RODADA_4`, acrescentar
 
@@ -917,7 +919,7 @@ e em `main()`, depois do laço de `TROCAS_RODADA_4`:
 - [ ] **Step 4: Ver passar o enquadramento; ajustar só `st.cam` se preciso**
 
 Run: `cd /home/runner/workspace && python3 portfolio/tests/check_filme.py --cenas escala icamento 2>&1 | tail -3`
-Expected: `OK`. Se `enquadramento escala` falhar, afastar a última chave (`[-2,18.5,23]` → `[-2,20,25]`) e repetir; se `icamento` falhar, mover o alvo da última chave em x (`[-2,3,0]` → `[0,3,0]`). Nunca mexer nos tempos nem em `st.run`. Cada ajuste vai também para `corrigir_filme.py`.
+Expected: `OK`. Se `enquadramento escala` falhar (miniaturas ou a frente do lote), afastar a última chave (`[-2,18.5,23]` → `[-2,20,25]`) e repetir; se `icamento` falhar, mover o alvo da última chave em x (`[0,3,0]` → `[1.5,3,0]`) ou afastar a câmera (`[-19,12,24]` → `[-19,12,26]`). Nunca mexer nos tempos nem em `st.run`. Cada ajuste vai também para `corrigir_filme.py`.
 
 - [ ] **Step 5: Re-render dos dois clipes**
 
