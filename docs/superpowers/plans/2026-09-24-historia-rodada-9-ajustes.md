@@ -100,14 +100,14 @@ Em `checar_css`, logo depois da checagem `".cena{scroll-margin-top:9rem}"`:
 Em `checar_js`, no fim da função:
 
 ```python
-    for exigido in ("'--barra'", "'resize'", ".barra"):
-        check(exigido in js, f"historia.js precisa de {exigido}: mede a barra fixa para o palco começar abaixo dela")
+    for exigido in ("'--barra'", "ResizeObserver", "'resize'", ".barra"):
+        check(exigido in js, f"historia.js precisa de {exigido}: mede a barra fixa (e toda mudança de altura dela) para o palco começar abaixo dela")
 ```
 
 - [ ] **Step 2: Ver falhar**
 
 Run: `cd /home/runner/workspace && python3 portfolio/tests/check_historia.py 2>&1 | head`
-Expected: `FALHOU:` com "o fundo começa abaixo da barra fixa" e "historia.js precisa de '--barra'".
+Expected: `FALHOU:` com "o palco gruda abaixo da barra fixa" e "historia.js precisa de '--barra'".
 
 - [ ] **Step 3: CSS e JS**
 
@@ -124,7 +124,8 @@ por
 var barra=document.querySelector('.barra');
 function medirBarra(){if(barra)document.documentElement.style.setProperty('--barra',barra.getBoundingClientRect().height.toFixed(2)+'px');} // sem arredondar: o palco grudado tem de medir o mesmo que em fluxo (senão a LCP oscila entre a tese e o pôster seguinte)
 medirBarra();
-addEventListener('resize',function(){clearTimeout(medirBarra.t);medirBarra.t=setTimeout(medirBarra,150);});
+if(barra&&'ResizeObserver' in window)new ResizeObserver(medirBarra).observe(barra); // fontes que chegam depois, quebra de linha, janela: qualquer mudança de altura
+else{addEventListener('resize',function(){clearTimeout(medirBarra.t);medirBarra.t=setTimeout(medirBarra,150);});if(document.fonts)document.fonts.addEventListener('loadingdone',medirBarra);}
 ```
 
 - [ ] **Step 4: Teste real**
@@ -134,7 +135,7 @@ Em `checar_layout`, dentro do laço `for largura, altura in ((1366, 768), (1920,
 ```python
                 topo = json.loads(ws.avaliar("JSON.stringify((function(){var b=document.querySelector('.barra').getBoundingClientRect(),"
                                              "f=document.querySelector('.palco figure.ativo').getBoundingClientRect();return {barra:b.bottom,fundo:f.top};})())"))
-                check(topo["fundo"] >= topo["barra"] - 1, f"{largura}×{altura}: o fundo ativo começa em {topo['fundo']:.0f} px, acima do pé da barra ({topo['barra']:.0f} px)")
+                check(abs(topo["fundo"] - topo["barra"]) <= 1, f"{largura}×{altura}: o fundo ativo começa em {topo['fundo']:.1f} px, e o pé da barra está em {topo['barra']:.1f} px (têm de coincidir: nem vão nem sobreposição)")
 ```
 
 No bloco `with chromium(390, altura=844) as ws:`, logo depois de `navegar(ws)` (ainda em `scrollY=0`, antes de qualquer rolagem):
@@ -143,7 +144,7 @@ No bloco `with chromium(390, altura=844) as ws:`, logo depois de `navegar(ws)` (
         vao = json.loads(ws.avaliar("JSON.stringify((function(){var b=document.querySelector('.barra').getBoundingClientRect(),"
                                     "f=document.querySelector('.palco figure.ativo').getBoundingClientRect();return {barra:b.bottom,fundo:f.top,scroll:scrollY};})())"))
         check(vao["scroll"] == 0 and abs(vao["fundo"] - vao["barra"]) <= 1,
-              f"390×844 em scrollY=0: o fundo da tese tem de encostar no pé da barra (barra {vao['barra']:.0f}, fundo {vao['fundo']:.0f}): sem vão, sem sobreposição")
+              f"390×844 em scrollY=0: o fundo da tese tem de encostar no pé da barra (barra {vao['barra']:.1f}, fundo {vao['fundo']:.1f}, scrollY {vao['scroll']}): sem vão, sem sobreposição")
 ```
 
 e, dentro do laço `for passo in curtos:`, depois de `time.sleep(0.5)`:
@@ -151,19 +152,22 @@ e, dentro do laço `for passo in curtos:`, depois de `time.sleep(0.5)`:
 ```python
             topo = json.loads(ws.avaliar("JSON.stringify((function(){var b=document.querySelector('.barra').getBoundingClientRect(),"
                                          "f=document.querySelector('.palco figure.ativo').getBoundingClientRect();return {barra:b.bottom,fundo:f.top};})())"))
-            check(topo["fundo"] >= topo["barra"] - 1, f"390×844 em {passo}: o fundo começa em {topo['fundo']:.0f} px, acima do pé da barra ({topo['barra']:.0f} px)")
+            check(abs(topo["fundo"] - topo["barra"]) <= 1, f"390×844 em {passo}: o fundo começa em {topo['fundo']:.1f} px, e o pé da barra está em {topo['barra']:.1f} px (têm de coincidir)")
 ```
 
 Antes de `alturas = {}`:
 
 ```python
-    with chromium(700, altura=900) as ws:  # a barra quebra em mais linhas quando a janela estreita: --barra acompanha (resize)
+    with chromium(700, altura=900) as ws:  # as fontes web chegam depois da primeira medida, e a barra quebra em mais linhas ao estreitar: --barra acompanha
         navegar(ws)
+        MEDIDA = ("JSON.stringify({barra:document.querySelector('.barra').getBoundingClientRect().height,"
+                  "var:parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--barra'))})")
+        m = json.loads(ws.avaliar(MEDIDA))
+        check(abs(m["barra"] - m["var"]) <= 1, f"700 px, depois do load (fontes já trocadas): --barra ({m['var']}) ≠ altura da barra ({m['barra']:.2f})")
         ws.comando("Emulation.setDeviceMetricsOverride", width=500, height=900, deviceScaleFactor=1, mobile=False)
         time.sleep(0.6)
-        m = json.loads(ws.avaliar("JSON.stringify({barra:document.querySelector('.barra').getBoundingClientRect().height,"
-                                  "var:parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--barra'))})"))
-        check(abs(m["barra"] - m["var"]) <= 1, f"depois de estreitar a janela para 500 px, --barra ({m['var']}) ≠ altura da barra ({m['barra']:.0f})")
+        m = json.loads(ws.avaliar(MEDIDA))
+        check(abs(m["barra"] - m["var"]) <= 1, f"depois de estreitar a janela para 500 px, --barra ({m['var']}) ≠ altura da barra ({m['barra']:.2f})")
 ```
 
 - [ ] **Step 5: Ver passar**
