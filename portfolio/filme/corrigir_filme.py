@@ -66,6 +66,11 @@ TROCAS_RODADA_4 = [
     ("for(var r=0;r<5;r++)for(var k=0;k<7;k++)c.fillText(String(r*7+k+1),14+k*34,110+r*40);",
      "for(var r=0;r<5;r++)for(var k=0;k<7;k++)if(r*7+k<31)c.fillText(String(r*7+k+1),14+k*34,110+r*40);"),
 ]
+# Rodada 9: reenquadramento do restaurante (as 12 miniaturas inteiras no último quadro)
+TROCAS_RODADA_9 = [
+    ("st.cam=[[0,[7,8.5,13],[0,1.2,0]],[5,[1,10,14.5],[0,1,0]],[10,[-3,15.5,19.5],[0,.6,-3]]];",
+     "st.cam=[[0,[7,8.5,13],[0,1.2,0]],[5,[1,10,14.5],[0,1,0]],[10,[-2,18.5,23],[0,.4,-2.6]]];"),
+]
 # Rodada 4: cenas portadas da página (SC[9], SC[10], SC[11]), coladas antes do render nesta ordem: casa → içamento → zip
 # (SC.push dá os índices). Estilo do filme: materiais por P(), um só acento ORANGE, nenhum texto pintado.
 CENA_CASA = """// ================= CASA (portada da página: casa-viaja, 10 s) =================
@@ -149,7 +154,7 @@ CENA_ICAMENTO = """// ================= IÇAMENTO (portado da página: icamento,
 (function(){var g=new THREE.Group();S.add(g);var st={g:g};SC.push(st);
 var L=8,C=3.2,H=2.9,CH=.3,TOPO=6.5,XC=6,XR=-6;
 slab(60,40,0xB8C99A,g);box(L+2,.5,C+1.6,0xC9C2B4,XR,.25,0,g);
-box(L+1,.5,C,0x4A4E55,XC,.55,0,g);box(L+1,.4,C+.6,0x8E9AA6,XC,1,0,g);box(2.4,2.6,C+.4,ORANGE,XC+L/2+1.9,1.5,0,g);box(2.2,1,C+.2,0xBFD8E6,XC+L/2+1.9,2.5,0,g,true);
+box(L+1,.5,C,0x4A4E55,XC,.55,0,g);box(L+1,.4,C+.6,0x8E9AA6,XC,1,0,g);st.cavalo=box(2.4,2.6,C+.4,ORANGE,XC+L/2+1.9,1.5,0,g);box(2.2,1,C+.2,0xBFD8E6,XC+L/2+1.9,2.5,0,g,true);
 [[XC-3,-1.6],[XC-3,1.6],[XC+1,-1.6],[XC+1,1.6],[XC+L/2+1.9,-1.8],[XC+L/2+1.9,1.8]].forEach(function(w){cyl(.5,.4,0x2B2F33,w[0],.5,w[1],g,14).rotation.x=Math.PI/2;});
 st.mod=new THREE.Group();g.add(st.mod);box(L,CH,C,0x7D8E9E,0,CH/2,0,st.mod);box(L-.1,H-CH,C-.1,0xF3ECDD,0,CH+(H-CH)/2,0,st.mod);box(L+.2,.14,C+.3,0x4A4E55,0,H+.07,0,st.mod);
 box(1.1,1.9,.06,0xC7A57A,-2.2,CH+.95,C/2,st.mod,true);box(1.4,.9,.06,0xBFD8E6,1.6,CH+1.6,C/2,st.mod,true);
@@ -159,7 +164,7 @@ st.bal=new THREE.Group();g.add(st.bal);box(L,.25,.25,0xE8B53E,0,0,cz,st.bal);box
 var gancho=new THREE.Mesh(new THREE.TorusGeometry(.3,.08,8,20),P(0x4A4E55));g.add(gancho);
 st.cabos=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x2a2622}));st.cabos.frustumCulled=false;g.add(st.cabos);
 tree(-14,-9,1.2,g);tree(13,-10,1,g);tree(-12,9,.9,g);tree(16,7,1.1,g);
-st.cam=[[0,[24,13,24],[6,3.5,0]],[3.3,[21,16,22],[5,6.5,0]],[6.6,[-4,17,26],[-3,6.5,0]],[10,[-23,12,23],[-6,3,0]]];
+st.cam=[[0,[24,13,24],[6,3.5,0]],[3.3,[21,16,22],[5,6.5,0]],[6.6,[-4,17,26],[-3,6.5,0]],[10,[-19,12,24],[-2,3,0]]];
 st.run=function(t){var x=lerp(XC,XR,ramp(t,3.75,6.75)),y=t<6.75?lerp(1.2,TOPO,ramp(t,.75,3.75)):lerp(TOPO,.5,ramp(t,6.75,9));
  st.mod.position.set(x,y,0);var bY=y+H+2.2,hY=bY+2.6,pts=[];st.bal.position.set(x,bY,0);gancho.position.set(x,hY,0);
  cantos.forEach(function(c){pts.push(x+c[0],bY,c[1],x+c[0],y+CH+.05,c[1]);pts.push(x+c[0],bY,c[1],x,hY,0);}); // cabo vertical balancim→olhal; eslinga balancim→gancho
@@ -246,6 +251,9 @@ def main():
         s = s.replace(velho, novo)
     for velho, novo in TROCAS_RODADA_4:
         assert s.count(velho) == 1, f"trecho da rodada 4 não encontrado (ou repetido): {velho[:60]!r}"
+        s = s.replace(velho, novo)
+    for velho, novo in TROCAS_RODADA_9:
+        assert s.count(velho) == 1, f"trecho da rodada 9 não encontrado (ou repetido): {velho[:60]!r}"
         s = s.replace(velho, novo)
     for ancora, antes, depois in INSERCOES_RODADA_4:
         assert s.count(ancora) == 1, f"âncora da rodada 4 não encontrada (ou repetida): {ancora[:60]!r}"

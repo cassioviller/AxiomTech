@@ -211,10 +211,18 @@ LEITURAS = {  # expressão avaliada no film.html?limpo → valor esperado (F-18:
     "zip": ("(function(){var st=SC[11],f=function(){return Math.round(((1-(((st.mm.rotation.z/(2*Math.PI))%1)+1)%1)%1)*60)%60;};"
             "renderCena(11,1.2);var a=f();renderCena(11,8);var b=f();return [a,b,!!st.walls&&st.walls.count>100];})()", [35, 11, True]),
 }
+ENQUADRAMENTOS = {  # no último quadro do trecho, o assunto inteiro dentro do quadro (F-13; prints de 24/09)
+    # escala: as 12 miniaturas e o pé — os cantos da frente do terreno (slab 16 × 11: x = ±8, z = 5,5) com margem embaixo e dos lados
+    "escala": ("(function(){renderCena(7,10);return SC[7].minis.every(function(m){var p=m.position.clone();p.y+=1.2;p.project(cam);"
+               "return Math.abs(p.x)<.98&&p.y>-.94&&p.y<.98;})&&[-8,8].every(function(x){var p=new THREE.Vector3(x,0,5.5).project(cam);"
+               "return Math.abs(p.x)<.98&&p.y>-.94;});})()", True),
+    "icamento": ("(function(){var st=SC[10];renderCena(10,10);var p=st.cavalo.position.clone();p.project(cam);return p.x<.9&&Math.abs(p.y)<.95;})()", True),
+}
 
 
 def checar_cenas_portadas(passos):
-    """Com o Chromium (SwiftShader) no film.html?limpo: a classe .limpo esconde a legenda; cada cena portada existe e responde a renderCena."""
+    """Com o Chromium (SwiftShader) no film.html?limpo: a classe .limpo esconde a legenda; cada cena portada existe e responde a renderCena;
+    nos passos de ENQUADRAMENTOS, o assunto cabe no último quadro (projeção pela câmera)."""
     import shutil
     from playwright.sync_api import sync_playwright
     from render_clipes import ARGS, PRONTO_COM_PRAZO
@@ -232,11 +240,15 @@ def checar_cenas_portadas(passos):
         for passo in passos:
             idx = CLIPES[passo][0]
             check(pg.evaluate(f"!!SC[{idx}]"), f"SC[{idx}] ({passo}) não existe")
-            if pg.evaluate(f"!!SC[{idx}]"):
+            if pg.evaluate(f"!!SC[{idx}]") and passo in LEITURAS:
                 exp, esperado = LEITURAS[passo]
                 achado = pg.evaluate(exp)
                 check(achado == esperado, f"cena portada {passo}: conteúdo {achado} ≠ {esperado}")
-        if set(passos) == set(PORTADAS):
+            if passo in ENQUADRAMENTOS:
+                exp, esperado = ENQUADRAMENTOS[passo]
+                achado = pg.evaluate(exp)
+                check(achado == esperado, f"enquadramento {passo}: {achado} ≠ {esperado} (assunto fora do quadro no último quadro)")
+        if set(PORTADAS) <= set(passos):  # o --cenas sem passos também leva o escala: a contagem continua valendo
             check(pg.evaluate("SC.length") == 12, "SC deve ter 12 cenas (9 do filme + 3 portadas)")
         nav.close()
     check(not erros, f"erros de JS no film.html?limpo: {erros}")
@@ -395,9 +407,10 @@ def main():
         checar_render_clipes()
         checar_portadas(filme, list(PORTADAS))  # estático e instantâneo: sempre
         if "--cenas" in sys.argv:  # conteúdo das cenas portadas no Chromium (~20 s)
-            passos = passos_de("--cenas") or list(PORTADAS)
-            check(set(passos) <= set(PORTADAS), f"--cenas: passos desconhecidos: {sorted(set(passos) - set(PORTADAS))}")
-            validos = [p for p in passos if p in PORTADAS]
+            passos = passos_de("--cenas") or sorted(set(PORTADAS) | set(ENQUADRAMENTOS))
+            conhecidos = set(PORTADAS) | set(ENQUADRAMENTOS)
+            check(set(passos) <= conhecidos, f"--cenas: passos desconhecidos: {sorted(set(passos) - conhecidos)}")
+            validos = [p for p in passos if p in PORTADAS or p in ENQUADRAMENTOS]
             if validos:  # só os passos conhecidos; um passo errado vira FALHOU, não KeyError
                 checar_cenas_portadas(validos)
         checar_reproducao()
