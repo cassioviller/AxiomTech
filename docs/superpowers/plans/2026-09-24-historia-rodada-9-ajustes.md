@@ -731,6 +731,7 @@ Cada item abaixo é uma troca exata. Nenhum limiar muda.
         check(e["pedidos404"] >= 1, f"o clipe trocado para 404 tem de ter sido pedido ({e['pedidos404']} pedidos a nao-existe.mp4)")
         check(not c["viva"] and c["img"] == "visible" and c["src"] is None and c["ready"] == 0,
               f"clipe inexistente (404): fica o pôster, sem .viva e sem src (estado: {c})")
+        check(e["erros"] == [], f"console limpo com um clipe em 404: {e['erros']}")
 ```
 
 (d) Mensagens com o valor medido:
@@ -826,7 +827,7 @@ Expected: `FALHOU:` com "a cena do içamento vive só no film.html" e "CENAS do 
 
 - [ ] **Step 3: Apagar**
 
-Em `maquetes.js`, apagar da linha `function cenaIcamento(fig){` (linha 195) até a linha que fecha essa função (a última `}` antes de `var CENAS=`), inclusive; trocar `var CENAS={'36min':cena36,'casa-viaja':cenaCasa,'icamento':cenaIcamento};` por `var CENAS={'36min':cena36,'casa-viaja':cenaCasa};`. Conferir: `grep -n "cenaIcamento\|'icamento'" portfolio/site/maquetes.js` não devolve nada; `grep -c "function cena" portfolio/site/maquetes.js` devolve 2.
+Em `maquetes.js`, apagar os dois comentários de cabeçalho da cena (`// ---------- CENA: o módulo sobe pelo balancim …` e `// Com o balancim, os cabos descem verticais…`) e da linha `function cenaIcamento(fig){` até a linha que fecha essa função (a última `}` antes de `var CENAS=`), inclusive; trocar `var CENAS={'36min':cena36,'casa-viaja':cenaCasa,'icamento':cenaIcamento};` por `var CENAS={'36min':cena36,'casa-viaja':cenaCasa};`. Conferir: `grep -n "cenaIcamento\|'icamento'" portfolio/site/maquetes.js` não devolve nada; `grep -c "function cena" portfolio/site/maquetes.js` devolve 2.
 
 - [ ] **Step 4: Ver passar**
 
