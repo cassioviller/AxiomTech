@@ -548,7 +548,7 @@ def checar_clipes_js():
         check(proibido not in js, f"clipes.js não pode usar {proibido}")
     for exigido in ("canPlayType", "'seeked'", "seekable", "rootMargin:'600px", "preload='auto'", ".load()", "removeAttribute('src')",
                     "prefers-reduced-motion: reduce", "'change'", "saveData", "clipes=nao", "readyState", "'load'",
-                    "TETO=250", "LENTOS=3", "VOO=600", "MAXIMO=2", "fig.__clipe=api"):
+                    "TETO=250", "LENTOS=3", "VOO=600", "MAXIMO=2", "fig.__clipe=api", "'progress'", "'emptied'", "networkState", "esperados"):
         check(exigido in js, f"clipes.js precisa de {exigido}")
     check("(Math.round(t*FPS)+0.5)/FPS" in js, "clipes.js: seek quantizado ao quadro, (round(t·24)+0,5)/24")
     check("v.currentTime=" in js and js.count("currentTime=") == 1, "clipes.js: o tempo do vídeo só muda por currentTime, num lugar só")
@@ -923,6 +923,30 @@ def checar_reduzido_real():
         check(voltou and ler_clipes(ws)["ativa"] == "casa", "ao desligar o movimento reduzido, o clipe ativo (casa) recarrega em ≤ 2 s")
 
 
+def checar_evicao():
+    """Despejo pelo navegador (WebKit sob pressão de memória, simulado por removeAttribute('src')+load() de fora): depois de
+    .viva, o clipe da cena ativa recarrega sozinho; despejado logo depois de receber src (antes ou logo depois dos metadados),
+    também recarrega — o 'emptied' do nosso próprio load() não é confundido com o do navegador."""
+    with chromium(390, altura=844) as ws:
+        ws.comando("Page.enable")
+        ws.comando("Page.addScriptToEvaluateOnNewDocument", source=ESPIAO)
+        navegar(ws)
+        rolar_ate(ws, "icamento", 0.4)
+        check(esperar(ws, "document.querySelector('figure.clipe[data-passo=\"icamento\"]').classList.contains('viva')", 25), "içamento .viva antes do despejo")
+        ws.avaliar(VIDEO_ICAMENTO + ".removeAttribute('src');" + VIDEO_ICAMENTO + ".load()")  # o navegador "esvaziou" o vídeo
+        voltou = esperar(ws, "(function(){var f=document.querySelector('figure.clipe[data-passo=\"icamento\"]');"
+                             "return f.classList.contains('viva')&&!!f.querySelector('video').getAttribute('src');})()", 3)
+        c = ler_clipe(ws, "icamento")
+        check(voltou, f"despejado depois de .viva, o clipe ativo recarrega e volta a .viva em ≤ 3 s (estado: {c})")
+        rolar_ate(ws, "casa", 0.4)  # despejo logo depois de o src ser atribuído
+        esperar(ws, "!!document.querySelector('figure.clipe[data-passo=\"casa\"] video').getAttribute('src')", 5)
+        ws.avaliar("(function(){var v=document.querySelector('figure.clipe[data-passo=\"casa\"] video');v.removeAttribute('src');v.load();})()")
+        voltou = esperar(ws, "document.querySelector('figure.clipe[data-passo=\"casa\"]').classList.contains('viva')", 5)
+        check(voltou, f"despejado logo depois do src, o clipe ativo recarrega e chega a .viva em ≤ 5 s (estado: {ler_clipe(ws, 'casa')})")
+        e = ler_clipes(ws)
+        check(len(e["comDados"]) <= 2 and e["erros"] == [], f"depois dos despejos: ≤ 2 vídeos com dados ({e['comDados']}) e console limpo ({e['erros']})")
+
+
 def checar_dados():
     """Economia de dados e rede lenta (F-10): o modo cenas fica, mas nenhum clipe baixa; em 3g baixa."""
     for conexao, baixa in (("{saveData:true,effectiveType:'4g'}", False), ("{saveData:false,effectiveType:'2g'}", False),
@@ -1109,6 +1133,7 @@ def main():
             checar_ficha_a_vista()
             checar_clipe_real()
             checar_reduzido_real()
+            checar_evicao()
             checar_dados()
             checar_foco()
             checar_layout()

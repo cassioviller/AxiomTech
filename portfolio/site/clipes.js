@@ -26,7 +26,7 @@ function arrumar(){
 
 figs.forEach(function(fig){
   var v=fig.querySelector('video'),cena=fig.closest('.cena')||fig,src=fig.dataset.clipe,dur=parseFloat(fig.dataset.dur)||0;
-  var alvo=-1,pedido=-1,emVoo=0,vivo=false,lentos=0,tinha=false,ligado=false,meta=false; // meta: já houve 'loadedmetadata' desde o último carregar()
+  var alvo=-1,pedido=-1,emVoo=0,vivo=false,lentos=0,tinha=false,ligado=false,esperados=0; // esperados: 'emptied' que os nossos load() ainda vão disparar
   var api={dur:dur,frozen:false,pronto:false,morto:false,perto:false,dist:dist,carregar:carregar,
     seek:function(t){api.frozen=true;alvo=quadro(Math.max(0,Math.min(dur,t)));if(ligado)arrumar();pedir();},
     descarregar:descarregar};
@@ -43,24 +43,27 @@ figs.forEach(function(fig){
   }
   function noBuffer(t){for(var i=0;i<v.buffered.length;i++)if(t>=v.buffered.start(i)&&t<=v.buffered.end(i))return true;return false;}
   function congelar(){api.morto=true;descarregar();arrumar();}            // plano B: pôster, sem mais seeks nesta figura; libera a vaga
+  function recarregar(){if(v.networkState!==0)esperados++;v.load();}    // load() só enfileira 'emptied' se havia algo (networkState ≠ EMPTY)
   function carregar(){
     if(api.pronto||api.morto||reduzir.matches)return;
     if(todas.filter(function(a){return a.pronto;}).length>=MAXIMO)return;  // trava de segurança: arrumar() já desocupou a vaga antes de chamar
-    api.pronto=true;meta=false;
-    v.setAttribute('src',src);v.preload='auto';v.load();
+    api.pronto=true;
+    v.setAttribute('src',src);v.preload='auto';recarregar();
   }
   function descarregar(){
     if(!api.pronto)return;
-    api.pronto=false;meta=false;pedido=-1;emVoo=0;viver(false);v.removeAttribute('src');v.load();
+    api.pronto=false;pedido=-1;emVoo=0;viver(false);v.removeAttribute('src');recarregar();
   }
   v.addEventListener('loadedmetadata',function(){
+    esperados=0;                                                          // todo 'emptied' nosso já chegou (ou foi descartado por um load() seguinte)
     if(!v.seekable.length||v.seekable.end(0)<dur-0.5){congelar();return;} // servidor sem Range: não dá para buscar; fica o pôster
-    meta=true;pedir();
+    pedir();
   });
   v.addEventListener('loadeddata',function(){                               // o 1º 'seeked' pode chegar sem quadro (readyState<2): agora há
     if(vivo||alvo<0)return;
     if(!emVoo&&pedido===alvo&&pedido===v.currentTime)viver(true);else pedir(); // já está no quadro pedido: só mostra; senão pedir() busca de novo
   });
+  v.addEventListener('progress',function(){if(!vivo&&alvo>=0&&!emVoo&&v.readyState>=2)pedir();}); // Safari: 'seeked' sem quadro e os dados chegam depois
   v.addEventListener('seeked',function(){
     var nosso=emVoo>0,levou=nosso?performance.now()-emVoo:0;emVoo=0;
     if(v.readyState<2){viver(false);return;}
@@ -70,10 +73,9 @@ figs.forEach(function(fig){
   });
   v.addEventListener('error',function(){congelar();});
   v.addEventListener('emptied',function(){                                  // WebKit sob pressão de memória esvazia o vídeo sozinho
-    if(v.readyState!==0)return;
-    viver(false);
-    if(!api.pronto||!(meta||v.getAttribute('src')!==src))return;            // foi o nosso descarregar() (pronto já é false) ou o load() de carregar()
-    api.pronto=false;meta=false;pedido=-1;emVoo=0;v.removeAttribute('src');arrumar(); // foi o navegador: libera a vaga (sem src, nem o WebKit recarrega sozinho) e recarrega quando voltar a estar entre os mais perto
+    if(esperados>0){esperados--;return;}                                    // este veio do nosso load() (carregar/descarregar), não é despejo
+    if(v.readyState!==0||!api.pronto)return;
+    viver(false);api.pronto=false;pedido=-1;emVoo=0;v.removeAttribute('src');arrumar(); // foi o navegador: libera a vaga (sem src, nem o WebKit recarrega sozinho) e recarrega quando voltar a estar entre os mais perto
   });
   depoisDoLoad(function(){
     new IntersectionObserver(function(es){api.perto=es[es.length-1].isIntersecting;arrumar();}, // um observer por figure, um alvo só: vale a entrada mais nova do lote
