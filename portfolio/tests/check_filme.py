@@ -231,8 +231,10 @@ def luma(arquivo):
 
 
 def quadro(mp4, n, destino):
+    destino.unlink(missing_ok=True)
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(mp4), "-vf", f"select='eq(n,{n})'", "-vframes", "1", "-update", "1",
                     str(destino)], check=True)
+    check(destino.exists(), f"{mp4.name}: não tem o quadro {n}")
 
 
 def checar_clipe(passo, tmp):
@@ -254,7 +256,8 @@ def checar_clipe(passo, tmp):
     tamanho = int(info["format"]["size"])
     check(tamanho <= 0.9 * 1024 * 1024, f"{passo}: {tamanho / 1024:.0f} KB > 0,9 MB")
     kf = quadros_chave(mp4)
-    check(kf and max(b - a for a, b in zip(kf, kf[1:])) <= 4 / FPS + 1e-3, f"{passo}: quadro-chave a cada ≤ 4 quadros")
+    check(bool(kf) and max(b - a for a, b in zip(kf, kf[1:] + [float(info["format"]["duration"])])) <= 4 / FPS + 1e-3,
+          f"{passo}: quadro-chave a cada ≤ 4 quadros (até o fim do clipe)")
     check("B" not in tipos_de_quadro(mp4), f"{passo}: sem B-frames")
     y = luma(mp4)
     check(all(40 <= a <= 235 for a, _ in y), f"{passo}: luma média fora de 40..235 em algum quadro")
@@ -262,7 +265,7 @@ def checar_clipe(passo, tmp):
     for i in range(0, len(y), FPS):
         check(sum(1 for _, d in y[i:i + FPS] if d >= 25.5) <= 3, f"{passo}: mais de 3 mudanças ≥ 10 % no segundo {i // FPS}")
     n = quadros(passo)
-    for a, b in ((0, int(round(0.3 * FPS))), (n - 1 - int(round(0.5 * FPS)), n - 1)):
+    for a, b in ((0, int(round(0.3 * FPS))), (n - int(round(0.5 * FPS)), n - 1)):
         fa, fb = tmp / f"{passo}-{a}.png", tmp / f"{passo}-{b}.png"
         quadro(mp4, a, fa)
         quadro(mp4, b, fb)

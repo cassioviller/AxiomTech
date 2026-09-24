@@ -55,10 +55,13 @@ def ffmpeg(*args):
 
 
 def psnr(a, b):
-    """PSNR médio (dB) entre duas imagens ou dois vídeos do mesmo tamanho; inf se iguais."""
-    saida = subprocess.run(["ffmpeg", "-i", str(a), "-i", str(b), "-lavfi", "psnr", "-f", "null", "-"], capture_output=True, text=True).stderr
-    m = re.search(r"average:(inf|[\d.]+)", saida)
-    return float("inf") if not m or m.group(1) == "inf" else float(m.group(1))
+    """PSNR médio (dB) entre duas imagens ou dois vídeos do mesmo tamanho; inf se iguais, 0.0 se o ffmpeg não mediu
+    (arquivo ausente ou ilegível, tamanhos diferentes): uma comparação que falhou nunca passa por igual."""
+    r = subprocess.run(["ffmpeg", "-i", str(a), "-i", str(b), "-lavfi", "psnr", "-f", "null", "-"], capture_output=True, text=True)
+    m = re.search(r"average:(inf|[\d.]+)", r.stderr)
+    if r.returncode != 0 or not m:
+        return 0.0
+    return float("inf") if m.group(1) == "inf" else float(m.group(1))
 
 
 def encode_web(mestre, destino, crf):
@@ -70,7 +73,10 @@ def encode_web(mestre, destino, crf):
 def poster(mp4, passo, destino):
     """Pôster = último quadro do clipe publicado: WebP com PSNR ≥ 40 dB em relação a ele e ≤ 60 KB (q75, senão 82, 90)."""
     png = SAIDA / f"ultimo-{passo}.png"
+    png.unlink(missing_ok=True)
     ffmpeg("-i", str(mp4), "-vf", f"select='eq(n,{quadros(passo) - 1})'", "-vframes", "1", "-update", "1", str(png))
+    if not png.exists():
+        sys.exit(f"{passo}: o clipe não tem o quadro {quadros(passo) - 1} (o último) para o pôster")
     for q in (75, 82, 90):
         ffmpeg("-i", str(png), "-c:v", "libwebp", "-quality", str(q), str(destino))
         if psnr(destino, png) >= 40 and destino.stat().st_size <= TETO_POSTER:
@@ -127,6 +133,10 @@ def ajustar_soma(crfs):
 
 
 def main():
+    if "--so" in sys.argv:  # confere o passo antes de abrir o Chromium
+        i = sys.argv.index("--so") + 1
+        if i >= len(sys.argv) or sys.argv[i] not in CLIPES:
+            sys.exit(f"--so pede um passo de CLIPES: {', '.join(CLIPES)}")
     from playwright.sync_api import sync_playwright
     passos = [sys.argv[sys.argv.index("--so") + 1]] if "--so" in sys.argv else list(CLIPES)
     SAIDA.mkdir(parents=True, exist_ok=True)
@@ -136,11 +146,18 @@ def main():
         exe = shutil.which("chromium")  # no Replit o Chromium do Playwright não roda (faltam bibliotecas): usa o do sistema
         navegador = p.chromium.launch(executable_path=exe, args=ARGS) if exe else p.chromium.launch(args=ARGS)
         pagina = navegador.new_page(viewport={"width": 1280, "height": 720})
+        erros = []  # erros de JavaScript da página: qualquer um invalida o render
+        pagina.on("pageerror", lambda e: erros.append(str(e)))
         pagina.goto((AQUI / "film.html").as_uri() + "?limpo")
         pagina.wait_for_timeout(2500)
         pagina.evaluate("PRONTO")  # texturas das cenas portadas (a planta real) carregadas
+        if erros:
+            sys.exit(f"erro de JavaScript ao carregar film.html?limpo: {'; '.join(erros)}")
         for passo in passos:
-            crfs[passo] = publicar(passo, render(pagina, passo))
+            mestre = render(pagina, passo)
+            if erros:
+                sys.exit(f"{passo}: erro de JavaScript no render: {'; '.join(erros)}")
+            crfs[passo] = publicar(passo, mestre)
         navegador.close()
     if "--so" not in sys.argv:
         ajustar_soma(crfs)
