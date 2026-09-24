@@ -143,6 +143,29 @@ st.run=function(t){
  var hookY=att?att.position.y+topo:tipW.y-2.2;hook.position.set(tipW.x,hookY,tipW.z);
  cabo.geometry.setFromPoints([tipW,new THREE.Vector3(tipW.x,hookY+.18,tipW.z)]);};
 })();"""
+CENA_ICAMENTO = """// ================= IÇAMENTO (portado da página: icamento, 8 s) =================
+// o módulo sai da carreta, sobe pelo balancim com os cabos na vertical (só tração nos olhais), anda e pousa no radier.
+// Acento: o cavalo da carreta. Sem texto. t 0..10 = 8 s: 0→0,6 s parado · 0,6→3 sobe · 3→5,4 anda · 5,4→7,2 pousa · 7,2→8 parado
+(function(){var g=new THREE.Group();S.add(g);var st={g:g};SC.push(st);
+var L=8,C=3.2,H=2.9,CH=.3,TOPO=6.5,XC=6,XR=-6;
+slab(60,40,0xB8C99A,g);box(L+2,.5,C+1.6,0xC9C2B4,XR,.25,0,g);
+box(L+1,.5,C,0x4A4E55,XC,.55,0,g);box(L+1,.4,C+.6,0x8E9AA6,XC,1,0,g);box(2.4,2.6,C+.4,ORANGE,XC+L/2+1.9,1.5,0,g);box(2.2,1,C+.2,0xBFD8E6,XC+L/2+1.9,2.5,0,g,true);
+[[XC-3,-1.6],[XC-3,1.6],[XC+1,-1.6],[XC+1,1.6],[XC+L/2+1.9,-1.8],[XC+L/2+1.9,1.8]].forEach(function(w){cyl(.5,.4,0x2B2F33,w[0],.5,w[1],g,14).rotation.x=Math.PI/2;});
+st.mod=new THREE.Group();g.add(st.mod);box(L,CH,C,0x7D8E9E,0,CH/2,0,st.mod);box(L-.1,H-CH,C-.1,0xF3ECDD,0,CH+(H-CH)/2,0,st.mod);box(L+.2,.14,C+.3,0x4A4E55,0,H+.07,0,st.mod);
+box(1.1,1.9,.06,0xC7A57A,-2.2,CH+.95,C/2,st.mod,true);box(1.4,.9,.06,0xBFD8E6,1.6,CH+1.6,C/2,st.mod,true);
+var cx=L/2-.2,cz=C/2+.05,cantos=[[-cx,-cz],[cx,-cz],[-cx,cz],[cx,cz]];
+cantos.forEach(function(c){var o=new THREE.Mesh(new THREE.TorusGeometry(.16,.05,8,20),P(0xE8B53E));o.position.set(c[0],CH+.05,c[1]);st.mod.add(o);});
+st.bal=new THREE.Group();g.add(st.bal);box(L,.25,.25,0xE8B53E,0,0,cz,st.bal);box(L,.25,.25,0xE8B53E,0,0,-cz,st.bal);box(.25,.25,C+.1,0xE8B53E,-cx,0,0,st.bal);box(.25,.25,C+.1,0xE8B53E,cx,0,0,st.bal);
+var gancho=new THREE.Mesh(new THREE.TorusGeometry(.3,.08,8,20),P(0x4A4E55));g.add(gancho);
+st.cabos=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x2a2622}));st.cabos.frustumCulled=false;g.add(st.cabos);
+tree(-14,-9,1.2,g);tree(13,-10,1,g);tree(-12,9,.9,g);tree(16,7,1.1,g);
+st.cam=[[0,[24,13,24],[6,3.5,0]],[3.3,[21,16,22],[5,6.5,0]],[6.6,[-4,17,26],[-3,6.5,0]],[10,[-23,12,23],[-6,3,0]]];
+st.run=function(t){var x=lerp(XC,XR,ramp(t,3.75,6.75)),y=t<6.75?lerp(1.2,TOPO,ramp(t,.75,3.75)):lerp(TOPO,.5,ramp(t,6.75,9));
+ st.mod.position.set(x,y,0);var bY=y+H+2.2,hY=bY+2.6,pts=[];st.bal.position.set(x,bY,0);gancho.position.set(x,hY,0);
+ cantos.forEach(function(c){pts.push(x+c[0],bY,c[1],x+c[0],y+CH+.05,c[1]);pts.push(x+c[0],bY,c[1],x,hY,0);}); // cabo vertical balancim→olhal; eslinga balancim→gancho
+ pts.push(x,hY,0,x,hY+30,0); // cabo do guindaste, para fora do quadro
+ st.cabos.geometry.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));};
+})();"""
 # Rodada 4: blocos novos do filme "limpo" (clipes de fundo da história). Cada entrada é (âncora única, texto antes, texto depois).
 INSERCOES_RODADA_4 = [
     # <style>: ?limpo esconde todo o DOM por cima do canvas (render_clipes.py)
@@ -171,6 +194,10 @@ INSERCOES_RODADA_4 = [
     # cena portada da casa (SC[9]): antes do render; as do içamento e do zip entram depois dela, com a mesma âncora
     ("// ================= render =================",
      CENA_CASA + "\n",
+     ""),
+    # cena portada do içamento (SC[10]): depois da casa, antes do render
+    ("// ================= render =================",
+     CENA_ICAMENTO + "\n",
      ""),
 ]
 
