@@ -66,6 +66,83 @@ TROCAS_RODADA_4 = [
     ("for(var r=0;r<5;r++)for(var k=0;k<7;k++)c.fillText(String(r*7+k+1),14+k*34,110+r*40);",
      "for(var r=0;r<5;r++)for(var k=0;k<7;k++)if(r*7+k<31)c.fillText(String(r*7+k+1),14+k*34,110+r*40);"),
 ]
+# Rodada 4: cenas portadas da página (SC[9], SC[10], SC[11]), coladas antes do render nesta ordem: casa → içamento → zip
+# (SC.push dá os índices). Estilo do filme: materiais por P(), um só acento ORANGE, nenhum texto pintado.
+CENA_CASA = """// ================= CASA (portada da página: casa-viaja, 10 s) =================
+// três viagens: caixa 1, caixa 2 (face de junção aberta: pórtico, viga de transferência e filme) e o telhado em kit,
+// montado no pátio pelos montadores e içado inteiro. Acento: a viga de transferência. Sem texto.
+(function(){var g=new THREE.Group();S.add(g);var st={g:g};SC.push(st);
+slab(34,30,0xB8C99A,g);box(4.2,.05,40,0x9A958D,9,.04,0,g,true);for(var i=-19;i<20;i+=3)box(.12,.06,1.4,0xF3EFE6,9,.07,i,g,true);
+[[-11,-8,1.3],[-12,4,1.1],[-8,9,1],[-6,-11,1.2],[-13,-2,.9],[3,10,1.1],[-6,10.5,.8],[14,-9,1],[14,6,1.1]].forEach(function(t){tree(t[0],t[1],t[2],g);});
+var W=6,H=2.85,D=3,PIL=.55;for(var r=0;r<3;r++)[-2.6,0,2.6].forEach(function(x){box(.24,PIL,.24,0xC9C2B4,x,PIL/2,-2.5+r*2.5,g);});
+function caixa(front){var q=new THREE.Group(),oz=front?-(D/2-.09):(D/2-.09),cz=front?(D/2-.06):-(D/2-.06);
+ box(W,.22,D,0x8E9AA6,0,.11,0,q);box(W-.03,.05,D-.03,0xC7A57A,0,.245,0,q,true);
+ box(W,H,.12,0xF3ECDD,0,.27+H/2,cz,q);box(.12,H,D,0xF3ECDD,-(W/2-.06),.27+H/2,0,q);box(.12,H,D,0xF3ECDD,W/2-.06,.27+H/2,0,q);box(W,.12,D,0xF3ECDD,0,.27+H-.06,0,q);
+ box(.18,H-.12,.18,0x7D8E9E,-(W/2-.21),.27+(H-.12)/2,oz,q);box(.18,H-.12,.18,0x7D8E9E,W/2-.21,.27+(H-.12)/2,oz,q);box(W-.24,.42,.2,ORANGE,0,.27+H-.12-.21,oz,q);
+ var dl=Math.hypot(W-.5,H-.5),da=Math.atan2(H-.5,W-.5);[1,-1].forEach(function(s){box(dl,.05,.05,0x7D8E9E,0,.27+(H-.42)/2,oz,q,true).rotation.z=s*da;});
+ var fm=new THREE.Mesh(new THREE.BoxGeometry(W-.2,H-.5,.03),new THREE.MeshStandardMaterial({color:0xE3EBF2,transparent:true,opacity:.5,roughness:.3,depthWrite:false}));
+ fm.position.set(0,.27+(H-.42)/2,oz+(front?-.14:.14));q.add(fm);q.filme=fm;
+ if(front){box(1.3,2.2,.08,0xC7A57A,-1.55,.27+1.1,D/2+.05,q);box(1.3,2.2,.08,0xC7A57A,1.55,.27+1.1,D/2+.05,q);box(2.6,.6,.08,0xF3ECDD,0,.27+2.5,D/2+.05,q);box(2.55,2.05,.02,0x3A302A,0,.27+1.05,D/2+.02,q,true);}
+ else box(1.2,1,.08,0xBFD8E6,-1.6,.27+1.5,-D/2-.05,q,true);
+ box(.08,1,1.1,0xBFD8E6,-W/2-.05,.27+1.4,0,q,true);box(.08,1,1.1,0xBFD8E6,W/2+.05,.27+1.4,0,q,true);g.add(q);return q;}
+st.c1=caixa(true);st.c2=caixa(false);
+// telhado gambrel em kit: cada peça tem a pose deitada (p0, no chão do pátio) e a pose montada (p1)
+var XQ=1.68,HQ=(3-XQ)*Math.tan(Math.PI/3),HH=HQ+XQ*Math.tan(Math.PI/6),RL=6.6;st.HH=HH;
+st.roof=new THREE.Group();g.add(st.roof);var kit=[],ni=0;
+function peca(m,p1,r1,p0,r0){m.rotation.copy(r1);var q1=m.quaternion.clone();m.rotation.copy(r0);var q0=m.quaternion.clone();m.position.copy(p1);m.quaternion.copy(q1);kit.push({m:m,p0:p0,q0:q0,p1:p1,q1:q1});st.roof.add(m);}
+function agua(x0,y0,x1,y1){var L=Math.hypot(x1-x0,y1-y0),m=new THREE.Mesh(new THREE.BoxGeometry(L,.16,RL),P(0x4A4E55));m.castShadow=m.receiveShadow=true;edge(m);
+ var ang=Math.atan2(y1-y0,x1-x0);if(ang>Math.PI/2)ang-=Math.PI;peca(m,new THREE.Vector3((x0+x1)/2,(y0+y1)/2,0),new THREE.Euler(0,0,ang),new THREE.Vector3(ni%2?.4:-.4,.08+ni*.18,0),new THREE.Euler(0,0,0));ni++;}
+[-1,1].forEach(function(s){agua(s*3.3,0,s*XQ,HQ);agua(s*XQ,HQ,0,HH);});
+var shp=new THREE.Shape();shp.moveTo(-3,0);shp.lineTo(-XQ,HQ);shp.lineTo(0,HH);shp.lineTo(XQ,HQ);shp.lineTo(3,0);shp.closePath();
+[-1,1].forEach(function(s,i){var f=new THREE.Mesh(new THREE.ExtrudeGeometry(shp,{depth:.1,bevelEnabled:false}),P(0xF3ECDD));f.castShadow=true;edge(f);
+ peca(f,new THREE.Vector3(0,0,s*2.95-.05),new THREE.Euler(0,0,0),new THREE.Vector3(-HH/2,.9+i*.12,0),new THREE.Euler(0,Math.PI/2,-Math.PI/2,'ZYX'));});
+function montar(k){kit.forEach(function(p,i){var ki=ease(k*1.6-i*.12);p.m.position.lerpVectors(p.p0,p.p1,ki);p.m.quaternion.copy(p.q0).slerp(p.q1,ki);});}
+// caminhão (cabine para +z: entra e sai de frente) e guindaste articulado
+st.truck=new THREE.Group();g.add(st.truck);box(7.4,.5,2.6,0xDCD5C6,-.6,1.05,0,st.truck);box(2,2.2,2.5,0x8E9AA6,3.9,1.9,0,st.truck);box(1.9,.9,2.3,0xBFD8E6,3.95,2.7,0,st.truck,true);
+[[-3.2,-1.2],[-3.2,1.2],[-1.6,-1.2],[-1.6,1.2],[3.5,-1.2],[3.5,1.2]].forEach(function(w){cyl(.55,.5,0x2B2F33,w[0],.55,w[1],st.truck,14).rotation.z=Math.PI/2;});st.truck.rotation.y=-Math.PI/2;
+var crane=new THREE.Group();crane.position.set(5.5,0,-6.5);g.add(crane);box(4.6,.9,2.4,0xE8B53E,0,.95,0,crane);
+[[-1.5,-1.3],[-1.5,1.3],[1.5,-1.3],[1.5,1.3]].forEach(function(w){cyl(.6,.6,0x2B2F33,w[0],.6,w[1],crane,14).rotation.z=Math.PI/2;});
+[[-2.2,-1.5],[-2.2,1.5],[2.2,-1.5],[2.2,1.5]].forEach(function(o){box(.3,.3,1.3,0xB88A2E,o[0],.55,o[1]*.8,crane);cyl(.12,.7,0x7D8E9E,o[0],.35,o[1]*1.2,crane,8);});
+var turret=new THREE.Group();turret.position.set(-.6,1.4,0);crane.add(turret);box(2.4,.9,1.9,0xB88A2E,0,.45,0,turret);box(1.2,1.1,1.4,0xE8B53E,-1.2,.55,.9,turret);
+var pivot=new THREE.Group();pivot.position.set(.6,.8,0);turret.add(pivot);var L=11.5;box(L,.5,.5,0xE8B53E,L/2,0,0,pivot);box(L*.5,.36,.36,0xB88A2E,L*.9,0,0,pivot);
+var tip=new THREE.Object3D();tip.position.set(L,0,0);pivot.add(tip);
+var cabo=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:0x2a2622}));cabo.frustumCulled=false;g.add(cabo);
+var hook=box(.5,.35,.5,0xB88A2E,0,0,0,g);
+function boneco(x,z,ry){var q=new THREE.Group();cyl(.14,.75,0x6F8FA8,0,.375,0,q,8);box(.5,.6,.3,0xE3C46A,0,1.05,0,q);var h=new THREE.Mesh(new THREE.SphereGeometry(.17,10,8),P(0xE0B294));h.position.y=1.52;h.castShadow=true;q.add(h);cyl(.2,.12,0xE8B53E,0,1.66,0,q,8);q.position.set(x,0,z);q.rotation.y=ry;q.visible=false;g.add(q);return q;}
+var YARD=new THREE.Vector3(3,0,-11.5),TOP=new THREE.Vector3(0,PIL+.27+H,0),BED=new THREE.Vector3(9,1.3,-.6);
+var gente=[boneco(-.4,-10.6,Math.PI/2),boneco(6.8,-14,-Math.PI/2),boneco(3.6,-15,0)];
+var TG={truck:new THREE.Vector3(9,0,0),site1:new THREE.Vector3(0,0,1.5),site2:new THREE.Vector3(0,0,-1.5),mid:new THREE.Vector3(0,0,0)};
+var cur=new THREE.Vector3(9,0,0),wp=new THREE.Vector3(),tipW=new THREE.Vector3();
+// mira do guindaste: o pivô gira com a torre (ponto fixo); parte de 0 e itera 5 vezes, para renderCena(9,t) ser puro em t
+function aimBoom(target){turret.rotation.y=0;for(var k=0;k<5;k++){g.updateMatrixWorld(true);pivot.getWorldPosition(wp);var dx=target.x-wp.x,dz=target.z-wp.z,d=Math.hypot(dx,dz);turret.rotation.y=Math.atan2(-dz,dx);}pivot.rotation.z=Math.acos(Math.min(.98,d/L));}
+function icar(t,t0,t1,bx,fr,to,restY,r0,r1,hy){var a=ramp(t,t0,t0+(t1-t0)*.3),b=ramp(t,t0+(t1-t0)*.3,t0+(t1-t0)*.7),c=ramp(t,t0+(t1-t0)*.7,t1);
+ var x=lerp(fr.x,to.x,b),z=lerp(fr.z,to.z,b),y=c>0?lerp(hy,restY,c):lerp(fr.y,hy,a);bx.position.set(x,y,z);bx.rotation.y=lerp(r0,r1,b);cur.set(x,0,z);return bx;}
+st.cam=[[0,[21.2,9,28.4],[3,2,-1]],[2.5,[22,9.5,18.5],[4,2.5,-.5]],[5,[25,15,-10],[3,3,-2]],[7.5,[21.8,16,-23.2],[2,2.5,-7]],[10,[32,16,12],[3,2,-6]]];
+st.run=function(t){
+ // caminhão: da névoa (z −16) ao ponto de descarga (z 0) e de volta, três vezes
+ var tz;if(t<.8)tz=lerp(-16,0,ramp(t,.2,.8));else if(t<3)tz=0;else if(t<3.6)tz=lerp(0,16,ramp(t,3,3.6));else if(t<4.2)tz=lerp(-16,0,ramp(t,3.6,4.2));
+ else if(t<6.2)tz=0;else if(t<6.8)tz=lerp(0,16,ramp(t,6.2,6.8));else if(t<7.4)tz=lerp(-16,0,ramp(t,6.8,7.4));else if(t<8.8)tz=0;else tz=lerp(0,16,ramp(t,8.8,9.4));
+ st.truck.position.set(9,0,tz);
+ var att=null,topo=0;function naCarroceria(o,ry){o.position.set(BED.x,BED.y,tz+BED.z);o.rotation.y=ry;}
+ function filme(c,a,b){c.filme.material.opacity=.5*(1-ramp(t,a,b));c.filme.visible=c.filme.material.opacity>.01;}
+ if(t<.8)naCarroceria(st.c1,-Math.PI/2);else if(t<3){att=icar(t,.8,3,st.c1,BED,TG.site1,PIL,-Math.PI/2,0,7.2);topo=3.4;}else{st.c1.position.set(0,PIL,1.5);st.c1.rotation.y=0;}
+ filme(st.c1,3,3.4);
+ st.c2.visible=t>=3.6;
+ if(st.c2.visible){if(t<4.2)naCarroceria(st.c2,Math.PI/2);else if(t<6.2){att=icar(t,4.2,6.2,st.c2,BED,TG.site2,PIL,Math.PI/2,0,7.2);topo=3.4;}else{st.c2.position.set(0,PIL,-1.5);st.c2.rotation.y=0;}}
+ filme(st.c2,6.2,6.6);
+ st.roof.visible=t>=6.8;
+ if(t<7.4){naCarroceria(st.roof,0);montar(0);}
+ else if(t<7.8){att=icar(t,7.4,7.8,st.roof,BED,YARD,0,0,0,5.5);topo=1.2;montar(0);}
+ else if(t<8.8){st.roof.position.copy(YARD);montar(ramp(t,7.85,8.75));}
+ else if(t<9.8){att=icar(t,8.8,9.8,st.roof,YARD,TOP,TOP.y,0,0,5.4);topo=HH+.3;montar(1);}
+ else{st.roof.position.copy(TOP);montar(1);}
+ var mexida=ramp(t,7.8,7.95)*(1-ramp(t,8.75,8.85));
+ gente.forEach(function(q,i){q.visible=t>=7.4;var ph=t*18+i*2;q.position.y=mexida*.12*Math.abs(Math.sin(ph));q.rotation.z=mexida*.08*Math.sin(ph*.7);});
+ aimBoom(att?cur:(t<.8?TG.truck:t<3.6?TG.site1:t<4.2?TG.truck:t<6.8?TG.site2:t<7.4?TG.truck:t<8.8?YARD:TG.mid));
+ g.updateMatrixWorld(true);tip.getWorldPosition(tipW);
+ var hookY=att?att.position.y+topo:tipW.y-2.2;hook.position.set(tipW.x,hookY,tipW.z);
+ cabo.geometry.setFromPoints([tipW,new THREE.Vector3(tipW.x,hookY+.18,tipW.z)]);};
+})();"""
 # Rodada 4: blocos novos do filme "limpo" (clipes de fundo da história). Cada entrada é (âncora única, texto antes, texto depois).
 INSERCOES_RODADA_4 = [
     # <style>: ?limpo esconde todo o DOM por cima do canvas (render_clipes.py)
@@ -91,6 +168,10 @@ INSERCOES_RODADA_4 = [
     ("renderAt(0);",
      "",
      "\nwindow.PRONTO=Promise.all(PRONTOS);"),
+    # cena portada da casa (SC[9]): antes do render; as do içamento e do zip entram depois dela, com a mesma âncora
+    ("// ================= render =================",
+     CENA_CASA + "\n",
+     ""),
 ]
 
 

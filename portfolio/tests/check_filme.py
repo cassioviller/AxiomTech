@@ -166,6 +166,78 @@ def checar_limpo(filme):
     check("var ORDER=[5,0,1,6,3,7,8,2,4]" in filme and "window.renderAt=function(T)" in filme, "film.html: o trailer não muda")
 
 
+PORTADAS = {"casa": "// ================= CASA (portada da página: casa-viaja, 10 s) =================",
+            "icamento": "// ================= IÇAMENTO (portado da página: icamento, 8 s) =================",
+            "zip": "// ================= 36 MINUTOS (portado da página: 36min, 10 s) ================="}
+
+
+def bloco_portado(filme, passo):
+    ini = filme.find(PORTADAS[passo])
+    if ini < 0:
+        return ""
+    fim = filme.find("// =================", ini + len(PORTADAS[passo]))
+    return filme[ini:fim if fim > 0 else len(filme)]
+
+
+def checar_portadas(filme, passos):
+    """Estilo do filme nas cenas portadas: sem stage(), materiais por P() (exceto o filme translúcido e a textura da planta),
+    um só acento ORANGE (+ a linha de cota no zip), nenhum texto pintado (F-18)."""
+    for passo in passos:
+        b = bloco_portado(filme, passo)
+        check(b, f"film.html: falta o bloco {PORTADAS[passo]!r}")
+        if not b:
+            continue
+        for proibido in ("stage(", "fillText", "SUBS", "LEG", "tex("):
+            check(proibido not in b, f"cena portada {passo}: sem {proibido} (nenhum texto pintado, nada do maquetes.js)")
+        for m in re.finditer(r"new THREE\.MeshStandardMaterial\(\{([^}]*)\}", b):
+            check("transparent:true" in m.group(1) or "map:" in m.group(1),
+                  f"cena portada {passo}: materiais por P(); só o filme translúcido e a textura da planta são MeshStandardMaterial")
+        check(b.count("ORANGE") == (2 if passo == "zip" else 1), f"cena portada {passo}: exatamente 1 acento ORANGE (+ a linha de cota no zip)")
+        check(re.search(r"0xE0622A", b, re.I) is None, f"cena portada {passo}: o laranja só entra como ORANGE")
+
+
+LEITURAS = {  # expressão avaliada no film.html?limpo → valor esperado (F-18: as cenas portadas preservam o conteúdo)
+    "casa": ("(function(){var st=SC[9],r=[];[.8,4.2,7.4].forEach(function(t){renderCena(9,t);var p=st.truck.position.clone().project(cam);"
+             "r.push(Math.abs(p.x)<1&&Math.abs(p.y)<1&&Math.abs(st.truck.position.z)<.05);});renderCena(9,9.8);"
+             "var q=st.roof.position.clone().project(cam);r.push(Math.abs(st.roof.position.y-3.67)<.05&&Math.abs(q.x)<1&&Math.abs(q.y)<1);return r;})()",
+             [True, True, True, True]),
+    "icamento": ("(function(){var st=SC[10];renderCena(10,5);var a=st.cabos.geometry.attributes.position.array,n=0;"
+                 "for(var i=0;i<a.length;i+=6){if(Math.abs(a[i]-a[i+3])<1e-6&&Math.abs(a[i+2]-a[i+5])<1e-6&&Math.abs(a[i+1]-a[i+4])<10)n++;}"
+                 "return [n,st.mod.position.y>3];})()", [4, True]),
+    "zip": ("(function(){var st=SC[11],f=function(){return Math.round(((1-(((st.mm.rotation.z/(2*Math.PI))%1)+1)%1)%1)*60)%60;};"
+            "renderCena(11,1.2);var a=f();renderCena(11,8);var b=f();return [a,b,!!st.walls&&st.walls.count>100];})()", [35, 11, True]),
+}
+
+
+def checar_cenas_portadas(passos):
+    """Com o Chromium (SwiftShader) no film.html?limpo: a classe .limpo esconde a legenda; cada cena portada existe e responde a renderCena."""
+    import shutil
+    from playwright.sync_api import sync_playwright
+    from render_clipes import ARGS
+    erros = []
+    with sync_playwright() as p:
+        exe = shutil.which("chromium")
+        nav = p.chromium.launch(executable_path=exe, args=ARGS) if exe else p.chromium.launch(args=ARGS)
+        pg = nav.new_page(viewport={"width": 1280, "height": 720})
+        pg.on("pageerror", lambda e: erros.append(str(e)))
+        pg.goto(FILME.as_uri() + "?limpo")
+        pg.wait_for_timeout(2000)
+        pg.evaluate("PRONTO")
+        check(pg.evaluate("document.documentElement.classList.contains('limpo')"), "?limpo não ligou a classe .limpo")
+        check(pg.evaluate("getComputedStyle(document.getElementById('cap')).display") == "none", ".limpo não escondeu a legenda")
+        for passo in passos:
+            idx = CLIPES[passo][0]
+            check(pg.evaluate(f"!!SC[{idx}]"), f"SC[{idx}] ({passo}) não existe")
+            if pg.evaluate(f"!!SC[{idx}]"):
+                exp, esperado = LEITURAS[passo]
+                achado = pg.evaluate(exp)
+                check(achado == esperado, f"cena portada {passo}: conteúdo {achado} ≠ {esperado}")
+        if set(passos) == set(PORTADAS):
+            check(pg.evaluate("SC.length") == 12, "SC deve ter 12 cenas (9 do filme + 3 portadas)")
+        nav.close()
+    check(not erros, f"erros de JS no film.html?limpo: {erros}")
+
+
 def checar_reproducao():
     """corrigir_filme.py aplicado ao film.html do zip reproduz o film.html commitado, byte a byte (F-02)."""
     if not ZIP.exists():
@@ -292,6 +364,10 @@ def main():
         filme = FILME.read_text(encoding="utf-8")
         checar_texto(filme, (SITE / "portfolio.html").read_text(encoding="utf-8"), (SITE / "index.html").read_text(encoding="utf-8"))
         checar_limpo(filme)
+        if "--cenas" in sys.argv:
+            passos = [a for a in sys.argv[sys.argv.index("--cenas") + 1:] if not a.startswith("--")] or list(PORTADAS)
+            checar_portadas(filme, passos)
+            checar_cenas_portadas(passos)
         checar_reproducao()
     if "--video" in sys.argv:
         passos = [a for a in sys.argv[sys.argv.index("--video") + 1:] if not a.startswith("--")]
