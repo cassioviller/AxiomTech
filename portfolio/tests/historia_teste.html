@@ -6,7 +6,7 @@
 <style>html,body{margin:0}#f{position:absolute;top:0;left:0;width:100%;height:800px;border:0}#resultado{position:absolute;top:820px;left:0;margin:0}</style>
 </head>
 <body>
-<iframe id="f" src="../site/index.html" title="História"></iframe>
+<iframe id="f" src="../site/index.html?clipes=nao" title="História"></iframe>
 <pre id="resultado">rodando</pre>
 <script>
 // Harness do Chromium headless: rola o iframe cena a cena e registra o estado em #resultado.
@@ -19,12 +19,12 @@ function log(s){saida.push(s);}
 function espera(ms){return new Promise(function(r){setTimeout(r,ms);});}
 function centralizar(w,el,fracao){var r=el.getBoundingClientRect();w.scrollTo(0,Math.round(r.top+w.scrollY+r.height*fracao-w.innerHeight/2));}
 function posicionarTopo(w,el,fracao){var r=el.getBoundingClientRect();w.scrollTo(0,Math.round(r.top+w.scrollY-w.innerHeight*fracao));}
-function maquetesVisiveis(d){return [].filter.call(d.querySelectorAll('.palco .maquete'),function(m){return !m.hidden;}).map(function(m){return m.dataset.passo;}).join(',')||'-';}
-function tempo(m){var t=m.__maquete&&m.__maquete.t;return typeof t==='number'?t.toFixed(1):'null';}
+function clipesVisiveis(d){return [].filter.call(d.querySelectorAll('.palco .clipe'),function(m){return !m.hidden;}).map(function(m){return m.dataset.passo;}).join(',')||'-';}
+function tempo(m){var t=m.__clipe&&m.__clipe.t;return typeof t==='number'?t.toFixed(1):'null';}
 f.addEventListener('load',function(){
   var w=f.contentWindow,d=f.contentDocument;
-  // maquete falsa: com --disable-3d-apis o maquetes.js desiste e a API real nunca aparece
-  [].forEach.call(d.querySelectorAll('figure.maquete'),function(m){m.__maquete={dur:1000,t:null,seek:function(x){this.t=x;}};});
+  // clipe falso: com ?clipes=nao o clipes.js não carrega vídeo; o harness responde a seek() e guarda t
+  [].forEach.call(d.querySelectorAll('figure.clipe'),function(m){m.__clipe={dur:1000,t:null,seek:function(x){this.t=x;}};});
   (async function(){
     await espera(800);
     var H=w.Historia||{};
@@ -41,10 +41,10 @@ f.addEventListener('load',function(){
       centralizar(w,c,.5);await espera(1000);
       if(parar===p)return;
       var fa=d.querySelector('.palco .fundo.ativo');
-      log('cena '+p+' ativa='+H.ativa+' fundo='+(fa?fa.dataset.passo:'nenhum')+' maquetes='+maquetesVisiveis(d));
+      log('cena '+p+' ativa='+H.ativa+' fundo='+(fa?fa.dataset.passo:'nenhum')+' clipes='+clipesVisiveis(d));
       var rc=d.querySelectorAll('.regua [aria-current="step"]');
       log('regua '+p+'='+(rc[0]?rc[0].getAttribute('href'):'-')+' n='+rc.length+' data='+d.querySelector('.regua-data').textContent);
-      var m=d.querySelector('figure.maquete[data-passo="'+p+'"]');
+      var m=d.querySelector('figure.clipe[data-passo="'+p+'"]');
       if(m){
         log('img '+p+'='+w.getComputedStyle(m.querySelector('img')).visibility);
         log('seek '+p+'='+tempo(m));
@@ -59,18 +59,18 @@ f.addEventListener('load',function(){
     posicionarTopo(w,seguinte,.95);await espera(500);
     log('reversao-95 ativa='+H.ativa);
     // three.js que só chega depois de 1 s de rolagem contínua: a maquete ainda precisa ser sincronizada (e congelada)
-    var mz=d.querySelector('figure.maquete[data-passo="zip"]');
+    var mz=d.querySelector('figure.clipe[data-passo="zip"]');
     if(mz){
-      delete mz.__maquete;
+      delete mz.__clipe;
       centralizar(w,d.getElementById('zip'),.3);await espera(300);
       for(var k=0;k<30;k++){w.scrollBy(0,2);await espera(33);}
       await espera(300);
-      mz.__maquete={dur:1000,t:null,seek:function(x){this.t=x;}};
+      mz.__clipe={dur:1000,t:null,seek:function(x){this.t=x;}};
       await espera(1000);
       log('seek-tardio zip='+tempo(mz));
     }
     centralizar(w,cenas[0],.5);await espera(1000);
-    log('salto ativa='+H.ativa+' maquetes='+maquetesVisiveis(d));
+    log('salto ativa='+H.ativa+' clipes='+clipesVisiveis(d));
     // salto pela régua: o foco vai para o título do capítulo, que fica abaixo da barra
     var marco=d.querySelector('.regua a[href="#veks"]');
     if(marco){marco.click();await espera(900);}

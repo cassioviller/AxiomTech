@@ -23,6 +23,10 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]  # portfolio/
+sys.path.insert(0, str(ROOT / "filme"))
+from render_clipes import CLIPES  # noqa: E402  (mapa capítulo → cena → trecho: a fonte da verdade)
+
+LONGAS = {"casa", "icamento", "zip"}  # capítulos de 200 svh (10 s, 10 s e 8 s de clipe, mas com mais a dizer)
 SITE = ROOT / "site"
 PAGINA = SITE / "index.html"
 PORTFOLIO = SITE / "portfolio.html"
@@ -31,7 +35,7 @@ FALHAS = []
 
 def cap(passo, tag, data, frase, ressalva, fundo, caso):
     """data: None ou (texto visível, [datetime, ...]); fundo: None, ("img", arquivo, largura, altura),
-    ("ano", texto) ou ("maquete", cena 3D, arquivo reserva, largura, altura); caso: None ou (âncora, texto do link)."""
+    ("ano", texto) ou ("clipe", duração em s); caso: None ou (âncora, texto do link)."""
     return {"passo": passo, "tag": tag, "data": data, "frase": frase, "ressalva": ressalva, "fundo": fundo, "caso": caso}
 
 
@@ -43,7 +47,7 @@ ROTEIRO = [
     cap("origem", "h2", ("2017 → 2024", ["2017", "2024"]),
         "Comecei pela contabilidade, não pela obra.",
         "Escritório contábil da família desde 2017; na UNIFEI, fiscal do DCE em 2022 e diretor de vendas da InLoco Jr. de 2023 a 2024.",
-        ("ano", "2017"), ("curriculo", "Ver no currículo: contabilidade e UNIFEI →")),
+        ("clipe", 8), ("curriculo", "Ver no currículo: contabilidade e UNIFEI →")),
     cap("mudanca", "h2", ("2025", ["2025"]),
         "Em 2025, mudei de cidade e de curso.",
         "Cruzeiro do Sul (EAD), morando em São José dos Campos: hoje no 7º semestre, faltam 3. Sistemas de Informação na PUC, em paralelo.",
@@ -51,19 +55,19 @@ ROTEIRO = [
     cap("obra", "h2", ("fev/2025 → mar/2026", ["2025-02", "2026-03"]),
         "Mas na obra, vi a mesma informação digitada cinco vezes.",
         "V Alves (gerente de produção, CLT meio período) e Estruturas do Vale (estágio, meio período), em paralelo. No estágio nasceu o SIGE.",
-        ("ano", "5×"), ("curriculo", "Ver no currículo: V Alves e Estruturas do Vale →")),
+        ("clipe", 8), ("curriculo", "Ver no currículo: V Alves e Estruturas do Vale →")),
     cap("veks", "h2", ("mar/2026 → set/2026", ["2026-03", "2026-09"]),
         "Em março de 2026, entrei na VEKS Engenharia.",
         "PJ, contrato de 6 meses cumprido até o fim; a V Alves, em meio período, seguiu até julho.",
-        ("ano", "2026"), ("obra", "Ver o caso completo: obras na VEKS →")),
+        ("clipe", 8), ("obra", "Ver o caso completo: obras na VEKS →")),
     cap("ferramentas", "h2", ("mar → abr/2026", ["2026-03", "2026-04"]),
         "Toda conta repetida virou ferramenta.",
         "Nos primeiros meses na VEKS: a calculadora de parede em LSF e drywall e o classificador do fluxo de caixa.",
-        ("ano", "3ª"), ("ferramentas", "Ver as ferramentas: calculadora e classificador →")),
+        ("clipe", 8), ("ferramentas", "Ver as ferramentas: calculadora e classificador →")),
     cap("sige", "h2", ("mai → set/2026", ["2026-05", "2026-09"]),
         "De maio a setembro, o SIGE ganhou versão nova.",
         "Cerca de 50 módulos em 6 áreas, entregas registradas de 22/07 a 14/09/2026; código escrito com assistente de IA, sob a minha direção.",
-        ("img", "c-aprovacao.webp", 1100, 467), ("sige", "Ver o caso completo: SIGE →")),
+        ("clipe", 8), ("sige", "Ver o caso completo: SIGE →")),
     cap("galpoes", "h2", ("jun/2026", ["2026-06-08"]),
         "Em junho, começou a obra que testaria o SIGE.",
         "Dois galpões e 22 baias numa fazenda, em Light Steel Frame: a obra real do portal do cliente e do diário.",
@@ -71,7 +75,7 @@ ROTEIRO = [
     cap("escala", "h2", ("jul → set/2026", ["2026-07-09", "2026-09-21"]),
         "13 obras no sistema, até R$ 24,5 milhões.",
         "11 com proposta; a menor, R$ 29 mil. A gestão de obra deste sistema ainda não rodou numa obra real.",
-        ("img", "s1.webp", 1000, 728), ("sistema", "Ver o caso completo: sistema de orçamento →")),
+        ("clipe", 8.5), ("sistema", "Ver o caso completo: sistema de orçamento →")),
     cap("precisao", "h2", ("jul → set/2026", ["2026-07-09", "2026-09-21"]),
         "Desvio máximo de 0,25% nos 19 serviços conferidos.",
         "Serviço a serviço, contra a tabela SINAPI da Caixa; acima de 1% de desvio, a importação é recusada.",
@@ -79,23 +83,23 @@ ROTEIRO = [
     cap("casa", "h2", ("ago/2026", ["2026-08"]),
         "O celeiro não cabe inteiro no caminhão.",
         "B-36, pré-dimensionado e sujeito à revisão do engenheiro responsável: duas caixas, três viagens, 37 decisões registradas.",
-        ("maquete", "casa-viaja", "m1.webp", 900, 562), ("modular", "Ver o caso completo: celeiro B-36 →")),
+        ("clipe", 10), ("modular", "Ver o caso completo: celeiro B-36 →")),
     cap("icamento", "h2", ("ago/2026", ["2026-08"]),
         "No estudo, o módulo sobe pelo balancim, cabos na vertical.",
         "Estudo 3D de agosto: com os cabos na vertical, a parede não é comprimida. Balancim de içamento e guindaste da classe certa viraram itens de regra no orçamento.",
-        ("maquete", "icamento", "m2.webp", 900, 562), ("modular", "Ver o caso completo: casas modulares →")),
+        ("clipe", 8), ("modular", "Ver o caso completo: casas modulares →")),
     cap("whatsapp", "h2", ("ago/2026", ["2026-08-11"]),
         "Depois de 11/08, o diário saiu do sistema.",
         "42 diários lançados até ali; os 23 dias seguintes ficaram só no grupo de WhatsApp, e 28 atividades prontas apareciam como atrasadas.",
-        ("img", "p-fotos.webp", 1600, 1353), ("sige", "Ver o caso completo: o diário no WhatsApp →")),
+        ("clipe", 8), ("sige", "Ver o caso completo: o diário no WhatsApp →")),
     cap("recuperado", "h2", ("set/2026", ["2026-09"]),
         "Recuperado, o diário mostrou 44,7% de avanço.",
         "Antes, 27,6%; planejado para 07/09, 60,8%. Lido numa cópia do sistema; no sistema em uso, a carga ainda não foi aplicada.",
-        ("img", "p-diario-portal.webp", 1600, 1193), ("sige", "Ver o caso completo: diários recuperados →")),
+        ("clipe", 8), ("sige", "Ver o caso completo: diários recuperados →")),
     cap("zip", "h2", ("set/2026", ["2026-09"]),
         "Em setembro, uma proposta assinável em 36 minutos.",
         "Medidos: 11:35 → 12:11, numa ampliação de unidade de saúde com 26 ambientes e 328 m². À mão, cerca de 2 dias úteis (estimativa).",
-        ("maquete", "36min", "upa-plan-grey.webp", 1400, 440), ("orcamento", "Ver o caso completo: 36 minutos →")),
+        ("clipe", 10), ("orcamento", "Ver o caso completo: 36 minutos →")),
     cap("metodo", "h2", None,
         "Construí o jeito de o número não sumir.",
         "De 2017 a 2026: contabilidade, obra e sistemas. Idealizei e dirigi; o código foi escrito com assistentes de IA, e as regras e a revisão são minhas.",
@@ -180,32 +184,47 @@ def checar_fundo(passo, i, fundo, miolo):
         return
     fa, fmiolo = atributos(figs[0][0]), figs[0][1]
     tipo = fundo[0]
-    classe = {"img": "fundo", "ano": "fundo tipo", "maquete": "fundo maquete"}[tipo]
+    classe = {"img": "fundo", "ano": "fundo tipo", "clipe": "fundo clipe"}[tipo]
     check(fa.get("class") == classe, f"cena {passo}: classe da figura {fa.get('class')!r}, esperava {classe!r}")
     check(fa.get("aria-hidden") == "true", f"cena {passo}: figura de fundo sem aria-hidden=\"true\"")
     check(fa.get("data-passo") == passo, f"cena {passo}: figura com data-passo {fa.get('data-passo')!r}")
-    check(fa.get("data-cena") == (fundo[1] if tipo == "maquete" else None), f"cena {passo}: data-cena {fa.get('data-cena')!r}")
+    check("data-cena" not in fa, f"cena {passo}: data-cena {fa.get('data-cena')!r} não entra mais na figura")
     check(not re.search(r"<(a|button|input|select|textarea)\b", fmiolo), f"cena {passo}: nada focável dentro da figura aria-hidden")
     if tipo == "ano":
         check(f'<span class="ano">{fundo[1]}</span>' in fmiolo and "<img" not in fmiolo,
               f"cena {passo}: fundo tipográfico deve ser só <span class=\"ano\">{fundo[1]}</span>")
         return
-    arquivo, largura, altura = (fundo[1], fundo[2], fundo[3]) if tipo == "img" else (fundo[2], fundo[3], fundo[4])
+    check(limpo(fmiolo) == "", f"cena {passo}: nenhum nó de texto dentro da figura (só o .ano dos fundos tipográficos)")
+    if tipo == "img":
+        arquivo, largura, altura, src = fundo[1], fundo[2], fundo[3], f"img/{fundo[1]}"
+    else:
+        dur = fundo[1]
+        arquivo, largura, altura, src = f"cena-{passo}.webp", 960, 540, f"video/cena-{passo}.webp"
+        check(fa.get("data-dur") == f"{dur:g}" and fa.get("data-clipe") == f"video/cena-{passo}.mp4",
+              f"cena {passo}: figure de clipe com data-dur=\"{dur:g}\" e data-clipe=\"video/cena-{passo}.mp4\"")
+        check(CLIPES.get(passo, (0, 0, 0, None))[3] == dur, f"cena {passo}: duração {dur} ≠ CLIPES de render_clipes.py")
+        v = re.search(r"<video ([^>]*)></video>", fmiolo)
+        check(v is not None and v.group(1) == 'muted playsinline preload="none" disableremoteplayback width="960" height="540"',
+              f"cena {passo}: <video muted playsinline preload=\"none\" disableremoteplayback width=\"960\" height=\"540\"></video>, nada mais")
+        for proibido in ("<canvas", "<source", "<track", 'class="hud"', "data-relogio", "data-legenda", "title=", "tabindex"):
+            check(proibido not in fmiolo, f"cena {passo}: {proibido} não entra na figura de clipe")
+        mp4 = SITE / "video" / f"cena-{passo}.mp4"
+        if mp4.exists():
+            real = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(mp4)],
+                                        capture_output=True, text=True, check=True).stdout)
+            check(abs(real - dur) <= 0.05, f"cena {passo}: data-dur {dur} ≠ duração real {real:.3f} s")
     imgs = re.findall(r"<img ([^>]*)>", fmiolo)
     check(len(imgs) == 1, f"cena {passo}: esperava 1 <img> na figura")
     if imgs:
         ia = atributos(imgs[0])
-        check(ia.get("src") == f"img/{arquivo}", f"cena {passo}: imagem {ia.get('src')!r}, esperava img/{arquivo}")
-        check((SITE / "img" / arquivo).exists(), f"cena {passo}: img/{arquivo} não existe")
+        check(ia.get("src") == src, f"cena {passo}: imagem {ia.get('src')!r}, esperava {src}")
+        check((SITE / src).exists(), f"cena {passo}: {src} não existe")
         check(ia.get("alt") == "", f"cena {passo}: imagem decorativa precisa de alt=\"\"")
         check(ia.get("width") == str(largura) and ia.get("height") == str(altura), f"cena {passo}: width/height devem ser {largura}×{altura}")
         if i == 1:
             check(ia.get("fetchpriority") == "high" and "loading" not in ia, "cena 1: imagem com fetchpriority=\"high\" e sem loading")
         else:
             check(ia.get("loading") == "lazy" and "fetchpriority" not in ia, f"cena {passo}: imagem com loading=\"lazy\" e sem fetchpriority")
-    if tipo == "maquete":
-        check("<canvas></canvas>" in fmiolo, f"cena {passo}: maquete sem <canvas>")
-        check("<b data-relogio></b>" in fmiolo and "<span data-legenda></span>" in fmiolo, f"cena {passo}: maquete sem HUD")
 
 
 def checar_marcacao(pagina, portfolio):
@@ -217,8 +236,8 @@ def checar_marcacao(pagina, portfolio):
         classes, ident, passo_html, miolo = achado
         passo = c["passo"]
         check(ident == passo and passo_html == passo, f"cena {i}: id/data-passo {ident!r}/{passo_html!r}, esperava {passo!r}")
-        longa = c["fundo"] is not None and c["fundo"][0] == "maquete"
-        check((classes == "cena longa") == longa, f"cena {passo}: a classe 'longa' vai só nas cenas de maquete")
+        longa = passo in LONGAS
+        check((classes == "cena longa") == longa, f"cena {passo}: a classe 'longa' vai só em casa, icamento e zip")
         m = re.search(r'<(h[12]) class="frase" tabindex="-1">(.*?)</\1>', miolo, re.S)
         check(m is not None and m.group(1) == c["tag"], f"cena {passo}: a frase deve ser <{c['tag']} class=\"frase\" tabindex=\"-1\">")
         if m:
@@ -246,6 +265,15 @@ def checar_marcacao(pagina, portfolio):
             check(nome not in nomes_caso, f"cena {passo}: nome de link repetido {nome!r}")
             nomes_caso[nome] = ancora
         checar_fundo(passo, i, c["fundo"], miolo)
+    clipes = {c["passo"]: c["fundo"][1] for c in ROTEIRO if c["fundo"] and c["fundo"][0] == "clipe"}
+    check(clipes == {p: v[3] for p, v in CLIPES.items()}, f"ROTEIRO e CLIPES divergem: {clipes} × {CLIPES}")
+    check(CLIPES["veks"][2] == CLIPES["ferramentas"][1] and CLIPES["whatsapp"][2] == CLIPES["recuperado"][1] == 3.0,
+          "cenas partilhadas: veks.t1 == ferramentas.t0 e whatsapp.t1 == recuperado.t0 == 3,0")
+    check(not {4, 5, 8} & {v[0] for v in CLIPES.values()}, "as cenas 36 min do filme (SC4), abertura (SC5) e celeiro (SC8) nunca vão à página")
+    check(all(v[1] < v[2] for v in CLIPES.values()), "cada trecho anda para a frente (t0 < t1)")
+    for proibido in ("<canvas", 'class="hud"', "data-relogio", "data-legenda", "data-cena", "<track", "<source"):
+        check(proibido not in corpo(pagina), f"index.html não tem mais {proibido}")  # só a marcação: o CSS tem --data-cena
+    check(re.search(r"<video [^>]*\bsrc=", pagina) is None, "nenhum <video> com src no HTML (o JS atribui na hora de carregar)")
     datadas = [data_iso(c["data"][1][0]) for c in ROTEIRO if c["data"]]
     check(datadas == sorted(datadas), f"capítulos fora da ordem cronológica: {datadas}")
     check('<main id="historia" class="historia">' in pagina, "falta <main id=\"historia\" class=\"historia\">")
@@ -290,6 +318,18 @@ def checar_texto(pagina, portfolio):
     check("centavo, não na parede" not in portfolio, "portfolio.html ainda abre com a frase do centavo (agora é a da contabilidade)")
 
 
+def bloco_css(css, inicio):
+    """Conteúdo de um bloco @media, contando chaves."""
+    i = css.find(inicio)
+    if i < 0:
+        return ""
+    j, n = i + len(inicio), 1
+    while j < len(css) and n:
+        n += {"{": 1, "}": -1}.get(css[j], 0)
+        j += 1
+    return css[i + len(inicio):j - 1]
+
+
 def checar_css(pagina):
     css = "\n".join(re.findall(r"<style>(.*?)</style>", pagina, re.S))
     check("dvh" not in css, "não usar dvh: a altura pula com a barra do Safari")
@@ -300,7 +340,6 @@ def checar_css(pagina):
     regra = re.search(r"\.js-historia \.historia\{([^}]*)\}", css)
     check(regra is not None and "background:var(--tinta)" in regra.group(1),
           "no modo cenas o fundo da história é tinta: sem faixa clara quando a barra do navegador recolhe (svh < lvh)")
-    check(".fundo .pausa{display:none!important}" in css, "o botão de pausa da maquete não pode ficar focável dentro do fundo aria-hidden")
     check(".cena{scroll-margin-top:9rem}" in css, "o título do capítulo não pode ficar atrás da barra ao chegar por salto")
     m = re.search(r"--scrim:\s*rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)", css)
     check(m is not None, "falta --scrim: rgba(...)")
@@ -317,15 +356,31 @@ def checar_css(pagina):
             check(cr >= 4.5, f"{var} sobre a faixa: {cr:.2f}:1 no pior caso (mín. 4,5)")
     relogio = re.search(r"--relogio:\s*#([0-9A-Fa-f]{6})", css)
     check(relogio is not None and contraste(tuple(int(relogio.group(1)[i:i + 2], 16) for i in (0, 2, 4)), fundo) >= 3.0,
-          "relógio da maquete (texto grande, negrito) sobre a faixa: mínimo 3:1 no pior caso")
-    check(re.search(r"\.hud b\{[^}]*background:var\(--scrim\)", css) is not None, "o relógio da maquete fica sobre a faixa escura")
-    check(".js-historia .palco .hud b:empty{display:none}" in css, "sem número no relógio (içamento), a faixa do relógio some")
+          "--relogio (o .ano dos fundos tipográficos) (texto grande, negrito) sobre a faixa: mínimo 3:1 no pior caso")
+    check(".fundo video{display:none}" in css, "modo empilhado: o vídeo não existe, fica a imagem")
+    pv = re.search(r"\.js-historia \.palco \.fundo video\{([^}]*)\}", css)
+    check(pv is not None and all(x in pv.group(1) for x in ("display:block", "object-fit:cover", "object-position:68% 50%", "opacity:0", "transition:opacity .4s")),
+          "modo cenas: o vídeo cobre o palco (object-fit:cover; object-position:68% 50%), começa invisível e aparece em .4s")
+    check(re.search(r"video[^{}]*\{[^}]*filter", css) is None, "sem filter em seletor com video (a paleta do filme fica como está)")
+    check(".js-historia .palco .fundo.viva video{opacity:1}" in css and ".js-historia .palco .fundo.viva img{visibility:hidden}" in css,
+          "a imagem só some (.viva) quando há quadro pronto")
+    check(re.search(r"\.js-historia \.palco \.fundo img\{[^}]*filter:brightness\(\.6\) saturate\(\.85\)", css) is not None,
+          "as fotos dos capítulos sem clipe mantêm brightness(.6) saturate(.85)")
+    reduzido = bloco_css(css, "@media (prefers-reduced-motion: reduce){")
+    check(".js-historia .palco .fundo video{display:none}" in reduzido and ".js-historia .palco .fundo.viva img{visibility:visible}" in reduzido,
+          "movimento reduzido em tempo real: o CSS esconde o vídeo e mostra a imagem sem JS")
+    larga = bloco_css(css, "@media (min-width:900px) and (orientation:landscape){")
+    check(".js-historia .cena{justify-content:flex-start}" in larga and ".js-historia .texto{max-width:min(620px,48vw);margin-left:max(24px,6vw);text-align:left}" in larga,
+          "tela larga: a faixa de texto vai para a esquerda, como no filme")
+    for sumido in (".hud", ".pausa", "canvas"):
+        check(sumido not in css, f"CSS sem {sumido}")
+    check("#E0622A" in (ROOT / "DESIGN.md").read_text(encoding="utf-8"), "DESIGN.md: a paleta dos clipes (#EFE6D6 / #1B1714 / #E0622A) fica registrada")
 
 
 def checar_scripts(pagina):
     tags = re.findall(r"<script ([^>]*)></script>", pagina)
     nomes = [atributos(t).get("src") for t in tags]
-    check(nomes == ["maquetes.js", "historia.js"], f"scripts devem ser maquetes.js e historia.js, nessa ordem; achei {nomes}")
+    check(nomes == ["clipes.js", "historia.js"], f"scripts devem ser clipes.js e historia.js, nessa ordem; achei {nomes}")
     check(all(" defer" in " " + t for t in tags), "os scripts precisam de defer")
     check("<script>" not in pagina, "sem script inline")
 
@@ -452,7 +507,7 @@ def checar_js():
     if not caminho.exists():
         return
     js = re.sub(r"//[^\n]*", "", caminho.read_text(encoding="utf-8"))  # comentários não contam
-    for proibido in ("scrollTo", "scrollBy", "scrollIntoView", "preventDefault", "'wheel'", "'touchmove'", "aria-live"):
+    for proibido in ("scrollTo", "scrollBy", "scrollIntoView", "preventDefault", "'wheel'", "'touchmove'", "aria-live", "__maquete", "'maquete'"):
         check(proibido not in js, f"historia.js não pode usar {proibido}")
     check("fps" not in js.lower() and "matar" not in js, "historia.js não duplica a guarda de desempenho do maquetes.js")
 
@@ -586,23 +641,23 @@ def navegador(largura=390, extra=("--disable-3d-apis",)):
 
 
 def checar_navegador():
-    maquetes = [c["passo"] for c in ROTEIRO if c["fundo"] and c["fundo"][0] == "maquete"]
+    clipes = [c["passo"] for c in ROTEIRO if c["fundo"] and c["fundo"][0] == "clipe"]
     normal = navegador(390)
     check("FIM" in normal, f"390 px: o harness não terminou — últimas linhas {normal[-3:]}")
-    for linha in ("reduzido=false", "js-historia=true", "overflow-x=false", "inicio ativa=tese", "salto ativa=tese maquetes=-",
+    for linha in ("reduzido=false", "js-historia=true", "overflow-x=false", "inicio ativa=tese", "salto ativa=tese clipes=-",
                   "reversao-48 ativa=casa", "reversao-95 ativa=precisao"):
         check(linha in normal, f"390 px: faltou {linha!r}")
     for c in ROTEIRO:
         passo = c["passo"]
         fundo = passo if c["fundo"] else "nenhum"
-        maq = passo if passo in maquetes else "-"
-        esperado = f"cena {passo} ativa={passo} fundo={fundo} maquetes={maq}"
+        maq = passo if passo in clipes else "-"
+        esperado = f"cena {passo} ativa={passo} fundo={fundo} clipes={maq}"
         check(esperado in normal, f"390 px: esperava {esperado!r}")
         inicio = c["data"][0].split("→")[0].strip() if c["data"] else ""
         rotulo = (inicio if re.search(r"\d", inicio) else inicio + "/" + c["data"][0].split("/")[-1].strip()) if c["data"] else "2017–2026"
         check(f"regua {passo}=#{passo} n=1 data={rotulo}" in normal,
               f"390 px: na cena {passo}, o marco ativo da régua deve ser #{passo} (e só ele), com a data {rotulo!r} à direita")
-        if passo in maquetes:
+        if passo in clipes:
             check(f"img {passo}=visible" in normal, f"390 px: sem WebGL, a imagem de reserva da cena {passo} precisa ficar visível")
     estreito = navegador(320)
     check("FIM" in estreito, "320 px: o harness não terminou")
@@ -618,38 +673,11 @@ def checar_navegador():
     check(re.search(r"^seek-tardio zip=\d", texto_normal, re.M) is not None,
           "three.js que chega depois da rolagem: a maquete precisa ser sincronizada (e congelada), sem limite de tentativas")
     check("progresso=0 0.5 1 0" in normal, "Historia.progresso fora do esperado (0 no topo, 0,5 no meio, 1 no fim, 0 sem altura)")
-    for passo in maquetes:
+    for passo in clipes:
         for chave, alvo in (("seek", 500), ("seek25", 250)):
             m = re.search(rf"^{chave} {passo}=([\d.]+)$", texto_normal, re.M)
             check(m is not None and abs(float(m.group(1)) - alvo) <= 20,
                   f"{chave} {passo}: esperava ≈{alvo} (dur 1000), achei {m.group(1) if m else 'nada'}")
-
-
-def checar_maquete_real():
-    """Com WebGL de verdade (SwiftShader): a cena do içamento monta sem erro, expõe a API e segue o scroll."""
-    espiao = ("window.__erros=[];addEventListener('error',function(e){__erros.push(String(e.message));});"
-              "var avisar=console.warn;console.warn=function(){var m=String(arguments[0]);"
-              "if(/^maquete|three\\.js/.test(m))__erros.push(m+' '+String(arguments[1]));return avisar.apply(console,arguments);};")
-    ler = ("JSON.stringify((function(){var f=document.querySelector('figure[data-cena=\"icamento\"]'),a=f&&f.__maquete;"
-           "return {api:!!a&&typeof a.frozen==='boolean',dur:a?a.dur:null,congelada:!!a&&a.frozen===true,erros:window.__erros};})())")
-    estado = {}
-    with chromium(390, ("--enable-unsafe-swiftshader",)) as ws:
-        ws.comando("Page.enable")
-        ws.comando("Page.addScriptToEvaluateOnNewDocument", source=espiao)
-        ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/site/index.html")
-        time.sleep(2)
-        ws.avaliar("(function(){var r=document.getElementById('icamento').getBoundingClientRect();"
-                   "window.scrollTo(0,scrollY+r.top+r.height*.4-innerHeight/2);})()")
-        prazo = time.time() + 25
-        while time.time() < prazo:
-            estado = json.loads(ws.avaliar(ler) or "{}")
-            if estado.get("congelada") or estado.get("erros"):
-                break
-            time.sleep(0.5)
-    check(estado.get("api") is True, f"com WebGL, a maquete do içamento precisa montar e expor a API (estado: {estado})")
-    check(estado.get("dur") == 16, f"a cena do içamento dura 16 s (achei {estado.get('dur')})")
-    check(estado.get("congelada") is True, "a maquete do içamento segue o scroll (seek congela o tempo)")
-    check(not estado.get("erros"), f"erros ao montar a maquete: {estado.get('erros')}")
 
 
 def checar_ficha_a_vista():
@@ -678,6 +706,27 @@ def checar_sem_trailer(pagina):
     check(not (SITE / "video" / "historia.mp4").exists() and not (SITE / "video" / "historia.jpg").exists(), "site/video/historia.* saem do site")
 
 
+NOTA = ('<p class="nota">As cenas ao fundo da história são dioramas em 3D feitos para este portfólio; '
+        'as telas e fotos reais estão no portfólio completo.</p>')
+
+
+def checar_nota(pagina):
+    ficha = re.search(r'<section class="ficha"[^>]*>(.*?)</section>', pagina, re.S)
+    check(ficha is not None and NOTA in ficha.group(1) and ficha.group(1).index(NOTA) > ficha.group(1).index("faltam 3 · CLT ou PJ"),
+          "a linha de crédito dos dioramas fica na ficha, depois de \"Engenharia Civil, 7º semestre…\"")
+
+
+def checar_origem(url):
+    """Na origem publicada, cada clipe tem de responder 206 a um Range (sem isso a página cai no pôster, por construção)."""
+    for passo in CLIPES:
+        req = urllib.request.Request(f"{url.rstrip('/')}/video/cena-{passo}.mp4", headers={"Range": "bytes=0-99"})
+        try:
+            with urllib.request.urlopen(req, timeout=20) as r:
+                check(r.status == 206 and "Content-Range" in r.headers, f"{url}: cena-{passo}.mp4 respondeu {r.status} a Range (esperava 206)")
+        except OSError as e:
+            check(False, f"{url}: cena-{passo}.mp4 não respondeu ({e})")
+
+
 def main():
     if "--gravar-baseline" in sys.argv:
         gravar_baseline()
@@ -693,14 +742,16 @@ def main():
         checar_curriculo(pagina)
         checar_regua(pagina)
         checar_sem_trailer(pagina)
+        checar_nota(pagina)
         checar_js()
         checar_clipes_js()
         checar_maquetes_js()
         checar_servidor()
         if "--navegador" in sys.argv:
             checar_navegador()
-            checar_maquete_real()
             checar_ficha_a_vista()
+    if "--origem" in sys.argv:
+        checar_origem(sys.argv[sys.argv.index("--origem") + 1])
     if FALHAS:
         print("FALHOU:")
         for f in FALHAS:

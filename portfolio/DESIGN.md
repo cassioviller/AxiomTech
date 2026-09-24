@@ -29,6 +29,8 @@ Tokens definidos em `:root`, com tema escuro por `prefers-color-scheme` e por `[
 
 Nas faixas azul-aço (`.case-banner`, `.savings`), o texto é `#fff`, o secundário é `#D7E1EC` e o eyebrow é `#F2B896`.
 
+- **Clipes da história** (fundo dos capítulos em `index.html`): papel `#EFE6D6`, tinta `#1B1714`, laranja `#E0622A` — a paleta do filme, tone-mapped (ACES), sem filtro por cima; o contraste do texto vem só da faixa `--scrim`.
+
 ## 3. Tipografia
 
 - **Display** — `Barlow Condensed` 500/600/700 (`--display`): `h1`–`h3`, números grandes (`.stats b`, `.timeline b`, HUD da maquete). `h1` em caixa-alta, `clamp(2.8rem,7vw,4.4rem)` no hero; `h2` `clamp(2rem,4.5vw,2.9rem)`; `h3` 1.55rem.
