@@ -73,7 +73,7 @@ figs.forEach(function(fig){
     if(v.readyState!==0)return;
     viver(false);
     if(!api.pronto||!(meta||v.getAttribute('src')!==src))return;            // foi o nosso descarregar() (pronto já é false) ou o load() de carregar()
-    api.pronto=false;meta=false;pedido=-1;emVoo=0;arrumar();                // foi o navegador: libera a vaga e recarrega quando voltar a estar entre os mais perto
+    api.pronto=false;meta=false;pedido=-1;emVoo=0;v.removeAttribute('src');arrumar(); // foi o navegador: libera a vaga (sem src, nem o WebKit recarrega sozinho) e recarrega quando voltar a estar entre os mais perto
   });
   depoisDoLoad(function(){
     new IntersectionObserver(function(es){api.perto=es[es.length-1].isIntersecting;arrumar();}, // um observer por figure, um alvo só: vale a entrada mais nova do lote
