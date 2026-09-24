@@ -567,7 +567,7 @@ def checar_maquetes_js():
 def checar_readme():
     """O README do portfólio explica o servidor com Range e como gerar os clipes (F-16)."""
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    for trecho in ("servir.py", "206", "render_clipes.py", "--origem", "clipes.js"):
+    for trecho in ("servir.py", "206", "render_clipes.py", "--origem", "clipes.js", "foco-alto", "--barra"):
         check(trecho in readme, f"README do portfólio sem {trecho!r}")
 
 

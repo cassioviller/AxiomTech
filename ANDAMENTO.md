@@ -52,3 +52,8 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Regenerar os clipes: `python3 portfolio/filme/render_clipes.py`; trailer de envio: `python3 portfolio/filme/render.py` → `portfolio/filme/saida/historia-960.mp4`.
 - Conferir tudo: `python3 portfolio/tests/check_historia.py --navegador && python3 portfolio/tests/check_filme.py --video && python3 portfolio/tests/check_site.py`.
 - Próximos passos: o merge de `historia-scrollytelling` em `main` foi feito em 24/09/2026 (fast-forward, 54 commits, branch apagado); falta: push para o GitHub; deploy estático; `python3 portfolio/tests/check_historia.py --origem <URL>` na origem publicada; teste num iPhone real; pendências do Cássio (idade, UNIFEI, estágio/júnior, trailer vertical).
+
+## Estado em 24/09/2026 — rodada 9 (ajustes dos prints e da revisão) CONCLUÍDA
+- Branch `historia-rodada-9` integrado em `main`; plano `docs/superpowers/plans/2026-09-24-historia-rodada-9-ajustes.md` (12 tarefas); changelog rodada 9.
+- Conferir tudo: `python3 portfolio/tests/check_historia.py --navegador && python3 portfolio/tests/check_filme.py --video && python3 portfolio/tests/check_filme.py --cenas && python3 portfolio/tests/check_site.py`.
+- Próximo: o plano irmão `2026-09-24-historia-cenas-novas.md` (cinco cenas novas: mudança, galpões, precisão, método, convite); depois push, deploy, `--origem`, iPhone real.

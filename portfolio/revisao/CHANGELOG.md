@@ -195,3 +195,13 @@ Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO
 - Testes: `check_filme.py --video` (texto pintado, estilo das cenas portadas, clipes: peso, GOP, pontas paradas, pôster); `check_filme.py --cenas` (conteúdo das cenas portadas no Chromium, ~20 s); `check_historia.py --navegador` (marcação e CSS dos clipes; harness; clipe real com Range e sem Range; 404; `?clipes=nao`; movimento reduzido ligado no meio; economia de dados; foco; composição; LCP/CLS/TaskDuration contra `tests/baseline.json`).
 - Em aberto: iPhone real (latência de seek, `preload` sem gesto, recorte em retrato → render 9:16 se houver "tiras"); URL do deploy para `--origem`; do Cássio: idade; UNIFEI 2020 ou 2022; estágio/júnior; versão vertical do trailer.
 - Passada pós-merge (/code-review high com as 5 personas): recarga do clipe depois de `emptied` do WebKit; re-seek em `loadeddata` quando o `seeked` chega sem quadro; `transition:none` no pôster sob movimento reduzido; `--cenas` valida os passos; `checar_portadas` confere o módulo do içamento ≤ 8 m no `film.html`; DESIGN.md e ANDAMENTO.md atualizados.
+
+---
+
+# Rodada 9 — ajustes depois dos prints e da revisão, 24/09/2026
+
+- Prints dos 17 capítulos (celular e desktop, pelo endereço público): https://claude.ai/artifact/AfNihqpe9eP2TRuNPzzrPB. Plano: `docs/superpowers/plans/2026-09-24-historia-rodada-9-ajustes.md`.
+- Página: o palco começa abaixo da barra fixa (`--barra`, medida pelo `historia.js` por `ResizeObserver`: fontes, quebra de linha, janela); foco vertical por clipe (`foco-alto` em obra, casa, whatsapp e içamento; `foco-baixo` em escala); marco tipográfico à direita na tela larga; celular deitado com a faixa à esquerda e menor.
+- `clipes.js`: despejo pelo navegador reconhecido pela conta dos `emptied` nossos (antes ou depois dos metadados); um só `emptied` nosso por `load()`; sem seek enquanto o `seekable` não está completo; a espera pelo Range morre com a carga que a criou; `progress` refaz o seek que chegou sem quadro; espera de até 1,5 s por um `seekable` completo antes de congelar; o quantizador nunca passa do último quadro (o `historia.js` deixou o `0,999`).
+- Filme: `escala` termina com as 12 miniaturas inteiras e `icamento` com o cavalo no quadro (câmeras; clipes regerados; enquadramento conferido por projeção no `--cenas`). `render_clipes.py` espera `PRONTO` com prazo.
+- `maquetes.js`: sai a cena morta do içamento. Testes: checagens que passavam sem provar foram amarradas (regra do vídeo ancorada, 404 pedido de verdade, precondições em `check`, caixas com largura), mensagens com o valor medido, `--origem` sem URL avisa, exceção de JS vira `FALHOU`.
