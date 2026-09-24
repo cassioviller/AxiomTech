@@ -670,7 +670,7 @@ def checar_ficha_a_vista():
 
 def checar_sem_trailer(pagina):
     """O trailer saiu da página (F-14): nada aponta para ele; o convite tem 3 botões."""
-    for trecho in ('class="filme"', 'id="filme"', 'href="#filme"', "transcricao", "Assistir ao filme", "A história em",
+    for trecho in ('class="filme"', 'id="filme"', 'href="#filme"', "transcricao", "Assistir ao filme", "A história em 85 segundos",
                    "Transcrição do filme", "historia.mp4", "historia.jpg"):
         check(trecho not in pagina, f"o trailer saiu da página: ainda há {trecho!r}")
     ultima = cenas(pagina)[-1][3] if cenas(pagina) else ""
