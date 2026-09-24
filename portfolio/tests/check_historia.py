@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]  # portfolio/
 sys.path.insert(0, str(ROOT / "filme"))
 from render_clipes import CLIPES  # noqa: E402  (mapa capítulo → cena → trecho: a fonte da verdade)
 
-LONGAS = {"casa", "icamento", "zip"}  # capítulos de 200 svh (10 s, 10 s e 8 s de clipe, mas com mais a dizer)
+LONGAS = {"casa", "icamento", "zip"}  # capítulos de 200 svh (10 s, 8 s e 10 s de clipe, mas com mais a dizer)
 SITE = ROOT / "site"
 PAGINA = SITE / "index.html"
 PORTFOLIO = SITE / "portfolio.html"
@@ -366,6 +366,7 @@ def checar_css(pagina):
           "a imagem só some (.viva) quando há quadro pronto")
     check(re.search(r"\.js-historia \.palco \.fundo img\{[^}]*filter:brightness\(\.6\) saturate\(\.85\)", css) is not None,
           "as fotos dos capítulos sem clipe mantêm brightness(.6) saturate(.85)")
+    check(".js-historia .palco .fundo.clipe img{filter:none;object-position:68% 50%}" in css, "o pôster do clipe fica igual ao vídeo: sem filtro e com o mesmo recorte 68% 50% (crossfade entre dois quadros iguais)")
     reduzido = bloco_css(css, "@media (prefers-reduced-motion: reduce){")
     check(".js-historia .palco .fundo video{display:none}" in reduzido and ".js-historia .palco .fundo.viva img{visibility:visible}" in reduzido,
           "movimento reduzido em tempo real: o CSS esconde o vídeo e mostra a imagem sem JS")
@@ -671,7 +672,7 @@ def checar_navegador():
         check(linha in reduzido, f"movimento reduzido: faltou {linha!r}")
     texto_normal = "\n".join(normal)
     check(re.search(r"^seek-tardio zip=\d", texto_normal, re.M) is not None,
-          "three.js que chega depois da rolagem: a maquete precisa ser sincronizada (e congelada), sem limite de tentativas")
+          "clipes.js que chega depois da rolagem: o clipe precisa ser sincronizado (e congelado), sem limite de tentativas")
     check("progresso=0 0.5 1 0" in normal, "Historia.progresso fora do esperado (0 no topo, 0,5 no meio, 1 no fim, 0 sem altura)")
     for passo in clipes:
         for chave, alvo in (("seek", 500), ("seek25", 250)):

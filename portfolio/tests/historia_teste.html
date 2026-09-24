@@ -58,7 +58,7 @@ f.addEventListener('load',function(){
     log('reversao-48 ativa='+H.ativa);
     posicionarTopo(w,seguinte,.95);await espera(500);
     log('reversao-95 ativa='+H.ativa);
-    // three.js que só chega depois de 1 s de rolagem contínua: a maquete ainda precisa ser sincronizada (e congelada)
+    // clipes.js que só chega depois de 1 s de rolagem contínua: o clipe ainda precisa ser sincronizado (e congelado)
     var mz=d.querySelector('figure.clipe[data-passo="zip"]');
     if(mz){
       delete mz.__clipe;
