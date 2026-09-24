@@ -391,6 +391,10 @@ def checar_css(pagina):
           "tela larga: a faixa de texto vai para a esquerda, como no filme")
     check(".js-historia .palco .fundo.tipo{justify-content:flex-end;padding:0 4vw 3vh 0}" in larga,
           "tela larga: o marco tipográfico (.ano) vai para a direita, longe da faixa de texto à esquerda")
+    paisagem = bloco_css(css, "@media (orientation:landscape) and (max-height:520px){")
+    check(".js-historia .texto{max-width:min(560px,54vw);margin-left:16px;text-align:left;padding:12px 16px}" in paisagem
+          and ".js-historia .frase{font-size:clamp(1.4rem,6.5vh,2.4rem);margin:0}" in paisagem,
+          "celular deitado (≤ 520 px de altura): faixa à esquerda, mais estreita e com o título menor, para o clipe continuar à mostra")
     for sumido in (".hud", ".pausa", "canvas"):
         check(sumido not in css, f"CSS sem {sumido}")
     check("#E0622A" in (ROOT / "DESIGN.md").read_text(encoding="utf-8"), "DESIGN.md: a paleta dos clipes (#EFE6D6 / #1B1714 / #E0622A) fica registrada")
@@ -1010,6 +1014,15 @@ def checar_layout():
             time.sleep(0.5)
             pos = ws.avaliar(f"getComputedStyle(document.querySelector('figure.clipe[data-passo=\"{passo}\"] video')).objectPosition")
             check(pos == esperado, f"2560×1080: object-position de {passo} é {pos!r}, esperava {esperado!r}")
+    with chromium(844, altura=390) as ws:  # celular deitado
+        navegar(ws)
+        for passo in ("sige", "icamento"):
+            rolar_ate(ws, passo, 0.5)
+            time.sleep(0.8)
+            r = json.loads(ws.avaliar(f"JSON.stringify((function(){{var r=document.querySelector('#{passo} .texto').getBoundingClientRect();"
+                                      f"return {{w:r.width,direita:r.right/innerWidth,h:r.height/innerHeight}};}})())"))
+            check(r["w"] > 0 and r["direita"] <= 0.62, f"844×390: a faixa de {passo} termina em {r['direita']:.2f} da largura (máx. 0,62; largura {r['w']:.0f})")
+            check(r["h"] <= 0.92, f"844×390: a faixa de {passo} ocupa {r['h']:.0%} da altura (máx. 92 %)")
     alturas = {}
     for largura in (390, 1280):
         with chromium(largura) as ws:  # a altura padrão (800) é a da linha de base

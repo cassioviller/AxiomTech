@@ -116,6 +116,8 @@ footer a{color:var(--ink)}
 @media (prefers-reduced-motion: reduce){.js-historia .palco .fundo,.js-historia .palco .fundo video{transition:none}.js-historia .palco .fundo video{display:none}.js-historia .palco .fundo.viva img{visibility:visible}.js-historia .palco .fundo.viva img{transition:none}}
 /* tela larga: a faixa de texto à esquerda, como no filme; o assunto do clipe fica a ~68 % da largura */
 @media (min-width:900px) and (orientation:landscape){.js-historia .cena{justify-content:flex-start}.js-historia .texto{max-width:min(620px,48vw);margin-left:max(24px,6vw);text-align:left}.js-historia .frase{margin:0}.js-historia .ressalva{margin-left:0}.js-historia .cta{justify-content:flex-start}.js-historia .palco .fundo.tipo{justify-content:flex-end;padding:0 4vw 3vh 0}}
+/* celular deitado (≤ 520 px de altura): faixa à esquerda, estreita e com o título menor, para o clipe continuar à mostra */
+@media (orientation:landscape) and (max-height:520px){.js-historia .cena{justify-content:flex-start;padding:calc(var(--barra,0px) + 12px) 16px 24px}.js-historia .texto{max-width:min(560px,54vw);margin-left:16px;text-align:left;padding:12px 16px}.js-historia .frase{font-size:clamp(1.4rem,6.5vh,2.4rem);margin:0}.js-historia .ressalva{margin:8px 0 0;font-size:.78rem}.js-historia .cta{justify-content:flex-start;margin-top:12px}.js-historia .cena.longa .texto{top:calc(var(--barra,0px) + 8px)}}
 </style>
 </head>
 <body>
