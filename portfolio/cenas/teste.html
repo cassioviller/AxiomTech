@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Cena de teste do kit</title>
+<link rel="icon" href="data:,"><!-- evita o pedido automático de /favicon.ico (viraria um "erro" de console falso) -->
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"../site/vendor/three.module.js"}}</script>
+</head><body>
+<script type="module">
+// cena mínima do kit: piso, parede ao fundo (canto parede-piso em z = -2) e um cubo; câmera parada
+import {THREE, criarPalco, material, trajeto, publicar} from './kit.js';
+const palco = criarPalco();
+const {cena} = palco;
+const piso = new THREE.Mesh(new THREE.BoxGeometry(12, .2, 8), material('concreto', {repetir: 2}));
+piso.position.y = -.1; piso.receiveShadow = true; cena.add(piso);
+const parede = new THREE.Mesh(new THREE.BoxGeometry(12, 3, .2), material('papel'));
+parede.position.set(0, 1.5, -2.1); parede.receiveShadow = parede.castShadow = true; cena.add(parede);
+const cubo = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material('madeira'));
+cubo.position.set(1.5, .5, 0); cubo.castShadow = cubo.receiveShadow = true; cena.add(cubo);
+publicar(palco, trajeto([[0, [3, 2.2, 6], [0, .6, -1]], [10, [3, 2.2, 6], [0, .6, -1]]]), t => { cubo.rotation.y = t * .1; });
+</script>
+</body></html>

@@ -134,11 +134,13 @@ Scripts em `portfolio/tests/`, no mesmo estilo dos atuais (`check()`, OK/FALHOU)
 
 ## 10. Ordem de trabalho
 
-1. **Fase 1, piloto:** o kit (`kit.js`, `render.py`, `documentos.py`) e o caso 1 completo (cena, documentos, seção na página, testes). O Cássio aprova o padrão visual por prints e pelo site rodando. **Os casos 2–4 não começam antes dessa aprovação.**
+1. **Fase 1, piloto:** o kit (`kit.js`, `render.py`, `documentos.py`) e o **caso 3 (SIGE na obra dos galpões)** completo (cena, documentos, seção na página, testes). O Cássio aprova o padrão visual por prints e pelo site rodando. **Os casos 2–4 não começam antes dessa aprovação.**
 2. **Fase 2:** casos 2–4, abertura, trajetória e fechamento. O protótipo sai do `index.html`.
 3. **Fase 3:** revisão do texto do `portfolio.html` e do currículo pelas regras §5 (incluindo D5) e regeneração do PDF.
 
 Cada fase tem o próprio plano de implementação. Este spec cobre as três; o primeiro plano cobre só a fase 1.
+
+Emenda (25/09): o piloto é o caso 3. O caso 1 só tem prints de 760 px (t1–t4) e a planta de 1400 px, e a regra §7.7 proíbe ampliar documento; ele fica para a fase 2, com os originais que o Cássio mandar.
 
 ## 11. Fora do escopo
 
@@ -149,4 +151,4 @@ Publicar e fazer deploy; push para o GitHub; o trailer de envio (`render.py` do 
 1. A frase de posicionamento da abertura (§4.1).
 2. As quatro manchetes (§4.2).
 3. Se o currículo PDF entra na fase 3 ou fica para depois.
-4. Qual print mostra a conferência com a SINAPI (0,25%) no caso 2. Se nenhum print dos zips mostra, o destaque do caso 2 fica no total da obra e o 0,25% fica só no texto.
+4. Qual print mostra a conferência com a SINAPI (0,25%) no caso 2. Se nenhum print dos zips mostra, o destaque do caso 2 fica no total da obra e o 0,25% fica só no texto. Aprovado em 25/09 com as manchetes e a frase da abertura como estão.
