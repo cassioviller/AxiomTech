@@ -91,6 +91,7 @@ const TIPOS = {
   telha: {cor: 0xAEB6BD, variacao: .1, G: 10, rug: .5, metal: .5},
   folha: {cor: 0x5F7F45, variacao: .3, G: 6, rug: 1},
   tronco: {cor: 0x7A6048, variacao: .2, G: 6, rug: 1},
+  asfalto: {cor: 0x4A4D50, variacao: .08, G: 12, rug: 1},
   acento: {cor: LARANJA, variacao: .05, G: 4, rug: .6},
 };
 const cache = {};

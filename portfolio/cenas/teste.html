@@ -16,5 +16,6 @@ parede.position.set(0, 1.5, -2.1); parede.receiveShadow = parede.castShadow = tr
 const cubo = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material('madeira'));
 cubo.position.set(1.5, .5, 0); cubo.castShadow = cubo.receiveShadow = true; cena.add(cubo);
 publicar(palco, trajeto([[0, [3, 2.2, 6], [0, .6, -1]], [10, [3, 2.2, 6], [0, .6, -1]]]), t => { cubo.rotation.y = t * .1; });
+window.__kit = {material}; // para o teste do kit conferir os materiais
 </script>
 </body></html>

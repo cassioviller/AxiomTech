@@ -93,6 +93,7 @@ const tampa = new THREE.Group(); tampa.position.set(0, .018, -.12); tampa.rotati
 perfil(.34, .23, .008, 0, .115, 0, tampa, material('plastico'));
 S.tela = new THREE.Mesh(new THREE.PlaneGeometry(.32, .2), new THREE.MeshBasicMaterial({color: 0xffffff}));
 S.tela.position.set(0, .12, .0045); tampa.add(S.tela);
+S.alvo = S.tela; // contrato da fase 2: o plano que termina em RETANGULO
 documento('../site/docs/sige-portal.webp').then(tx => { S.tela.material.map = tx; S.tela.material.needsUpdate = true; });
 // folhas reais presas na parede: as fotos da obra e o relatório diário
 [[documento('../site/docs/sige-fotos.webp'), 1600 / 1353, -1.05], [documento('../site/docs/sige-rdo.webp'), 1600 / 1193, 1.05]].forEach(([textura, prop, x]) => {

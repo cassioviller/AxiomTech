@@ -110,7 +110,12 @@ FPS = 24
 INICIO_PARADO, FIM_PARADO = 0.3, 0.5  # s parados no começo e no fim do vídeo
 TETO_CLIPE, TETO_POSTER = int(2.5 * 1024 * 1024), 150 * 1024
 CRF, CRF_MAX = 26, 36  # a cena com grão (pasto, terra) e GOP 4 pede crf 34 para caber em 2,5 MB; em 36 o portal ainda é legível
-CENAS = {"sige": ("caso-sige.html", 10.0)}  # caso: (arquivo em cenas/, duração do vídeo em s); t da cena vai de 0 a 10
+CENAS = {  # caso: (arquivo em cenas/, duração do vídeo em s); t da cena vai sempre de 0 a 10
+    "abertura": ("abertura.html", 8.0),
+    "veks": ("caso-orcamento.html", 10.0),
+    "sige": ("caso-sige.html", 10.0),
+    "modulares": ("caso-modulares.html", 12.0),
+}
 
 
 def tempo_local(s, dur):

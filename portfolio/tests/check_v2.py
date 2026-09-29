@@ -53,6 +53,8 @@ def checar_kit():
                 "var d=g.getImageData(0,0,24,24).data,t=0;for(var i=0;i<d.length;i+=4)t+=(d[i]+d[i+1]+d[i+2])/3;return t/(d.length/4);})"
                 f"({px[0]},{px[1]})"))
         check(lum[0] <= lum[1] - 3, f"kit: o GTAO não escureceu o canto (com {lum[0]:.1f}, sem {lum[1]:.1f})")
+        asfalto = pg.evaluate("(function(){try{var m=window.__kit.material('asfalto');return [m.map&&m.map.isTexture,m.roughness];}catch(e){return String(e);}})()")
+        check(asfalto == [True, 1], f"kit: material('asfalto') {asfalto}")
         check(not erros, f"kit: erros de JS em teste.html: {erros}")
 
 
@@ -151,6 +153,52 @@ def checar_cena_estatica():
           f"cena sige: documentos {sorted(docs)}")
 
 
+CASOS = {
+    "veks": {"cena": "caso-orcamento.html", "doc": "veks-orcamento", "dur": 10},
+    "sige": {"cena": "caso-sige.html", "doc": "sige-portal", "dur": 10},
+    "modulares": {"cena": "caso-modulares.html", "doc": "b36-caixas", "dur": 12},
+}
+ALVO = [[384, 180], [1536, 180], [1536, 900], [384, 900]]  # RETANGULO em 1920×1080, cantos a partir do sup. esq.
+
+
+def inicio_da_cena(pg, js_assunto):
+    """t=0: [todos os cantos das caixas do assunto dentro de ±0,95; largura projetada (0..2); tudo antes da névoa]."""
+    return pg.evaluate("""(function(){var T=window.__palco.THREE,cam=window.__palco.camera,f=window.__palco.cena.fog;renderCena(0);
+      var xs=[],ok=true,dmax=0;(""" + js_assunto + """).forEach(function(G){var b=new T.Box3().setFromObject(G);
+        [b.min.x,b.max.x].forEach(function(x){[b.min.z,b.max.z].forEach(function(z){[b.min.y,b.max.y].forEach(function(y){
+          var p=new T.Vector3(x,y,z);dmax=Math.max(dmax,p.distanceTo(cam.position));p.project(cam);
+          xs.push(p.x);if(Math.abs(p.x)>.95||Math.abs(p.y)>.95)ok=false;});});});});
+      return [ok,Math.max.apply(null,xs)-Math.min.apply(null,xs),!f||dmax<f.near];})()""")
+
+
+def enquadramento_final(pg):
+    """t=10: [cantos do alvo em px 1920×1080, o alvo é o primeiro Mesh atingido por um raio da câmera ao seu centro]."""
+    return pg.evaluate("""(function(){var S=window.__cena,T=window.__palco.THREE,cam=window.__palco.camera;renderCena(10);
+      S.alvo.geometry.computeBoundingBox();var b=S.alvo.geometry.boundingBox,cs=[];
+      [[b.min.x,b.min.y],[b.max.x,b.min.y],[b.max.x,b.max.y],[b.min.x,b.max.y]].forEach(function(c){
+        var p=S.alvo.localToWorld(new T.Vector3(c[0],c[1],0)).project(cam);cs.push([(p.x+1)/2*1920,(1-p.y)/2*1080]);});
+      var centro=S.alvo.getWorldPosition(new T.Vector3()),dir=centro.clone().sub(cam.position).normalize();
+      var hits=new T.Raycaster(cam.position.clone(),dir).intersectObject(window.__palco.cena,true).filter(function(h){return h.object.isMesh;});
+      return [cs,hits.length>0&&hits[0].object===S.alvo];})()""")
+
+
+def checar_enquadramento(pg, nome):
+    fim = enquadramento_final(pg)
+    achados = sorted(fim[0], key=lambda c: (round(c[1] / 100), c[0]))
+    esperado = sorted(ALVO, key=lambda c: (round(c[1] / 100), c[0]))
+    erro = max(max(abs(a[0] - e[0]), abs(a[1] - e[1])) for a, e in zip(achados, esperado))
+    check(erro <= 2, f"{nome}: cantos do alvo a {erro:.1f} px de RETANGULO no último quadro (máx. 2 px): {achados}")
+    check(fim[1], f"{nome}: no último quadro algo fica entre a câmera e o centro do alvo")
+
+
+def checar_proporcao_alvo(pg, doc, nome):
+    """O plano-alvo tem a proporção exata do corte do documento (senão a imagem real entra esticada)."""
+    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))[doc]
+    prop = pg.evaluate("(function(){var p=window.__cena.alvo.geometry.parameters;return p.width/p.height;})()")
+    esperado = dest["largura"] / dest["altura"]
+    check(abs(prop / esperado - 1) <= .005, f"{nome}: alvo com proporção {prop:.4f}, o corte de {doc} tem {esperado:.4f}")
+
+
 def checar_cena_sige():
     """No Chromium: conteúdo (2 galpões, 22 divisórias, 3 painéis subindo e parados no fim), tela com o portal;
     t=0: os dois galpões inteiros no quadro, juntos ≥ 60% da largura, e antes do começo da névoa;
@@ -162,49 +210,35 @@ def checar_cena_sige():
           return [S.galpoes.length,S.divisorias.length,S.paineisSubindo.length,
                   S.paineisSubindo.every(function(p){return Math.abs(p.rotation.x)<1e-6;}),
                   S.tela.material.map&&S.tela.material.map.image.src.split('/').pop(),
-                  S.quadros.map(function(q){return q.material.map.image.src.split('/').pop();}).sort()];})()""")
-        check(conteudo == [2, 22, 3, True, "sige-portal.webp", ["sige-fotos.webp", "sige-rdo.webp"]], f"cena sige: conteúdo {conteudo}")
-        inicio = pg.evaluate("""(function(){var S=window.__cena,T=window.__palco.THREE,cam=window.__palco.camera,f=window.__palco.cena.fog;renderCena(0);
-          var xs=[],ok=true,dmax=0;S.galpoes.forEach(function(G){var b=new T.Box3().setFromObject(G);
-            [b.min.x,b.max.x].forEach(function(x){[b.min.z,b.max.z].forEach(function(z){[0,b.max.y].forEach(function(y){
-              var p=new T.Vector3(x,y,z);dmax=Math.max(dmax,p.distanceTo(cam.position));p.project(cam);
-              xs.push(p.x);if(Math.abs(p.x)>.95||Math.abs(p.y)>.95)ok=false;});});});});
-          return [ok,Math.max.apply(null,xs)-Math.min.apply(null,xs),dmax<f.near];})()""")
+                  S.quadros.map(function(q){return q.material.map.image.src.split('/').pop();}).sort(), S.alvo===S.tela];})()""")
+        check(conteudo == [2, 22, 3, True, "sige-portal.webp", ["sige-fotos.webp", "sige-rdo.webp"], True], f"cena sige: conteúdo {conteudo}")
+        inicio = inicio_da_cena(pg, "window.__cena.galpoes")
         check(inicio[0], "cena sige: em t=0 algum canto dos galpões sai do quadro")
         check(inicio[1] >= 1.2, f"cena sige: em t=0 os galpões ocupam {inicio[1] / 2:.0%} da largura, esperava ≥ 60%")
         check(inicio[2], "cena sige: em t=0 parte dos galpões está dentro da névoa")
-        fim = pg.evaluate("""(function(){var S=window.__cena,T=window.__palco.THREE,cam=window.__palco.camera;renderCena(10);
-          S.tela.geometry.computeBoundingBox();var b=S.tela.geometry.boundingBox,cs=[];
-          [[b.min.x,b.min.y],[b.max.x,b.min.y],[b.max.x,b.max.y],[b.min.x,b.max.y]].forEach(function(c){
-            var p=S.tela.localToWorld(new T.Vector3(c[0],c[1],0)).project(cam);cs.push([(p.x+1)/2*1920,(1-p.y)/2*1080]);});
-          var centro=S.tela.getWorldPosition(new T.Vector3()),dir=centro.clone().sub(cam.position).normalize();
-          var hits=new T.Raycaster(cam.position.clone(),dir).intersectObject(window.__palco.cena,true).filter(function(h){return h.object.isMesh;});
-          return [cs,hits.length>0&&hits[0].object===S.tela];})()""")
-        alvo = [[384, 180], [1536, 180], [1536, 900], [384, 900]]  # RETANGULO em 1920×1080, cantos em sentido horário a partir do sup. esq.
-        achados = sorted(fim[0], key=lambda c: (round(c[1] / 100), c[0]))
-        esperado = sorted(alvo, key=lambda c: (round(c[1] / 100), c[0]))
-        erro = max(max(abs(a[0] - e[0]), abs(a[1] - e[1])) for a, e in zip(achados, esperado))
-        check(erro <= 2, f"cena sige: cantos da tela a {erro:.1f} px de RETANGULO no último quadro (máx. 2 px): {achados}")
-        check(fim[1], "cena sige: no último quadro algo fica entre a câmera e o centro da tela")
+        checar_enquadramento(pg, "cena sige")
+        checar_proporcao_alvo(pg, "sige-portal", "cena sige")
         check(not erros, f"cena sige: erros de JS: {erros}")
 
 
-def checar_passagem():
-    """A passagem vídeo → imagem real é invisível: no último quadro, a região de RETANGULO, levada a 1600×1000,
-    tem PSNR ≥ 28 dB contra site/docs/sige-portal.webp."""
+def checar_passagem(caso):
+    """A passagem vídeo → imagem real é invisível: no último quadro, a região de RETANGULO, levada ao tamanho do corte,
+    tem PSNR ≥ 28 dB contra site/docs/<doc>.webp."""
     from render import abrir_cena, capturar, navegador, psnr, servidor
+    c = CASOS[caso]
+    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))[c["doc"]]
     with tempfile.TemporaryDirectory() as tmp, servidor() as base, navegador() as nav:
         tmp = Path(tmp)
-        pg, _ = abrir_cena(nav, f"{base}/cenas/caso-sige.html")
+        pg, _ = abrir_cena(nav, f"{base}/cenas/{c['cena']}")
         pg.evaluate("renderCena(10)")
         quadro = tmp / "fim.png"
         quadro.write_bytes(capturar(pg))
         regiao = tmp / "regiao.png"
-        subprocess.run(["magick", str(quadro), "-crop", "1152x720+384+180", "+repage", "-resize", "1600x1000!", str(regiao)], check=True)
+        subprocess.run(["magick", str(quadro), "-crop", "1152x720+384+180", "+repage", "-resize", f"{dest['largura']}x{dest['altura']}!", str(regiao)], check=True)
         doc = tmp / "doc.png"
-        subprocess.run(["magick", str(DOCS / "sige-portal.webp"), str(doc)], check=True)
+        subprocess.run(["magick", str(DOCS / f"{c['doc']}.webp"), str(doc)], check=True)
         valor = psnr(regiao, doc)
-        check(valor >= 28, f"passagem: PSNR {valor:.1f} dB entre a tela do último quadro e o documento real (mín. 28)")
+        check(valor >= 28, f"passagem {caso}: PSNR {valor:.1f} dB entre o alvo do último quadro e o documento real (mín. 28)")
 
 
 def checar_video():
@@ -447,7 +481,7 @@ def main():
         checar_kit()
         checar_render()
         checar_cena_sige()
-        checar_passagem()
+        checar_passagem("sige")
         checar_pagina()
         checar_viewports()
         checar_sem_range()
