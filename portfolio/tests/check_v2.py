@@ -199,6 +199,36 @@ def checar_passagem():
         check(valor >= 28, f"passagem: PSNR {valor:.1f} dB entre a tela do último quadro e o documento real (mín. 28)")
 
 
+def checar_video():
+    """Vídeo publicado de cada caso de CENAS: 1920×1080, 24 fps, High 4.0, sem áudio, quadros = dur × 24, ≤ 2,5 MB;
+    pontas paradas (PSNR ≥ 45 dB entre os dois primeiros e entre os dois últimos quadros); pôster ≤ 150 KB e
+    PSNR ≥ 40 dB contra o último quadro."""
+    import render
+    for caso, (_arq, dur) in render.CENAS.items():
+        mp4, cartaz = SITE / "video" / f"v2-{caso}.mp4", SITE / "video" / f"v2-{caso}.webp"
+        check(mp4.exists() and cartaz.exists(), f"vídeo {caso}: v2-{caso}.mp4/.webp ausentes (rodar render.py --so {caso})")
+        if not (mp4.exists() and cartaz.exists()):
+            continue
+        info = ffprobe(mp4)
+        v = [s for s in info.get("streams", []) if s.get("codec_type") == "video"]
+        check(not [s for s in info.get("streams", []) if s.get("codec_type") == "audio"], f"vídeo {caso}: tem áudio")
+        check(v and (v[0]["width"], v[0]["height"], v[0].get("r_frame_rate"), v[0].get("profile"), v[0].get("level")) == (1920, 1080, "24/1", "High", 40),
+              f"vídeo {caso}: {v and (v[0]['width'], v[0]['height'], v[0].get('r_frame_rate'), v[0].get('profile'), v[0].get('level'))}")
+        n = render.quadros(dur)
+        check(v and v[0].get("nb_frames") == str(n), f"vídeo {caso}: {v and v[0].get('nb_frames')} quadros, esperava {n}")
+        check(mp4.stat().st_size <= render.TETO_CLIPE, f"vídeo {caso}: {mp4.stat().st_size / 1024 / 1024:.2f} MB > 2,5 MB")
+        check(cartaz.stat().st_size <= render.TETO_POSTER, f"vídeo {caso}: pôster {cartaz.stat().st_size // 1024} KB > 150 KB")
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            q = {}
+            for k in (0, 1, n - 2, n - 1):
+                q[k] = tmp / f"q{k}.png"
+                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(mp4), "-vf", f"select='eq(n,{k})'", "-vframes", "1", str(q[k])], check=True)
+            check(render.psnr(q[0], q[1]) >= 45, f"vídeo {caso}: o início não está parado")
+            check(render.psnr(q[n - 2], q[n - 1]) >= 45, f"vídeo {caso}: o fim não está parado")
+            check(render.psnr(cartaz, q[n - 1]) >= 40, f"vídeo {caso}: o pôster não é o último quadro (PSNR < 40 dB)")
+
+
 def main():
     checar_documentos()
     checar_cena_estatica()
@@ -207,6 +237,8 @@ def main():
         checar_render()
         checar_cena_sige()
         checar_passagem()
+    if "--video" in sys.argv:
+        checar_video()
     if FALHAS:
         print("FALHOU:")
         for f in FALHAS:
