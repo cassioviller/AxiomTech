@@ -38,3 +38,12 @@ build.sh     regenera todos os PDFs e copia para site/
 Só números do site original / brief. Clientes sempre genéricos. Nunca: margens ou percentuais de ex-contratante,
 salários, valores de contrato, endereço, nascimento, CPF/CNPJ, nomes de pessoas. `ref/img-nao-usadas/o1.webp` e `o2.webp` mostram
 o nome do cliente da unidade de saúde — não usar; (foram tirados de `site/img/` para não irem junto na publicação).
+
+## Site v2 (piloto, 25–29/09/2026)
+
+Página nova ao lado da história: `site/v2.html` (abertura, caso SIGE na obra dos galpões, fechamento). Cada caso mostra uma cena criada em 3D que leva ao documento real: no fim do vídeo, a imagem real do documento entra exatamente sobre a tela da cena, com o número da manchete destacado em laranja. Spec: `docs/superpowers/specs/2026-09-25-site-v2-design.md`.
+
+- Documentos reais (só de prints já anonimizados): `python3 portfolio/cenas/documentos.py` → `site/docs/`.
+- Cena em vídeo 1920×1080: `python3 portfolio/cenas/render.py --so sige` → `site/video/v2-sige.mp4` e `.webp`. No Replit (SwiftShader) cada quadro leva 15–35 s: os 240 quadros levam cerca de 1 h; rodar em segundo plano.
+- Conferir: `python3 portfolio/tests/check_v2.py && python3 portfolio/tests/check_v2.py --navegador && python3 portfolio/tests/check_v2.py --video`. A suíte de navegador leva uns 20 min pelo mesmo motivo.
+- Ver no navegador: `python3 portfolio/servir.py 5000 --directory portfolio/site` e abrir `/v2.html` (precisa de Range).

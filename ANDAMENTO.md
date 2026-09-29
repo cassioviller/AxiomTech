@@ -59,3 +59,10 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - O trailer de envio (`portfolio/filme/render.py`) não foi regerado e ainda tem a câmera antiga do restaurante: rodar `render.py` antes de enviar.
 - Conferir tudo: `python3 portfolio/tests/check_historia.py --navegador && python3 portfolio/tests/check_filme.py --video && python3 portfolio/tests/check_filme.py --cenas && python3 portfolio/tests/check_site.py`.
 - Próximo: o plano irmão `2026-09-24-historia-cenas-novas.md` (cinco cenas novas: mudança, galpões, precisão, método, convite); depois push, deploy, `--origem`, iPhone real.
+
+## Estado em 29/09/2026 — site v2, fase 1 (piloto) CONCLUÍDA, aguardando aprovação do Cássio
+- Branch `site-v2`; spec `docs/superpowers/specs/2026-09-25-site-v2-design.md`; plano `docs/superpowers/plans/2026-09-25-site-v2-piloto.md`.
+- O protótipo (16 capítulos) está no branch `historia-cenas-novas`, sem merge em `main`.
+- Conferir: `python3 portfolio/tests/check_v2.py && python3 portfolio/tests/check_v2.py --navegador && python3 portfolio/tests/check_v2.py --video`.
+- Ressalvas para o Cássio olhar: as texturas de pasto e terra têm manchas grandes e o conjunto ainda parece maquete; o vídeo ficou em crf 33 (2,43 MB) para caber no teto de 2,5 MB; nos prints anonimizados o contorno das palavras borradas ainda se adivinha.
+- Próximo: o Cássio aprova (ou corrige) o padrão visual do piloto; depois a fase 2 (casos 2 e 4, caso 1 com os originais, abertura com cena, `v2.html` vira `index.html`).

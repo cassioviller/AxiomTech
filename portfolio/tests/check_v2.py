@@ -392,10 +392,17 @@ def checar_celular():
         ctx.close()
 
 
+def checar_readme():
+    readme = (RAIZ / "README.md").read_text(encoding="utf-8")
+    for trecho in ("site/v2.html", "cenas/render.py --so sige", "cenas/documentos.py", "tests/check_v2.py --navegador"):
+        check(trecho in readme, f"README do portfólio sem {trecho!r}")
+
+
 def main():
     checar_documentos()
     checar_cena_estatica()
     checar_pagina_estatica()
+    checar_readme()
     if "--navegador" in sys.argv:
         checar_kit()
         checar_render()

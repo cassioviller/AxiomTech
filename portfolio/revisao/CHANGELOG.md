@@ -205,3 +205,12 @@ Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO
 - `clipes.js`: despejo pelo navegador reconhecido pela conta dos `emptied` nossos (antes ou depois dos metadados); um só `emptied` nosso por `load()`; sem seek enquanto o `seekable` não está completo; a espera pelo Range morre com a carga que a criou; `progress` refaz o seek que chegou sem quadro; espera de até 1,5 s por um `seekable` completo antes de congelar; o quantizador nunca passa do último quadro (o `historia.js` deixou o `0,999`).
 - Filme: `escala` termina com as 12 miniaturas inteiras e `icamento` com o cavalo no quadro (câmeras; clipes regerados; enquadramento conferido por projeção no `--cenas`). `render_clipes.py` espera `PRONTO` com prazo. O trailer de envio (`portfolio/filme/render.py`) não foi regerado e ainda tem a câmera antiga do restaurante: rodar `render.py` antes de enviar.
 - `maquetes.js`: sai a cena morta do içamento. Testes: checagens que passavam sem provar foram amarradas (regra do vídeo ancorada, 404 pedido de verdade, precondições em `check`, caixas com largura), mensagens com o valor medido, `--origem` sem URL avisa, exceção de JS vira `FALHOU`.
+
+---
+
+# Rodada 11 — piloto do site v2, 25–29/09/2026
+
+- O site das rodadas 1–10 vira protótipo (branch `historia-cenas-novas`, sem merge). Avaliação do Cássio: cenas com cara de brinquedo, desbotadas e genéricas, sem mostrar os documentos reais; texto enfeitado demais para um currículo.
+- Spec `2026-09-25-site-v2-design.md`: abertura, quatro casos fortes, trajetória curta e fechamento; em cada caso, a cena criada leva ao documento real; manchete com fato e número (≤ 12 palavras), sem metáfora.
+- Piloto = caso SIGE na obra dos galpões (o caso 1, dos 36 minutos, só tem prints de 760 px; espera os originais). Kit novo das cenas (three.js 0.186, GTAO, ambiente, render 2×, 1920×1080), documentos em `site/docs/`, página `site/v2.html`, checagens em `tests/check_v2.py`.
+- Render no Replit: a captura lê o framebuffer do WebGL (`readPixels`), porque o `screenshot` saía com o canvas vazio no primeiro quadro; o contexto WebGL se perde às vezes no aquecimento e a cena é reaberta. O vídeo do SIGE só coube em 2,5 MB em crf 33 (as texturas com grão custam caro com GOP 4).
