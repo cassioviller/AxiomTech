@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cássio Viller — orçamento, planejamento e custos de obra</title>
+<meta name="description" content="Cássio Viller, estudante de Engenharia Civil (7º semestre): orçamento, planejamento e custos de obra. Casos reais com os documentos produzidos.">
+<meta name="theme-color" content="#12171D">
+<link rel="icon" href="data:,"><!-- sem ícone ainda: evita o pedido automático de /favicon.ico (404 no console) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#ECEBE6; --surface:#FFFFFF; --ink:#171F29; --ink-2:#3C4652; --muted:#5B6672;
+  --accent:#B5440E; --accent-ink:#FFFFFF; --rule:#D3D1CA;
+  --palco:#0F1419; --texto-palco:#F2F1EC; --apoio-palco:#D4DCE4; --laranja:#F07A3E;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--ground:#12171D; --surface:#1A2129; --ink:#E9E7E1; --ink-2:#C4C8CC; --muted:#93A0AD; --accent:#F07A3E; --accent-ink:#161616; --rule:#2E3A47;}
+}
+:root[data-theme="dark"]{--ground:#12171D; --surface:#1A2129; --ink:#E9E7E1; --ink-2:#C4C8CC; --muted:#93A0AD; --accent:#F07A3E; --accent-ink:#161616; --rule:#2E3A47;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%;height:auto}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.pular{position:absolute;left:-9999px;top:8px;z-index:50;background:var(--accent);color:var(--accent-ink);padding:10px 14px;font-family:var(--mono);font-size:.8rem}
+.pular:focus{left:12px}
+.barra{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;padding:10px 20px;background:var(--ground);border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:.8rem}
+.barra .nome{font-family:var(--display);font-weight:700;font-size:1.15rem;text-transform:uppercase;color:var(--ink);text-decoration:none}
+.barra nav{display:flex;flex-wrap:wrap;gap:6px 16px;flex:1 1 auto}
+.barra a{color:var(--ink)}
+.abertura,.fechamento{max-width:62rem;margin:0 auto;padding:10vh 20px}
+.abertura h1{font-family:var(--display);font-size:clamp(2.6rem,7vw,5rem);line-height:1;margin:0 0 .25em;text-transform:uppercase}
+.vaga{font-size:1.35rem;font-weight:500;margin:0 0 .6em}
+.posicionamento{font-size:1.15rem;color:var(--ink-2);max-width:42rem;margin:0}
+.ficha{list-style:none;padding:0;margin:1.2em 0;color:var(--ink-2)}
+.contato{display:flex;flex-wrap:wrap;gap:10px 18px;margin:0}
+.contato a{color:var(--ink)}
+.contato .zap{background:var(--accent);color:var(--accent-ink);padding:8px 12px;text-decoration:none;border-radius:2px}
+.fechamento h2{font-family:var(--display);font-size:2rem;margin:0 0 .5em}
+.fechamento ul{padding-left:1.1em;margin:0 0 1.2em}
+/* caso, sem JS ou com movimento reduzido: quadro (pôster + documento + destaque) e texto empilhados */
+.caso{position:relative;background:var(--palco)}
+.palco{position:relative;overflow:hidden}
+.quadro{position:relative;width:100%;aspect-ratio:16/9}
+.clipe{position:absolute;inset:0;margin:0}
+.clipe img,.clipe video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.clipe video{opacity:0}
+.clipe.viva video{opacity:1}
+.clipe.viva img{visibility:hidden;transition:visibility 0s .2s}
+.doc{position:absolute;overflow:hidden;opacity:var(--doc,1)}
+.doc img{width:100%;height:100%}
+.destaque{position:absolute;border:3px solid var(--laranja);border-radius:3px;opacity:var(--destaque,1);transform:scale(calc(1.25 - .25*var(--destaque,1)));box-shadow:0 0 0 200vmax rgba(10,14,18,calc(.38*var(--destaque,1)))}
+.texto{padding:28px 20px 48px;max-width:40rem;margin:0 auto;color:var(--texto-palco)}
+.rotulo{font-family:var(--mono);font-size:.8rem;color:var(--laranja);margin:0 0 .6em;text-transform:uppercase;letter-spacing:.04em}
+.manchete{font-family:var(--display);font-size:clamp(1.9rem,3.2vw,2.8rem);line-height:1.08;margin:0 0 .5em}
+.apoio{color:var(--apoio-palco);margin:0 0 1em}
+.recorte{display:none;margin:0 0 1em}
+.caso-link a{color:var(--texto-palco)}
+/* com JS e movimento: o palco fica preso na tela por 300vh; a cena anda na 1ª metade, o documento e o texto na 2ª */
+.js-v2 .caso{height:300vh}
+.js-v2 .palco{position:sticky;top:0;height:100vh}
+.js-v2 .quadro{position:absolute;left:50%;top:50%;width:max(100vw,177.78vh);transform:translate(-50%,-50%) translateX(calc(var(--lado,0)*-13%)) scale(calc(1 - .24*var(--lado,0)))}
+.js-v2 .texto{position:absolute;right:4vw;top:50%;width:min(30rem,30vw);transform:translateY(-50%);opacity:var(--lado,0);padding:0;margin:0}
+@media (max-aspect-ratio:3/2) and (min-width:761px){.js-v2 .quadro{width:100vw}}
+@media (max-width:760px){
+  .doc{display:none}
+  .recorte{display:block}
+  .js-v2 .quadro{transform:translate(-50%,-50%)}
+  .js-v2 .texto{left:0;right:0;top:auto;bottom:0;width:auto;transform:none;padding:20px;background:linear-gradient(transparent,rgba(10,14,18,.92) 14%)}
+}
+@media (prefers-reduced-motion: reduce){.clipe video{display:none}}
+</style>
+</head>
+<body>
+<a class="pular" href="#sige">Pular para o caso</a>
+<header class="barra">
+  <a class="nome" href="#inicio">Cássio Viller</a>
+  <nav aria-label="Seções"><a href="#sige">SIGE na obra</a><a href="#contato">Contato</a></nav>
+  <a href="curriculo-cassio-viller.pdf">Currículo (PDF)</a>
+</header>
+<main id="conteudo">
+  <section class="abertura" id="inicio">
+    <h1>Cássio Viller</h1>
+    <p class="vaga">Orçamento, planejamento e custos de obra</p>
+    <p class="posicionamento">Orço obras, acompanho a execução e construí os sistemas que uso para isso.</p>
+    <ul class="ficha">
+      <li>Engenharia Civil, 7º semestre (faltam 3), Cruzeiro do Sul, após 6 semestres na UNIFEI</li>
+      <li>São José dos Campos/SP · CLT ou PJ · presencial ou remoto</li>
+    </ul>
+    <p class="contato"><a class="zap" href="https://wa.me/5512982071116">WhatsApp (12) 98207-1116</a><a href="mailto:cassiovillers@gmail.com">cassiovillers@gmail.com</a><a href="curriculo-cassio-viller.pdf">Currículo (PDF)</a></p>
+  </section>
+
+  <section class="caso cena" id="sige" data-caso="sige">
+    <div class="palco">
+      <div class="quadro">
+        <figure class="clipe" data-clipe="video/v2-sige.mp4" data-dur="10" aria-hidden="true">
+          <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
+          <img src="video/v2-sige.webp" alt="" width="1920" height="1080">
+        </figure>
+        <div class="doc" style="left:20%;top:16.6667%;width:60%;height:66.6667%">
+          <img src="docs/sige-portal.webp" width="1600" height="1000" alt="Portal do cliente no SIGE: obra com 44,7% concluído, 109 etapas e 65 relatórios diários; o nome do cliente aparece borrado.">
+          <span class="destaque" style="left:6.8750%;top:27.8000%;width:12.5000%;height:7.8000%"></span>
+        </div>
+      </div>
+      <div class="texto">
+        <p class="rotulo">SIGE na obra dos galpões · jun → set/2026</p>
+        <h2 class="manchete">Implantei a gestão de obra em dois galpões com 22 baias.</h2>
+        <p class="apoio">Depois de 11/08 o diário ficou 23 dias só no WhatsApp. Recuperado, o avanço passou de 27,6% para 44,7%, lido numa cópia do sistema.</p>
+        <figure class="recorte"><img src="docs/sige-portal-recorte.webp" width="800" height="400" alt="Recorte do portal do cliente: 44,7% concluído, 109 etapas, 65 relatórios."></figure>
+        <p class="caso-link"><a href="portfolio.html#sige">Ver o caso completo →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="fechamento" id="contato">
+    <h2>O que faço numa construtora</h2>
+    <ul>
+      <li>Levantamento de quantitativos no projeto</li>
+      <li>Orçamento com composições SINAPI e BDI</li>
+      <li>Cronograma físico-financeiro com curva S</li>
+      <li>Diário de obra e medição</li>
+      <li>Compras com cotação e quadro de concorrência</li>
+      <li>Fluxo de caixa e custo previsto × realizado</li>
+    </ul>
+    <p class="contato"><a class="zap" href="https://wa.me/5512982071116">WhatsApp (12) 98207-1116</a><a href="mailto:cassiovillers@gmail.com">cassiovillers@gmail.com</a><a href="curriculo-cassio-viller.pdf">Currículo (PDF)</a><a href="portfolio.html">Portfólio completo</a></p>
+  </section>
+</main>
+<script src="clipes.js" defer></script>
+<script src="v2.js" defer></script>
+</body>
+</html>

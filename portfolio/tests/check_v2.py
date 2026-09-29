@@ -229,14 +229,182 @@ def checar_video():
             check(render.psnr(cartaz, q[n - 1]) >= 40, f"vídeo {caso}: o pôster não é o último quadro (PSNR < 40 dB)")
 
 
+PAGINA = SITE / "v2.html"
+PROIBIDOS = ["27×", "≈ 27", "≈27", "2 dias úteis", "dois dias úteis", "Kabod", "Santa Mônica", "UPA", "Bertioga", "203.1809",
+             "número não sumir", "Não falta obra feita", "número sem origem"]
+RETANGULO_CSS = "left:20%;top:16.6667%;width:60%;height:66.6667%"
+
+
+def texto_visivel(html_):
+    import html as h
+    html_ = re.sub(r"<(script|style)\b.*?</\1>", " ", html_, flags=re.S)
+    return " ".join(h.unescape(re.sub(r"<[^>]+>", " ", html_)).split())
+
+
+def checar_pagina_estatica():
+    """v2.html: textos aprovados; regras de texto (§5); proibidos; documentos com width/height reais; .doc em RETANGULO;
+    destaque em % igual ao destaques.json; figure.clipe apontando para o vídeo publicado com a duração de CENAS."""
+    import render
+    check(PAGINA.exists(), "página: portfolio/site/v2.html não existe")
+    if not PAGINA.exists():
+        return
+    p = PAGINA.read_text(encoding="utf-8")
+    vis = texto_visivel(p)
+    check("Orço obras, acompanho a execução e construí os sistemas que uso para isso." in vis, "página: frase da abertura ausente")
+    manchetes = [texto_visivel(m) for m in re.findall(r'<h2 class="manchete"[^>]*>(.*?)</h2>', p, re.S)]
+    apoios = [texto_visivel(m) for m in re.findall(r'<p class="apoio"[^>]*>(.*?)</p>', p, re.S)]
+    check(manchetes == ["Implantei a gestão de obra em dois galpões com 22 baias."], f"página: manchetes {manchetes}")
+    check(apoios == ["Depois de 11/08 o diário ficou 23 dias só no WhatsApp. Recuperado, o avanço passou de 27,6% para 44,7%, lido numa cópia do sistema."],
+          f"página: apoios {apoios}")
+    for m in manchetes:
+        check(len(m.split()) <= 12 and re.search(r"\d", m), f"página: manchete fora da regra (≤ 12 palavras, com número): {m!r}")
+    for a in apoios:
+        check(len(a.split()) <= 30, f"página: apoio com {len(a.split())} palavras (máx. 30)")
+    for proibido in PROIBIDOS:
+        check(proibido not in vis, f"página: texto proibido {proibido!r}")
+    check(re.search(r"\bItu\b", vis) is None, "página: nome do município do cliente (Itu)")
+    for src, w, h in re.findall(r'<img src="(docs/[^"]+)" width="(\d+)" height="(\d+)"', p):
+        check(dims(SITE / src) == (int(w), int(h)), f"página: {src} com width/height {w}×{h} ≠ arquivo {dims(SITE / src)}")
+    check(f'class="doc" style="{RETANGULO_CSS}"' in p, "página: .doc fora de RETANGULO (left:20%;top:16.6667%;width:60%;height:66.6667%)")
+    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))["sige-portal"]
+    x, y, w, h = dest["destaque"]
+    esperado = f"left:{x / dest['largura']:.4%};top:{y / dest['altura']:.4%};width:{w / dest['largura']:.4%};height:{h / dest['altura']:.4%}"
+    check(f'class="destaque" style="{esperado}"' in p, f"página: destaque ≠ destaques.json (esperava style=\"{esperado}\")")
+    dur = render.CENAS["sige"][1]
+    check(f'<figure class="clipe" data-clipe="video/v2-sige.mp4" data-dur="{dur:g}" aria-hidden="true">' in p, "página: figure.clipe do caso SIGE")
+    check('<script src="clipes.js" defer></script>' in p and '<script src="v2.js" defer></script>' in p, "página: scripts clipes.js e v2.js")
+
+
+def abrir_pagina(nav, base, largura, altura, **kw):
+    ctx = nav.new_context(viewport={"width": largura, "height": altura}, **kw)
+    pg = ctx.new_page()
+    erros = []
+    pg.on("pageerror", lambda e: erros.append(str(e)))
+    pg.on("console", lambda m: erros.append(m.text) if m.type == "error" else None)
+    pg.on("response", lambda r: erros.append(f"{r.status} {r.url}") if r.status >= 400 else None)
+    pg.goto(f"{base}/site/v2.html")
+    pg.wait_for_load_state("load")
+    return ctx, pg, erros
+
+
+def rolar(pg, caso, p):
+    """Rola até o progresso p (0..1) do caso e espera dois quadros de animação."""
+    pg.evaluate(f"""(function(){{var c=document.getElementById('{caso}'),r=c.getBoundingClientRect();
+      scrollTo(0,scrollY+r.top+{p}*(c.offsetHeight-innerHeight));}})()""")
+    pg.evaluate("new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r);});})")
+
+
+def caixas(pg, caso):
+    return pg.evaluate(f"""(function(){{var c=document.getElementById('{caso}'),f=function(s){{var e=c.querySelector(s);if(!e)return null;
+      var r=e.getBoundingClientRect();return [r.left,r.top,r.width,r.height,getComputedStyle(e).opacity,getComputedStyle(e).display];}};
+      return {{quadro:f('.quadro'),doc:f('.doc'),dest:f('.destaque'),texto:f('.texto'),recorte:f('.recorte img'),img:f('.doc img')}};}})()""")
+
+
+def checar_alinhado(b, nome):
+    """O .doc ocupa RETANGULO do .quadro (as duas caixas já incluem o transform): ±1,5 px em cada lado."""
+    q, d = b["quadro"], b["doc"]
+    ref = [q[0] + .2 * q[2], q[1] + q[3] / 6, .6 * q[2], 2 * q[3] / 3]
+    for nome_eixo, achado, esperado in zip(("left", "top", "width", "height"), d[:4], ref):
+        check(abs(achado - esperado) <= 1.5, f"{nome}: .doc fora de RETANGULO em {nome_eixo} ({achado:.1f} ≠ {esperado:.1f})")
+
+
+def checar_pagina():
+    """1920×1080 com Range: sem erros nem 404; em p=0,25 o vídeo busca 5 s e mostra quadro (.viva); em p=0,25 o documento
+    está invisível; em p=1 o documento, o destaque e o texto estão visíveis, o documento em RETANGULO, o destaque
+    dentro do documento, a imagem real nunca ampliada, e o texto não cobre o documento."""
+    from render import navegador, servidor
+    with servidor() as base, navegador() as nav:
+        ctx, pg, erros = abrir_pagina(nav, base, 1920, 1080)
+        check(pg.evaluate("document.documentElement.classList.contains('js-v2')"), "página: v2.js não ligou .js-v2")
+        rolar(pg, "sige", .25)
+        pg.wait_for_function("document.querySelector('#sige figure.clipe').classList.contains('viva')", timeout=20000)
+        t = pg.evaluate("document.querySelector('#sige video').currentTime")
+        check(abs(t - 5.0208) < .05, f"página: em p=0,25 o vídeo está em {t:.3f} s, esperava 5,021 s")
+        b = caixas(pg, "sige")
+        check(float(b["doc"][4]) == 0, f"página: em p=0,25 o documento já aparece (opacidade {b['doc'][4]})")
+        rolar(pg, "sige", 1)
+        b = caixas(pg, "sige")
+        check(float(b["doc"][4]) == 1 and float(b["dest"][4]) == 1 and float(b["texto"][4]) == 1, f"página: em p=1 opacidades {b['doc'][4]}, {b['dest'][4]}, {b['texto'][4]}")
+        checar_alinhado(b, "página 1920×1080")
+        d, s = b["doc"], b["dest"]
+        check(d[0] <= s[0] and d[1] <= s[1] and s[0] + s[2] <= d[0] + d[2] and s[1] + s[3] <= d[1] + d[3], "página: destaque fora do documento")
+        check(b["img"][2] <= 1600, f"página: documento exibido com {b['img'][2]:.0f} px, acima dos 1600 px do arquivo (ampliado)")
+        check(b["texto"][0] >= d[0] + d[2] + 16, "página: o texto cobre o documento em 1920×1080")
+        check(not erros, f"página: erros/404: {erros}")
+        ctx.close()
+
+
+def checar_viewports():
+    """Viewports fora de 16:9: documento em RETANGULO, inteiro na tela, texto sem cobrir o documento, em p=1."""
+    from render import navegador, servidor
+    with servidor() as base, navegador() as nav:
+        for w, h in ((1366, 768), (2560, 1080), (1280, 1024)):
+            ctx, pg, erros = abrir_pagina(nav, base, w, h)
+            rolar(pg, "sige", 1)
+            b = caixas(pg, "sige")
+            checar_alinhado(b, f"página {w}×{h}")
+            d = b["doc"]
+            check(d[0] >= 0 and d[1] >= 0 and d[0] + d[2] <= w and d[1] + d[3] <= h, f"página {w}×{h}: documento sai da tela {d[:4]}")
+            check(b["texto"][0] >= d[0] + d[2] + 16, f"página {w}×{h}: o texto cobre o documento")
+            check(b["img"][2] <= 1600, f"página {w}×{h}: documento ampliado")
+            check(not erros, f"página {w}×{h}: erros/404: {erros}")
+            ctx.close()
+
+
+def checar_sem_range():
+    """Servidor sem Range: o clipe congela no pôster (sem .viva); documento, destaque e texto aparecem alinhados em p=1."""
+    from render import navegador, servidor
+    with servidor(com_range=False) as base, navegador() as nav:
+        ctx, pg, erros = abrir_pagina(nav, base, 1920, 1080)
+        rolar(pg, "sige", .25)
+        pg.wait_for_timeout(3000)
+        check(not pg.evaluate("document.querySelector('#sige figure.clipe').classList.contains('viva')"), "sem Range: o clipe não congelou no pôster")
+        rolar(pg, "sige", 1)
+        b = caixas(pg, "sige")
+        check(float(b["doc"][4]) == 1 and float(b["dest"][4]) == 1, "sem Range: documento/destaque invisíveis em p=1")
+        checar_alinhado(b, "sem Range")
+        ctx.close()
+
+
+def checar_celular():
+    """390×844: sem o documento inteiro (display none); o recorte visível, inteiro na tela em p=1 e nunca ampliado;
+    movimento reduzido: sem .js-v2, pôster, documento e destaque visíveis; sem JS: manchete e documento visíveis."""
+    from render import navegador, servidor
+    with servidor() as base, navegador() as nav:
+        ctx, pg, erros = abrir_pagina(nav, base, 390, 844, device_scale_factor=2, is_mobile=True, has_touch=True)
+        rolar(pg, "sige", 1)
+        b = caixas(pg, "sige")
+        check(b["doc"][5] == "none", "celular: o documento inteiro aparece (ilegível em 390 px)")
+        r = b["recorte"]
+        check(r and r[5] != "none" and r[0] >= 0 and r[1] >= 0 and r[0] + r[2] <= 390 and r[1] + r[3] <= 844, f"celular: recorte fora da tela {r}")
+        check(r and r[2] <= 800, "celular: recorte ampliado")
+        check(not erros, f"celular: erros/404: {erros}")
+        ctx.close()
+        ctx, pg, erros = abrir_pagina(nav, base, 1920, 1080, reduced_motion="reduce")
+        check(not pg.evaluate("document.documentElement.classList.contains('js-v2')"), "movimento reduzido: .js-v2 ligado")
+        b = caixas(pg, "sige")
+        check(float(b["doc"][4]) == 1 and float(b["dest"][4]) == 1, "movimento reduzido: documento/destaque invisíveis")
+        check(pg.evaluate("getComputedStyle(document.querySelector('#sige video')).display") == "none", "movimento reduzido: o vídeo aparece")
+        ctx.close()
+        ctx, pg, erros = abrir_pagina(nav, base, 1920, 1080, java_script_enabled=False)
+        b = caixas(pg, "sige")
+        check(float(b["doc"][4]) == 1 and pg.is_visible("#sige h2.manchete"), "sem JS: manchete ou documento invisíveis")
+        ctx.close()
+
+
 def main():
     checar_documentos()
     checar_cena_estatica()
+    checar_pagina_estatica()
     if "--navegador" in sys.argv:
         checar_kit()
         checar_render()
         checar_cena_sige()
         checar_passagem()
+        checar_pagina()
+        checar_viewports()
+        checar_sem_range()
+        checar_celular()
     if "--video" in sys.argv:
         checar_video()
     if FALHAS:
