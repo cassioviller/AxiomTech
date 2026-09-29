@@ -1,0 +1,5 @@
+{
+  "sige-portal": {"fonte": "site/img/p-portal.webp", "corte": [0, 0, 1600, 1000], "destaque": [110, 278, 200, 78], "recorte": [20, 140, 800, 400]},
+  "sige-fotos": {"fonte": "site/img/p-fotos.webp", "corte": [0, 0, 1600, 1353]},
+  "sige-rdo": {"fonte": "site/img/p-diario-portal.webp", "corte": [0, 0, 1600, 1193]}
+}

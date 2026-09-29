@@ -1,0 +1,30 @@
+{
+ "sige-portal": {
+  "largura": 1600,
+  "altura": 1000,
+  "destaque": [
+   110,
+   278,
+   200,
+   78
+  ],
+  "recorte": [
+   20,
+   140,
+   800,
+   400
+  ]
+ },
+ "sige-fotos": {
+  "largura": 1600,
+  "altura": 1353,
+  "destaque": null,
+  "recorte": null
+ },
+ "sige-rdo": {
+  "largura": 1600,
+  "altura": 1193,
+  "destaque": null,
+  "recorte": null
+ }
+}

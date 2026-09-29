@@ -88,7 +88,45 @@ def checar_render():
         check(not erros, f"render: erros de JS: {erros}")
 
 
+DOCS = SITE / "docs"
+
+
+def dims(arquivo):
+    r = subprocess.run(["magick", "identify", "-format", "%w %h", str(arquivo)], capture_output=True, text=True)
+    return tuple(int(x) for x in r.stdout.split()) if r.returncode == 0 else None
+
+
+def checar_documentos():
+    """site/docs: só o que o manifesto lista, vindo só de fontes liberadas (já anonimizadas); dimensões conferem;
+    o destaque cai dentro da imagem e dentro do recorte."""
+    from documentos import LIBERADOS, MANIFESTO
+    man = json.loads(MANIFESTO.read_text(encoding="utf-8"))
+    check((DOCS / "destaques.json").exists(), "documentos: site/docs/destaques.json ausente (rodar documentos.py)")
+    if not (DOCS / "destaques.json").exists():
+        return
+    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))
+    esperados = {f"{i}.webp" for i in man} | {f"{i}-recorte.webp" for i, d in man.items() if d.get("recorte")} | {"destaques.json"}
+    achados = {p.name for p in DOCS.iterdir()}
+    check(achados == esperados, f"documentos: site/docs tem {sorted(achados ^ esperados)} fora do manifesto (ou falta)")
+    for i, d in man.items():
+        check(d["fonte"] in LIBERADOS, f"documentos: {i} vem de {d['fonte']}, fora das fontes anonimizadas liberadas")
+        x, y, w, h = d["corte"]
+        check(dims(DOCS / f"{i}.webp") == (w, h), f"documentos: {i}.webp {dims(DOCS / f'{i}.webp')} ≠ corte {w}×{h}")
+        check(dest.get(i, {}).get("largura") == w and dest[i].get("altura") == h, f"documentos: destaques.json de {i} sem as dimensões do corte")
+        if d.get("destaque"):
+            dx, dy, dw, dh = d["destaque"]
+            check(0 <= dx and 0 <= dy and dx + dw <= w and dy + dh <= h, f"documentos: destaque de {i} fora da imagem")
+            check(dest[i]["destaque"] == d["destaque"], f"documentos: destaques.json de {i} ≠ manifesto")
+        if d.get("recorte"):
+            rx, ry, rw, rh = d["recorte"]
+            check(dims(DOCS / f"{i}-recorte.webp") == (rw, rh), f"documentos: recorte de {i} com dimensões erradas")
+            if d.get("destaque"):
+                check(rx <= dx and ry <= dy and dx + dw <= rx + rw and dy + dh <= ry + rh, f"documentos: o recorte de {i} não contém o destaque")
+    check(set(man) >= {"sige-portal", "sige-fotos", "sige-rdo"}, "documentos: o caso SIGE pede sige-portal, sige-fotos e sige-rdo")
+
+
 def main():
+    checar_documentos()
     if "--navegador" in sys.argv:
         checar_kit()
         checar_render()
