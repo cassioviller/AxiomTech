@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Cena · SIGE na obra dos galpões</title>
+<link rel="icon" href="data:,"><!-- evita o pedido automático de /favicon.ico (viraria um "erro" de console falso) -->
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"../site/vendor/three.module.js"}}</script>
+</head><body>
+<script type="module">
+// Caso SIGE na obra dos galpões: a obra (dois galpões de Light Steel Frame numa fazenda, 11 baias cada, terra vermelha
+// como nas fotos) e o escritório de obra, onde o notebook mostra o portal do cliente real (44,7% concluído).
+// t: 0,6 → 2,8 os três últimos painéis do galpão B sobem (verticalização, como nas fotos); a câmera desce da vista
+// aérea (t=0) ao escritório (t=4 e 7) e termina de frente para a tela (t=10), com a tela exatamente em RETANGULO.
+import {THREE, criarPalco, material, documento, trajeto, enquadrarPlano, publicar, rampa} from './kit.js';
+
+const palco = criarPalco({ceu: 0xD9E2EA, nevoa: [140, 340]});
+const {cena, camera, sol} = palco;
+sol.position.set(-40, 60, 30);
+const S = {galpoes: [], divisorias: [], paineisSubindo: [], tela: null, quadros: []};
+window.__cena = S;
+
+function perfil(c, a, p, x, y, z, pai, mat = material('aco')) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(c, a, p), mat);
+  m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; pai.add(m); return m;
+}
+// painel de Light Steel Frame: guias em cima e embaixo, montantes a cada 40 cm, bloqueador no meio (como nas fotos)
+function painelLSF(compr, alt, pai) {
+  const g = new THREE.Group(); pai.add(g);
+  perfil(compr, .09, .09, compr / 2, .045, 0, g);
+  perfil(compr, .09, .09, compr / 2, alt - .045, 0, g);
+  const n = Math.round(compr / .4);
+  for (let i = 0; i <= n; i++) perfil(.04, alt - .18, .09, Math.min(i * .4, compr - .02), alt / 2, 0, g);
+  perfil(compr, .04, .09, compr / 2, alt * .5, 0, g);
+  return g;
+}
+function arvore(x, z, s) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); cena.add(g);
+  const tronco = new THREE.Mesh(new THREE.CylinderGeometry(.12 * s, .18 * s, 3 * s, 8), material('tronco'));
+  tronco.position.y = 1.5 * s; tronco.castShadow = true; g.add(tronco);
+  [[0, 3.6, 0, 1.5], [.6, 3.1, .3, 1.1], [-.5, 3.3, -.4, 1.2]].forEach(f => {
+    const copa = new THREE.Mesh(new THREE.IcosahedronGeometry(f[3] * s, 1), material('folha'));
+    copa.position.set(f[0] * s, f[1] * s, f[2] * s); copa.castShadow = true; g.add(copa);
+  });
+}
+
+// terreno: pasto e a praça da obra em terra vermelha
+const pasto = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), material('pasto', {repetir: 60}));
+pasto.rotation.x = -Math.PI / 2; pasto.receiveShadow = true; cena.add(pasto);
+const praca = new THREE.Mesh(new THREE.PlaneGeometry(96, 56), material('solo', {repetir: 12}));
+praca.rotation.x = -Math.PI / 2; praca.position.set(0, .02, 4); praca.receiveShadow = true; cena.add(praca);
+
+// os dois galpões: piso de concreto, parede do fundo em painéis de LSF de 3 m, 11 divisórias de baia; o A já tem os pilares da cobertura
+const COMPR = 33, LARG = 9, N_BAIAS = 11, H_PAINEL = 2.2, H_PILAR = 4.8;
+function galpao(x0, comPilares) {
+  const G = new THREE.Group(); G.position.set(x0, 0, 0); cena.add(G);
+  const piso = new THREE.Mesh(new THREE.BoxGeometry(COMPR, .18, LARG), material('concreto', {repetir: 6}));
+  piso.position.y = .09; piso.castShadow = piso.receiveShadow = true; G.add(piso);
+  const fundo = [];
+  for (let i = 0; i < COMPR / 3; i++) { const p = painelLSF(3, H_PAINEL, G); p.position.set(-COMPR / 2 + i * 3, .18, -LARG / 2 + .1); fundo.push(p); }
+  const passo = COMPR / N_BAIAS;
+  for (let k = 0; k < N_BAIAS; k++) {
+    const d = painelLSF(3.6, H_PAINEL * .8, G); d.rotation.y = -Math.PI / 2;
+    d.position.set(-COMPR / 2 + (k + .5) * passo, .18, -LARG / 2 + .15); S.divisorias.push(d);
+  }
+  if (comPilares) for (let k = 0; k <= N_BAIAS; k += 2)
+    [-LARG / 2 + .3, LARG / 2 - .3].forEach(z => perfil(.25, H_PILAR, .25, -COMPR / 2 + k * passo, .18 + H_PILAR / 2, z, G, material('acoPintado')));
+  S.galpoes.push(G);
+  return fundo;
+}
+galpao(-20, true);
+const fundoB = galpao(20, false);
+S.paineisSubindo = fundoB.slice(-3); // os três últimos painéis do B ainda sobem (verticalização)
+
+// canteiro: pilhas de perfis e os cones que marcam o caminho até o escritório (o acento da cena)
+for (let i = 0; i < 6; i++) perfil(6, .09, .09, 0, .05 + i * .1, 9 + (i % 2) * .12, cena);
+const cone = material('acento');
+[[2, 10.5], [3.2, 12.5], [4.4, 14.5], [5.6, 16.5]].forEach(p => {
+  const c = new THREE.Mesh(new THREE.ConeGeometry(.22, .7, 16), cone); c.position.set(p[0], .37, p[1]); c.castShadow = true; cena.add(c);
+});
+[[-45, -30, 1.4], [-38, -34, 1.1], [42, -31, 1.3], [50, -26, 1.2], [-52, 24, 1.2], [58, 30, 1.4]].forEach(a => arvore(a[0], a[1], a[2]));
+
+// escritório de obra: telheiro aberto para a câmera, mesa, notebook com o portal, folhas presas na parede do fundo
+const E = new THREE.Group(); E.position.set(0, 0, 20); cena.add(E);
+const pisoE = new THREE.Mesh(new THREE.BoxGeometry(5, .12, 4), material('madeira', {repetir: 2})); pisoE.position.y = .06; pisoE.receiveShadow = true; E.add(pisoE);
+[[-2.4, -1.9], [2.4, -1.9], [-2.4, 1.9], [2.4, 1.9]].forEach(p => perfil(.1, 2.7, .1, p[0], 1.35, p[1], E, material('acoPintado')));
+perfil(5.4, .06, 4.4, 0, 2.73, 0, E, material('telha'));
+const paredeE = perfil(5, 2.6, .08, 0, 1.36, -1.95, E, material('papel'));
+paredeE.castShadow = false;
+perfil(1.6, .05, .8, 0, .75, -.9, E, material('madeira'));
+[[-.72, -1.22], [.72, -1.22], [-.72, -.58], [.72, -.58]].forEach(p => perfil(.05, .72, .05, p[0], .37, p[1], E, material('acoPintado')));
+// notebook: base e tampa aberta 15° para trás; a tela (0,32 × 0,20) na face da frente da tampa
+const note = new THREE.Group(); note.position.set(0, .775, -.85); E.add(note);
+perfil(.34, .018, .24, 0, .009, 0, note, material('plastico'));
+const tampa = new THREE.Group(); tampa.position.set(0, .018, -.12); tampa.rotation.x = -THREE.MathUtils.degToRad(15); note.add(tampa);
+perfil(.34, .23, .008, 0, .115, 0, tampa, material('plastico'));
+S.tela = new THREE.Mesh(new THREE.PlaneGeometry(.32, .2), new THREE.MeshBasicMaterial({color: 0xffffff}));
+S.tela.position.set(0, .12, .0045); tampa.add(S.tela);
+documento('../site/docs/sige-portal.webp').then(tx => { S.tela.material.map = tx; S.tela.material.needsUpdate = true; });
+// folhas reais presas na parede: as fotos da obra e o relatório diário
+[[documento('../site/docs/sige-fotos.webp'), 1600 / 1353, -1.05], [documento('../site/docs/sige-rdo.webp'), 1600 / 1193, 1.05]].forEach(([textura, prop, x]) => {
+  const h = .78, folha = new THREE.Mesh(new THREE.PlaneGeometry(h * prop, h), new THREE.MeshStandardMaterial({color: 0xffffff, roughness: .9}));
+  folha.position.set(x, 1.6, -1.9); folha.receiveShadow = true; E.add(folha); S.quadros.push(folha);
+  textura.then(tx => { folha.material.map = tx; folha.material.needsUpdate = true; });
+});
+
+// câmera: vista aérea dos dois galpões → escritório → de frente para a tela (última chave calculada: tela exatamente em RETANGULO)
+cena.updateMatrixWorld(true);
+const centro = S.tela.getWorldPosition(new THREE.Vector3());
+const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(S.tela.getWorldQuaternion(new THREE.Quaternion()));
+const fim = enquadrarPlano(camera, centro, normal, .32);
+const aproximacao = centro.clone().addScaledVector(normal, 1.6);
+const cam = trajeto([
+  [0, [48, 34, 70], [0, 0, 0]],
+  [4, [7, 5, 31], [0, 1.2, 19]],
+  [7, aproximacao.toArray(), centro.toArray()],
+  [10, fim[0], fim[1]],
+]);
+publicar(palco, cam, t => {
+  S.paineisSubindo.forEach((p, j) => { p.rotation.x = Math.PI / 2 * (1 - rampa(t, .6 + j * .5, 1.8 + j * .5)); });
+});
+</script>
+</body></html>

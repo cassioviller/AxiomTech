@@ -27,7 +27,9 @@ sys.path.insert(0, str(RAIZ))
 from servir import ComRange  # noqa: E402
 
 LARGURA, ALTURA = 1920, 1080
-ARGS = ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"]
+ARGS = ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--enable-webgl", "--ignore-gpu-blocklist",
+        "--disable-gpu-watchdog"]  # um quadro 3840×2160 com GTAO leva 15-60 s no SwiftShader: sem a flag o vigia mata a GPU (contexto perdido)
+CONTEXTO_OK = "(function(){var gl=window.__palco.renderer.getContext();return !gl.isContextLost()&&gl.drawingBufferWidth>0;})()"
 PRONTO_COM_PRAZO = ("Promise.race([window.PRONTO, new Promise(function(_, falha){setTimeout(function(){"
                     "falha(new Error('PRONTO: 30 s sem resolver (textura de documento?)'));}, 30000);})])")
 
@@ -63,19 +65,25 @@ def navegador():
             nav.close()
 
 
-def abrir_cena(nav, url):
-    """Página 1920×1080 (escala 1) com a cena carregada e as texturas prontas; devolve (página, lista de erros de JS)."""
-    pg = nav.new_page(viewport={"width": LARGURA, "height": ALTURA}, device_scale_factor=1)
-    pg.set_default_timeout(120000)  # no SwiftShader a carga da cena (PMREM, texturas) passa dos 30 s padrão sob carga
-    erros = []
-    pg.on("pageerror", lambda e: erros.append(str(e)))
-    pg.on("console", lambda m: erros.append(m.text) if m.type == "error" else None)
-    pg.goto(url)
-    pg.wait_for_function("typeof window.renderCena === 'function' && !!window.PRONTO", timeout=60000)
-    pg.evaluate(PRONTO_COM_PRAZO)
-    pg.evaluate("renderCena(0)")  # aquecimento: compila os shaders e sobe as texturas; o primeiro quadro nunca vai para o vídeo
-    capturar(pg)
-    return pg, erros
+def abrir_cena(nav, url, tentativas=3):
+    """Página 1920×1080 (escala 1) com a cena carregada e as texturas prontas; devolve (página, lista de erros de JS).
+    Se o contexto WebGL se perder no aquecimento (SwiftShader sob carga), reabre a página, até `tentativas` vezes."""
+    for tentativa in range(1, tentativas + 1):
+        pg = nav.new_page(viewport={"width": LARGURA, "height": ALTURA}, device_scale_factor=1)
+        pg.set_default_timeout(120000)  # no SwiftShader a carga da cena (PMREM, texturas) passa dos 30 s padrão sob carga
+        erros = []
+        pg.on("pageerror", lambda e: erros.append(str(e)))
+        pg.on("console", lambda m: erros.append(m.text) if m.type == "error" else None)
+        pg.goto(url)
+        pg.wait_for_function("typeof window.renderCena === 'function' && !!window.PRONTO", timeout=60000)
+        pg.evaluate(PRONTO_COM_PRAZO)
+        pg.evaluate("renderCena(0)")  # aquecimento: compila os shaders e sobe as texturas; o primeiro quadro nunca vai para o vídeo
+        if pg.evaluate(CONTEXTO_OK):
+            capturar(pg)
+            return pg, erros
+        pg.close()
+        print(f"aviso: contexto WebGL perdido ao abrir {url} (tentativa {tentativa} de {tentativas}); reabrindo", file=sys.stderr, flush=True)
+    sys.exit(f"{url}: contexto WebGL perdido {tentativas} vezes seguidas")
 
 
 # PNG 1920×1080 lido do framebuffer do WebGL com gl.readPixels (espera o SwiftShader terminar) e reduzido 2×2 em JS.
@@ -93,6 +101,8 @@ x.putImageData(img,0,0);return g.toDataURL('image/png');})()"""
 
 def capturar(pg):
     """Bytes do PNG 1920×1080 do quadro renderizado por último (renderCena)."""
+    if not pg.evaluate(CONTEXTO_OK):
+        raise RuntimeError("contexto WebGL perdido durante o render (SwiftShader); o quadro não pode ser capturado")
     return base64.b64decode(pg.evaluate(CAPTURA).split(",", 1)[1])
 
 

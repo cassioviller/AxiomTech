@@ -125,11 +125,88 @@ def checar_documentos():
     check(set(man) >= {"sige-portal", "sige-fotos", "sige-rdo"}, "documentos: o caso SIGE pede sige-portal, sige-fotos e sige-rdo")
 
 
+CENA_SIGE = CENAS_DIR / "caso-sige.html"
+
+
+def checar_cena_estatica():
+    """Estilo: nenhum texto pintado, um só acento, documentos só de ../site/docs/."""
+    check(CENA_SIGE.exists(), "cena: portfolio/cenas/caso-sige.html não existe")
+    if not CENA_SIGE.exists():
+        return
+    s = CENA_SIGE.read_text(encoding="utf-8")
+    check("fillText" not in s and "strokeText" not in s, "cena sige: texto pintado (fillText/strokeText)")
+    n = s.count("material('acento')")
+    check(n == 1, f"cena sige: {n} usos de material('acento'), esperava 1")
+    check(re.search(r"0x[Ee]0622[Aa]|ORANGE|LARANJA", s) is None, "cena sige: laranja fora de material('acento')")
+    docs = set(re.findall(r"documento\('([^']+)'\)", s))
+    check(docs == {"../site/docs/sige-portal.webp", "../site/docs/sige-fotos.webp", "../site/docs/sige-rdo.webp"},
+          f"cena sige: documentos {sorted(docs)}")
+
+
+def checar_cena_sige():
+    """No Chromium: conteúdo (2 galpões, 22 divisórias, 3 painéis subindo e parados no fim), tela com o portal;
+    t=0: os dois galpões inteiros no quadro, juntos ≥ 60% da largura, e antes do começo da névoa;
+    t=10: os cantos da tela a ≤ 2 px de RETANGULO e o centro da tela como primeiro alvo de um raio da câmera."""
+    from render import abrir_cena, navegador, servidor
+    with servidor() as base, navegador() as nav:
+        pg, erros = abrir_cena(nav, f"{base}/cenas/caso-sige.html")
+        conteudo = pg.evaluate("""(function(){var S=window.__cena;renderCena(10);
+          return [S.galpoes.length,S.divisorias.length,S.paineisSubindo.length,
+                  S.paineisSubindo.every(function(p){return Math.abs(p.rotation.x)<1e-6;}),
+                  S.tela.material.map&&S.tela.material.map.image.src.split('/').pop(),
+                  S.quadros.map(function(q){return q.material.map.image.src.split('/').pop();}).sort()];})()""")
+        check(conteudo == [2, 22, 3, True, "sige-portal.webp", ["sige-fotos.webp", "sige-rdo.webp"]], f"cena sige: conteúdo {conteudo}")
+        inicio = pg.evaluate("""(function(){var S=window.__cena,T=window.__palco.THREE,cam=window.__palco.camera,f=window.__palco.cena.fog;renderCena(0);
+          var xs=[],ok=true,dmax=0;S.galpoes.forEach(function(G){var b=new T.Box3().setFromObject(G);
+            [b.min.x,b.max.x].forEach(function(x){[b.min.z,b.max.z].forEach(function(z){[0,b.max.y].forEach(function(y){
+              var p=new T.Vector3(x,y,z);dmax=Math.max(dmax,p.distanceTo(cam.position));p.project(cam);
+              xs.push(p.x);if(Math.abs(p.x)>.95||Math.abs(p.y)>.95)ok=false;});});});});
+          return [ok,Math.max.apply(null,xs)-Math.min.apply(null,xs),dmax<f.near];})()""")
+        check(inicio[0], "cena sige: em t=0 algum canto dos galpões sai do quadro")
+        check(inicio[1] >= 1.2, f"cena sige: em t=0 os galpões ocupam {inicio[1] / 2:.0%} da largura, esperava ≥ 60%")
+        check(inicio[2], "cena sige: em t=0 parte dos galpões está dentro da névoa")
+        fim = pg.evaluate("""(function(){var S=window.__cena,T=window.__palco.THREE,cam=window.__palco.camera;renderCena(10);
+          S.tela.geometry.computeBoundingBox();var b=S.tela.geometry.boundingBox,cs=[];
+          [[b.min.x,b.min.y],[b.max.x,b.min.y],[b.max.x,b.max.y],[b.min.x,b.max.y]].forEach(function(c){
+            var p=S.tela.localToWorld(new T.Vector3(c[0],c[1],0)).project(cam);cs.push([(p.x+1)/2*1920,(1-p.y)/2*1080]);});
+          var centro=S.tela.getWorldPosition(new T.Vector3()),dir=centro.clone().sub(cam.position).normalize();
+          var hits=new T.Raycaster(cam.position.clone(),dir).intersectObject(window.__palco.cena,true).filter(function(h){return h.object.isMesh;});
+          return [cs,hits.length>0&&hits[0].object===S.tela];})()""")
+        alvo = [[384, 180], [1536, 180], [1536, 900], [384, 900]]  # RETANGULO em 1920×1080, cantos em sentido horário a partir do sup. esq.
+        achados = sorted(fim[0], key=lambda c: (round(c[1] / 100), c[0]))
+        esperado = sorted(alvo, key=lambda c: (round(c[1] / 100), c[0]))
+        erro = max(max(abs(a[0] - e[0]), abs(a[1] - e[1])) for a, e in zip(achados, esperado))
+        check(erro <= 2, f"cena sige: cantos da tela a {erro:.1f} px de RETANGULO no último quadro (máx. 2 px): {achados}")
+        check(fim[1], "cena sige: no último quadro algo fica entre a câmera e o centro da tela")
+        check(not erros, f"cena sige: erros de JS: {erros}")
+
+
+def checar_passagem():
+    """A passagem vídeo → imagem real é invisível: no último quadro, a região de RETANGULO, levada a 1600×1000,
+    tem PSNR ≥ 28 dB contra site/docs/sige-portal.webp."""
+    from render import abrir_cena, capturar, navegador, psnr, servidor
+    with tempfile.TemporaryDirectory() as tmp, servidor() as base, navegador() as nav:
+        tmp = Path(tmp)
+        pg, _ = abrir_cena(nav, f"{base}/cenas/caso-sige.html")
+        pg.evaluate("renderCena(10)")
+        quadro = tmp / "fim.png"
+        quadro.write_bytes(capturar(pg))
+        regiao = tmp / "regiao.png"
+        subprocess.run(["magick", str(quadro), "-crop", "1152x720+384+180", "+repage", "-resize", "1600x1000!", str(regiao)], check=True)
+        doc = tmp / "doc.png"
+        subprocess.run(["magick", str(DOCS / "sige-portal.webp"), str(doc)], check=True)
+        valor = psnr(regiao, doc)
+        check(valor >= 28, f"passagem: PSNR {valor:.1f} dB entre a tela do último quadro e o documento real (mín. 28)")
+
+
 def main():
     checar_documentos()
+    checar_cena_estatica()
     if "--navegador" in sys.argv:
         checar_kit()
         checar_render()
+        checar_cena_sige()
+        checar_passagem()
     if FALHAS:
         print("FALHOU:")
         for f in FALHAS:
