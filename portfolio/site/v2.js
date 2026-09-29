@@ -8,11 +8,15 @@ if(!('IntersectionObserver' in window))return;
 if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 var casos=[].slice.call(document.querySelectorAll('.caso'));
 if(!casos.length)return;
-document.documentElement.classList.add('js-v2');
+// tela baixa (celular deitado): o palco preso não cabe com o texto; fica empilhada, como sem JS, e acompanha a rotação
+var CURTA=matchMedia('(max-height: 520px)');
+function modo(){document.documentElement.classList.toggle('js-v2',!CURTA.matches);}
+modo();
 var CENA=.5,DOC=[.5,.6],DESTAQUE=[.6,.7],LADO=[.62,.72],pendente=false;
 function faixa(p,f){return Math.max(0,Math.min(1,(p-f[0])/(f[1]-f[0])));}
 function atualizar(){
   pendente=false;
+  if(CURTA.matches)return;
   casos.forEach(function(c){
     var r=c.getBoundingClientRect(),curso=c.offsetHeight-innerHeight;
     if(r.bottom<-innerHeight||r.top>2*innerHeight)return;
@@ -21,11 +25,14 @@ function atualizar(){
     if(fig&&fig.__clipe)fig.__clipe.seek(Math.min(1,p/CENA)*fig.__clipe.dur);
     c.style.setProperty('--doc',faixa(p,DOC));
     c.style.setProperty('--destaque',faixa(p,DESTAQUE));
-    c.style.setProperty('--lado',faixa(p,LADO));
+    var lado=faixa(p,LADO);
+    c.style.setProperty('--lado',lado);
+    c.style.setProperty('--vis',lado>0?'visible':'hidden'); // texto invisível fora do fluxo de foco (teclado)
   });
 }
 function pedir(){if(!pendente){pendente=true;requestAnimationFrame(atualizar);}}
 addEventListener('scroll',pedir,{passive:true});
 addEventListener('resize',pedir);
+if(CURTA.addEventListener)CURTA.addEventListener('change',function(){modo();pedir();});
 pedir();
 })();

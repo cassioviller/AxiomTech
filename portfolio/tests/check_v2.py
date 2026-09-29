@@ -308,6 +308,12 @@ def checar_alinhado(b, nome):
         check(abs(achado - esperado) <= 1.5, f"{nome}: .doc fora de RETANGULO em {nome_eixo} ({achado:.1f} ≠ {esperado:.1f})")
 
 
+def checar_texto_fora_do_quadro(b, nome):
+    """Em p=1 o texto fica à direita do quadro inteiro (não só do documento): ≥ 16 px de folga e inteiro na tela."""
+    q, t = b["quadro"], b["texto"]
+    check(t[0] >= q[0] + q[2] + 16, f"{nome}: o texto invade o quadro do vídeo ({q[0] + q[2] - t[0]:.0f} px)")
+
+
 def checar_pagina():
     """1920×1080 com Range: sem erros nem 404; em p=0,25 o vídeo busca 5 s e mostra quadro (.viva); em p=0,25 o documento
     está invisível; em p=1 o documento, o destaque e o texto estão visíveis, o documento em RETANGULO, o destaque
@@ -322,14 +328,19 @@ def checar_pagina():
         check(abs(t - 5.0208) < .05, f"página: em p=0,25 o vídeo está em {t:.3f} s, esperava 5,021 s")
         b = caixas(pg, "sige")
         check(float(b["doc"][4]) == 0, f"página: em p=0,25 o documento já aparece (opacidade {b['doc'][4]})")
+        vis = pg.evaluate("getComputedStyle(document.querySelector('#sige .texto')).visibility")
+        check(vis == "hidden", f"página: em p=0,25 o texto invisível ainda recebe foco (visibility {vis}, esperava hidden)")
         rolar(pg, "sige", 1)
         b = caixas(pg, "sige")
         check(float(b["doc"][4]) == 1 and float(b["dest"][4]) == 1 and float(b["texto"][4]) == 1, f"página: em p=1 opacidades {b['doc'][4]}, {b['dest'][4]}, {b['texto'][4]}")
+        vis = pg.evaluate("getComputedStyle(document.querySelector('#sige .texto')).visibility")
+        check(vis == "visible", f"página: em p=1 o texto está com visibility {vis}")
         checar_alinhado(b, "página 1920×1080")
         d, s = b["doc"], b["dest"]
         check(d[0] <= s[0] and d[1] <= s[1] and s[0] + s[2] <= d[0] + d[2] and s[1] + s[3] <= d[1] + d[3], "página: destaque fora do documento")
         check(b["img"][2] <= 1600, f"página: documento exibido com {b['img'][2]:.0f} px, acima dos 1600 px do arquivo (ampliado)")
         check(b["texto"][0] >= d[0] + d[2] + 16, "página: o texto cobre o documento em 1920×1080")
+        checar_texto_fora_do_quadro(b, "página 1920×1080")
         check(not erros, f"página: erros/404: {erros}")
         ctx.close()
 
@@ -346,6 +357,7 @@ def checar_viewports():
             d = b["doc"]
             check(d[0] >= 0 and d[1] >= 0 and d[0] + d[2] <= w and d[1] + d[3] <= h, f"página {w}×{h}: documento sai da tela {d[:4]}")
             check(b["texto"][0] >= d[0] + d[2] + 16, f"página {w}×{h}: o texto cobre o documento")
+            checar_texto_fora_do_quadro(b, f"página {w}×{h}")
             check(b["img"][2] <= 1600, f"página {w}×{h}: documento ampliado")
             check(not erros, f"página {w}×{h}: erros/404: {erros}")
             ctx.close()
@@ -392,6 +404,26 @@ def checar_celular():
         ctx.close()
 
 
+def checar_recorte_viewports():
+    """Telas em que o documento inteiro sairia ilegível (celular deitado 844×390, tablet em pé 768×1024): sem o documento,
+    com o recorte inteiro na tela e nunca ampliado, e o texto (manchete e apoio) inteiro na tela em p=1."""
+    from render import navegador, servidor
+    with servidor() as base, navegador() as nav:
+        for w, h in ((844, 390), (768, 1024)):
+            ctx, pg, erros = abrir_pagina(nav, base, w, h, device_scale_factor=2, is_mobile=True, has_touch=True)
+            rolar(pg, "sige", 1)
+            b = caixas(pg, "sige")
+            check(b["doc"][5] == "none", f"recorte {w}×{h}: o documento inteiro aparece (sairia com {b['doc'][2]:.0f} px)")
+            r = b["recorte"]
+            check(r and r[5] != "none" and r[0] >= 0 and r[1] >= 0 and r[0] + r[2] <= w and r[1] + r[3] <= h, f"recorte {w}×{h}: recorte fora da tela {r and r[:4]}")
+            check(r and r[2] <= 800, f"recorte {w}×{h}: recorte ampliado")
+            m = pg.evaluate("""(function(){var e=document.querySelector('#sige .apoio').getBoundingClientRect(),
+              t=document.querySelector('#sige .manchete').getBoundingClientRect();return [t.top,e.bottom];})()""")
+            check(m[0] >= 0 and m[1] <= h, f"recorte {w}×{h}: manchete/apoio fora da tela (topo {m[0]:.0f}, base {m[1]:.0f})")
+            check(not erros, f"recorte {w}×{h}: erros/404: {erros}")
+            ctx.close()
+
+
 def checar_readme():
     readme = (RAIZ / "README.md").read_text(encoding="utf-8")
     for trecho in ("site/v2.html", "cenas/render.py --so sige", "cenas/documentos.py", "tests/check_v2.py --navegador"):
@@ -412,6 +444,7 @@ def main():
         checar_viewports()
         checar_sem_range()
         checar_celular()
+        checar_recorte_viewports()
     if "--video" in sys.argv:
         checar_video()
     if FALHAS:

@@ -60,14 +60,16 @@ img{display:block;max-width:100%;height:auto}
 .manchete{font-family:var(--display);font-size:clamp(1.9rem,3.2vw,2.8rem);line-height:1.08;margin:0 0 .5em}
 .apoio{color:var(--apoio-palco);margin:0 0 1em}
 .recorte{display:none;margin:0 0 1em}
+.recorte img{max-height:30vh;width:auto;max-width:100%}
 .caso-link a{color:var(--texto-palco)}
 /* com JS e movimento: o palco fica preso na tela por 300vh; a cena anda na 1ª metade, o documento e o texto na 2ª */
 .js-v2 .caso{height:300vh}
 .js-v2 .palco{position:sticky;top:0;height:100vh}
-.js-v2 .quadro{position:absolute;left:50%;top:50%;width:max(100vw,177.78vh);transform:translate(-50%,-50%) translateX(calc(var(--lado,0)*-13%)) scale(calc(1 - .24*var(--lado,0)))}
-.js-v2 .texto{position:absolute;right:4vw;top:50%;width:min(30rem,30vw);transform:translateY(-50%);opacity:var(--lado,0);padding:0;margin:0}
-@media (max-aspect-ratio:3/2) and (min-width:761px){.js-v2 .quadro{width:100vw}}
-@media (max-width:760px){
+.js-v2 .quadro{position:absolute;left:50%;top:50%;width:max(100vw,177.78vh);transform:translate(-50%,-50%) translateX(calc(var(--lado,0)*-21%)) scale(calc(1 - .24*var(--lado,0)))}
+.js-v2 .texto{position:absolute;right:3vw;top:50%;width:min(30rem,26vw);transform:translateY(-50%);opacity:var(--lado,0);visibility:var(--vis,hidden);padding:0;margin:0}
+@media (max-aspect-ratio:3/2) and (min-width:901px){.js-v2 .quadro{width:100vw}}
+/* documento inteiro ilegível (tela estreita ou baixa): entra o recorte; em tela baixa o v2.js deixa a página empilhada */
+@media (max-width:900px), (max-height:520px){
   .doc{display:none}
   .recorte{display:block}
   .js-v2 .quadro{transform:translate(-50%,-50%)}
