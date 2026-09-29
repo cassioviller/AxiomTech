@@ -272,6 +272,31 @@ def checar_cena_veks():
         check(not erros, f"cena veks: erros de JS: {erros}")
 
 
+def checar_cena_modulares():
+    """O B-36: 2 caixas, o caminhão chega, o guindaste iça a caixa 1 até a fundação, o telhado desce; a prancha no
+    cavalete é o alvo; t=0: caixa 2 e guindaste inteiros e ≥ 60% da largura; t=10 tudo em repouso e a prancha em RETANGULO."""
+    from render import abrir_cena, navegador, servidor
+    with servidor() as base, navegador() as nav:
+        pg, erros = abrir_cena(nav, f"{base}/cenas/caso-modulares.html")
+        fim = pg.evaluate("""(function(){var S=window.__cena;renderCena(10);var c=S.caixas[0].position,r=S.repouso;
+          return [S.caixas.length,S.alvo===S.prancha,S.docs.slice().sort(),
+                  Math.hypot(c.x-r.caixa1[0],c.y-r.caixa1[1],c.z-r.caixa1[2])<1e-3, Math.abs(S.telhado.position.y-r.telhado)<1e-3,
+                  Math.abs(S.caminhao.position.z)<1e-3, S.telhado.visible];})()""")
+        check(fim == [2, True, ["b36-ata.webp", "b36-caixas.webp", "b36-transporte.webp"], True, True, True, True], f"cena modulares: fim {fim}")
+        meio = pg.evaluate("""(function(){var S=window.__cena,r=[];[0,2,5,7.5].forEach(function(t){renderCena(t);
+          r.push([S.caminhao.position.z.toFixed(1),S.caixas[0].position.y.toFixed(2),S.telhado.visible]);});return r;})()""")
+        check(float(meio[0][0]) < -30 and float(meio[1][0]) < 0 and float(meio[2][0]) == 0, f"cena modulares: o caminhão não entra (z em t=0, 2, 5: {[m[0] for m in meio]})")
+        check(float(meio[2][1]) > 4, f"cena modulares: em t=5 a caixa 1 não está no ar (y {meio[2][1]})")
+        check(not meio[0][2] and meio[3][2], "cena modulares: o telhado aparece cedo demais ou não aparece em t=7,5")
+        inicio = inicio_da_cena(pg, "window.__cena.assunto")
+        check(inicio[0], "cena modulares: em t=0 a caixa 2 ou o guindaste saem do quadro")
+        check(inicio[1] >= 1.2, f"cena modulares: em t=0 o assunto ocupa {inicio[1] / 2:.0%} da largura, esperava ≥ 60%")
+        check(inicio[2], "cena modulares: em t=0 parte do assunto está dentro da névoa")
+        checar_enquadramento(pg, "cena modulares")
+        checar_proporcao_alvo(pg, "b36-caixas", "cena modulares")
+        check(not erros, f"cena modulares: erros de JS: {erros}")
+
+
 def checar_passagem(caso):
     """A passagem vídeo → imagem real é invisível: no último quadro, a região de RETANGULO, levada ao tamanho do corte,
     tem PSNR ≥ 28 dB contra site/docs/<doc>.webp."""
@@ -534,6 +559,8 @@ def main():
         checar_cena_abertura()
         checar_cena_veks()
         checar_passagem("veks")
+        checar_cena_modulares()
+        checar_passagem("modulares")
         checar_cena_sige()
         checar_passagem("sige")
         checar_pagina()
