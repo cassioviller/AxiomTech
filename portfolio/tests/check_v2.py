@@ -251,6 +251,27 @@ def checar_cena_abertura():
         check(not erros, f"cena abertura: erros de JS: {erros}")
 
 
+def checar_cena_veks():
+    """A estação de trabalho: o orçamento no monitor (alvo), a planta sobre a mesa; a cadeira gira e para;
+    t=0: mesa, cadeira e estante inteiras e ≥ 60% da largura; t=10: a tela do monitor exatamente em RETANGULO."""
+    from render import abrir_cena, navegador, servidor
+    with servidor() as base, navegador() as nav:
+        pg, erros = abrir_cena(nav, f"{base}/cenas/caso-orcamento.html")
+        conteudo = pg.evaluate("""(function(){var S=window.__cena;renderCena(10);
+          return [S.alvo===S.tela,S.tela.material.map&&S.tela.material.map.image.src.split('/').pop(),S.docs.slice().sort(),S.assunto.length,
+                  Math.abs(S.cadeira.rotation.y)<1e-6];})()""")
+        check(conteudo == [True, "veks-orcamento.webp", ["veks-orcamento.webp", "veks-planta.webp"], 3, True], f"cena veks: conteúdo {conteudo}")
+        giro = pg.evaluate("(function(){var S=window.__cena;renderCena(0);return S.cadeira.rotation.y;})()")
+        check(giro > .5, f"cena veks: a cadeira não começa girada (rotation.y {giro:.2f})")
+        inicio = inicio_da_cena(pg, "window.__cena.assunto")
+        check(inicio[0], "cena veks: em t=0 mesa, cadeira ou estante saem do quadro")
+        check(inicio[1] >= 1.2, f"cena veks: em t=0 a estação ocupa {inicio[1] / 2:.0%} da largura, esperava ≥ 60%")
+        check(inicio[2], "cena veks: em t=0 parte da estação está dentro da névoa")
+        checar_enquadramento(pg, "cena veks")
+        checar_proporcao_alvo(pg, "veks-orcamento", "cena veks")
+        check(not erros, f"cena veks: erros de JS: {erros}")
+
+
 def checar_passagem(caso):
     """A passagem vídeo → imagem real é invisível: no último quadro, a região de RETANGULO, levada ao tamanho do corte,
     tem PSNR ≥ 28 dB contra site/docs/<doc>.webp."""
@@ -511,6 +532,8 @@ def main():
         checar_kit()
         checar_render()
         checar_cena_abertura()
+        checar_cena_veks()
+        checar_passagem("veks")
         checar_cena_sige()
         checar_passagem("sige")
         checar_pagina()
