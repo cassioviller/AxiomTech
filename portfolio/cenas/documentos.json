@@ -1,5 +1,11 @@
 {
   "sige-portal": {"fonte": "site/img/p-portal.webp", "corte": [0, 0, 1600, 1000], "destaque": [110, 278, 200, 78], "recorte": [20, 140, 800, 400]},
   "sige-fotos": {"fonte": "site/img/p-fotos.webp", "corte": [0, 0, 1600, 1353]},
-  "sige-rdo": {"fonte": "site/img/p-diario-portal.webp", "corte": [0, 0, 1600, 1193]}
+  "sige-rdo": {"fonte": "site/img/p-diario-portal.webp", "corte": [0, 0, 1600, 1193]},
+  "veks-orcamento": {"fonte": "zip:saida.zip!saida/manual-do-app/prints/diretor-projetos-1-orcamento.png", "corte": [0, 0, 1280, 800], "destaque": [768, 205, 232, 135], "recorte": [480, 170, 800, 400]},
+  "veks-planta": {"fonte": "zip:saida.zip!saida/manual-do-app/prints/diretor-projetos-1-planta.png", "corte": [296, 160, 600, 500]},
+  "b36-caixas": {"fonte": "zip:casas pre moldadas (1).zip!B36-como-viaja-e-une.png", "corte": [0, 0, 1442, 901], "destaque": [90, 220, 1200, 400], "recorte": [40, 160, 1340, 520]},
+  "b36-transporte": {"fonte": "zip:casas pre moldadas (1).zip!prancha-transporte-tiltup-gambrel.png", "corte": [0, 0, 1709, 1069]},
+  "b36-ata": {"fonte": "pdf:casas pre moldadas (1).zip!b36-atas-decisoes-plano-de-acoes.pdf#1", "corte": [0, 0, 1650, 2330]},
+  "veks-proposta": {"fonte": "site/img/o-proposta.webp", "corte": [0, 0, 885, 1060]}
 }

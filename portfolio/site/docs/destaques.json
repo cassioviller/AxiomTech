@@ -26,5 +26,61 @@
   "altura": 1193,
   "destaque": null,
   "recorte": null
+ },
+ "veks-orcamento": {
+  "largura": 1280,
+  "altura": 800,
+  "destaque": [
+   768,
+   205,
+   232,
+   135
+  ],
+  "recorte": [
+   480,
+   170,
+   800,
+   400
+  ]
+ },
+ "veks-planta": {
+  "largura": 600,
+  "altura": 500,
+  "destaque": null,
+  "recorte": null
+ },
+ "b36-caixas": {
+  "largura": 1442,
+  "altura": 901,
+  "destaque": [
+   90,
+   220,
+   1200,
+   400
+  ],
+  "recorte": [
+   40,
+   160,
+   1340,
+   520
+  ]
+ },
+ "b36-transporte": {
+  "largura": 1709,
+  "altura": 1069,
+  "destaque": null,
+  "recorte": null
+ },
+ "b36-ata": {
+  "largura": 1650,
+  "altura": 2330,
+  "destaque": null,
+  "recorte": null
+ },
+ "veks-proposta": {
+  "largura": 885,
+  "altura": 1060,
+  "destaque": null,
+  "recorte": null
  }
 }

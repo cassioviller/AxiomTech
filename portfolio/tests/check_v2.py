@@ -122,7 +122,15 @@ def checar_documentos():
             check(dims(DOCS / f"{i}-recorte.webp") == (rw, rh), f"documentos: recorte de {i} com dimensões erradas")
             if d.get("destaque"):
                 check(rx <= dx and ry <= dy and dx + dw <= rx + rw and dy + dh <= ry + rh, f"documentos: o recorte de {i} não contém o destaque")
-    check(set(man) >= {"sige-portal", "sige-fotos", "sige-rdo"}, "documentos: o caso SIGE pede sige-portal, sige-fotos e sige-rdo")
+    check(set(man) >= {"sige-portal", "sige-fotos", "sige-rdo", "veks-orcamento", "veks-planta", "b36-caixas", "b36-transporte", "b36-ata", "veks-proposta"},
+          f"documentos: faltam ids no manifesto: {sorted({'sige-portal', 'sige-fotos', 'sige-rdo', 'veks-orcamento', 'veks-planta', 'b36-caixas', 'b36-transporte', 'b36-ata', 'veks-proposta'} - set(man))}")
+    for i, d in man.items():
+        f = d["fonte"]
+        check(f.startswith(("zip:", "pdf:")) or (RAIZ / f).exists(), f"documentos: fonte de {i} não existe: {f}")
+        if f.startswith("zip:") or f.startswith("pdf:"):
+            check("!" in f and Path(f.split(":", 1)[1].split("!")[0]).suffix == ".zip", f"documentos: fonte {f!r} de {i} não é zip:<arquivo.zip>!<membro>")
+        if f.startswith("pdf:"):
+            check(re.search(r"#\d+$", f) is not None, f"documentos: fonte pdf de {i} sem #página")
 
 
 CENA_SIGE = CENAS_DIR / "caso-sige.html"
