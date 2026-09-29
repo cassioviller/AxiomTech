@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Cena · Abertura (a mesa de trabalho)</title>
+<link rel="icon" href="data:,"><!-- evita o pedido automático de /favicon.ico (viraria um "erro" de console falso) -->
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"../site/vendor/three.module.js"}}</script>
+</head><body>
+<script type="module">
+// Abertura: a mesa de trabalho com os documentos reais dos casos: a proposta dos 36 minutos (folha A4), a tela do
+// orçamento da VEKS (impressa, A4 deitada), o portal do SIGE (num tablet) e a prancha do B-36 (A3 deitada).
+// t: 0,5 → 2,5 a proposta desliza para o lugar; a câmera sai de três quartos à frente da mesa (t=0) e termina a pino (t=10).
+import {THREE, criarPalco, material, documento, trajeto, enquadrarPlano, publicar, rampa, lerp} from './kit.js';
+
+const palco = criarPalco({ceu: 0xE3E7EA, nevoa: [30, 90]});
+const {cena, camera, sol} = palco;
+sol.position.set(-6, 9, 5);
+Object.assign(sol.shadow.camera, {left: -6, right: 6, top: 6, bottom: -6});
+sol.shadow.camera.updateProjectionMatrix();
+const S = {mesa: null, proposta: null, docs: [], assunto: [], alvo: null};
+window.__cena = S;
+
+function bloco(c, a, p, x, y, z, pai, mat) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(c, a, p), mat);
+  m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; pai.add(m); return m;
+}
+// documento real deitado sobre a mesa (papel ou tela): plano com a proporção do arquivo, textura de ../site/docs/
+function folha(textura, larg, alt, x, y, z, giro, pai) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(larg, alt), new THREE.MeshBasicMaterial({color: 0xffffff}));
+  m.rotation.set(-Math.PI / 2, 0, giro); m.position.set(x, y, z); pai.add(m); S.docs.push(m);
+  textura.then(tx => { m.material.map = tx; m.material.needsUpdate = true; });
+  return m;
+}
+
+// a sala: piso de madeira, parede do fundo
+const piso = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), material('madeira', {repetir: 6}));
+piso.rotation.x = -Math.PI / 2; piso.receiveShadow = true; cena.add(piso);
+bloco(12, 3, .1, 0, 1.5, -2.5, cena, material('papel'));
+
+// a mesa: tampo 1,6 × 0,8 m a 0,75 m, pernas de aço pintado
+S.mesa = new THREE.Group(); cena.add(S.mesa); S.assunto = [S.mesa];
+bloco(1.6, .04, .8, 0, .73, 0, S.mesa, material('madeira', {repetir: 2}));
+[[-.75, -.35], [.75, -.35], [-.75, .35], [.75, .35]].forEach(p => bloco(.05, .71, .05, p[0], .355, p[1], S.mesa, material('acoPintado')));
+
+// os documentos: a prancha do B-36 (A3 deitada, 1442×901), a tela do orçamento impressa (A4 deitada, 1280×800),
+// o portal do SIGE num tablet (tela 0,24 × 0,15, 1600×1000) e a proposta (A4 em pé, 885×1060), que desliza para o lugar
+folha(documento('../site/docs/b36-caixas.webp'), .42, .2624, -.42, .752, .18, .04, S.mesa);
+folha(documento('../site/docs/veks-orcamento.webp'), .297, .1856, .05, .752, -.15, -.03, S.mesa);
+const tablet = new THREE.Group(); tablet.position.set(.45, .75, .12); tablet.rotation.y = .1; S.mesa.add(tablet);
+bloco(.26, .008, .17, 0, .004, 0, tablet, material('plastico'));
+folha(documento('../site/docs/sige-portal.webp'), .24, .15, 0, .0085, 0, 0, tablet);
+S.proposta = folha(documento('../site/docs/veks-proposta.webp'), .21, .2515, -.62, .754, -.34, .4, S.mesa); // começa na beira da mesa
+
+// o resto da mesa: uma caneca, um lápis laranja (o acento da cena)
+const caneca = new THREE.Mesh(new THREE.CylinderGeometry(.04, .036, .095, 24), material('papel'));
+caneca.position.set(.66, .7975, -.25); caneca.castShadow = true; S.mesa.add(caneca);
+const lapis = new THREE.Mesh(new THREE.CylinderGeometry(.004, .004, .18, 8), material('acento'));
+lapis.rotation.set(0, 0, Math.PI / 2); lapis.rotation.y = .5; lapis.position.set(.2, .754, .3); lapis.castShadow = true; S.mesa.add(lapis);
+
+// câmera: de três quartos, à frente da mesa, a 2,7 m (t=0; a mesa inteira, pés no chão) a pino sobre ela (t=10), com 1,05 m do tampo no retângulo (cada documento com ≥ 12 % da largura)
+cena.updateMatrixWorld(true);
+const centro = new THREE.Vector3(0, .75, 0);
+const fim = enquadrarPlano(camera, centro, new THREE.Vector3(0, 1, .06), 1.05);
+const cam = trajeto([
+  [0, [1.53, 1.1, 2.11], [0, .28, 0]],
+  [4, [1.2, 1.7, 1.0], [0, .75, 0]],
+  [10, fim[0], fim[1]],
+]);
+publicar(palco, cam, t => {
+  const f = rampa(t, .5, 2.5);
+  S.proposta.position.set(lerp(-.62, -.36, f), .754, lerp(-.34, -.2, f));
+  S.proposta.rotation.z = lerp(.4, .08, f);
+});
+</script>
+</body></html>

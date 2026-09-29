@@ -135,22 +135,27 @@ def checar_documentos():
             check(re.search(r"#\d+$", f) is not None, f"documentos: fonte pdf de {i} sem #página")
 
 
-CENA_SIGE = CENAS_DIR / "caso-sige.html"
+CENAS_HTML = {"abertura.html": {"veks-proposta", "veks-orcamento", "sige-portal", "b36-caixas"},
+              "caso-orcamento.html": {"veks-orcamento", "veks-planta"},
+              "caso-sige.html": {"sige-portal", "sige-fotos", "sige-rdo"},
+              "caso-modulares.html": {"b36-caixas", "b36-transporte", "b36-ata"}}
 
 
 def checar_cena_estatica():
-    """Estilo: nenhum texto pintado, um só acento, documentos só de ../site/docs/."""
-    check(CENA_SIGE.exists(), "cena: portfolio/cenas/caso-sige.html não existe")
-    if not CENA_SIGE.exists():
-        return
-    s = CENA_SIGE.read_text(encoding="utf-8")
-    check("fillText" not in s and "strokeText" not in s, "cena sige: texto pintado (fillText/strokeText)")
-    n = s.count("material('acento')")
-    check(n == 1, f"cena sige: {n} usos de material('acento'), esperava 1")
-    check(re.search(r"0x[Ee]0622[Aa]|ORANGE|LARANJA", s) is None, "cena sige: laranja fora de material('acento')")
-    docs = set(re.findall(r"documento\('([^']+)'\)", s))
-    check(docs == {"../site/docs/sige-portal.webp", "../site/docs/sige-fotos.webp", "../site/docs/sige-rdo.webp"},
-          f"cena sige: documentos {sorted(docs)}")
+    """Estilo de cada cena: nenhum texto pintado, um só acento, documentos só de ../site/docs/ (os previstos)."""
+    for arquivo, docs_esperados in CENAS_HTML.items():
+        cena = CENAS_DIR / arquivo
+        check(cena.exists(), f"cena: portfolio/cenas/{arquivo} não existe")
+        if not cena.exists():
+            continue
+        s = cena.read_text(encoding="utf-8")
+        check("fillText" not in s and "strokeText" not in s, f"cena {arquivo}: texto pintado (fillText/strokeText)")
+        n = s.count("material('acento')")
+        check(n == 1, f"cena {arquivo}: {n} usos de material('acento'), esperava 1")
+        check(re.search(r"0x[Ee]0622[Aa]|ORANGE|LARANJA", s) is None, f"cena {arquivo}: laranja fora de material('acento')")
+        docs = set(re.findall(r"documento\('\.\./site/docs/([a-z0-9-]+)\.webp'\)", s))
+        check(docs == docs_esperados, f"cena {arquivo}: documentos {sorted(docs)}, esperava {sorted(docs_esperados)}")
+        check('<link rel="icon" href="data:,">' in s, f"cena {arquivo}: sem o ícone inerte (o 404 de /favicon.ico vira erro de console)")
 
 
 CASOS = {
@@ -219,6 +224,31 @@ def checar_cena_sige():
         checar_enquadramento(pg, "cena sige")
         checar_proporcao_alvo(pg, "sige-portal", "cena sige")
         check(not erros, f"cena sige: erros de JS: {erros}")
+
+
+def checar_cena_abertura():
+    """A mesa: quatro documentos reais; t=0 a mesa inteira, ≥ 60% da largura; t 0,5→2,5 a proposta desliza e para;
+    t=10 os quatro documentos inteiros no quadro, cada um com ≥ 12% da largura."""
+    from render import abrir_cena, navegador, servidor
+    with servidor() as base, navegador() as nav:
+        pg, erros = abrir_cena(nav, f"{base}/cenas/abertura.html")
+        nomes = pg.evaluate("(function(){var S=window.__cena;renderCena(10);return [S.docs.map(function(d){return d.material.map&&d.material.map.image.src.split('/').pop();}).sort(),S.alvo===null,S.assunto.length];})()")
+        check(nomes == [["b36-caixas.webp", "sige-portal.webp", "veks-orcamento.webp", "veks-proposta.webp"], True, 1], f"cena abertura: {nomes}")
+        inicio = inicio_da_cena(pg, "window.__cena.assunto")
+        check(inicio[0], "cena abertura: em t=0 a mesa sai do quadro")
+        check(inicio[1] >= 1.2, f"cena abertura: em t=0 a mesa ocupa {inicio[1] / 2:.0%} da largura, esperava ≥ 60%")
+        check(inicio[2], "cena abertura: em t=0 a mesa está dentro da névoa")
+        pos = pg.evaluate("(function(){var S=window.__cena,r=[];[0,2.5,10].forEach(function(t){renderCena(t);r.push(S.proposta.position.x.toFixed(3));});return r;})()")
+        check(pos[0] != pos[1] and pos[1] == pos[2], f"cena abertura: a proposta não desliza e para (x em t=0, 2,5 e 10: {pos})")
+        fim = pg.evaluate("""(function(){var S=window.__cena,T=window.__palco.THREE,cam=window.__palco.camera;renderCena(10);
+          return S.docs.map(function(d){d.geometry.computeBoundingBox();var b=d.geometry.boundingBox,xs=[],ok=true;
+            [[b.min.x,b.min.y],[b.max.x,b.min.y],[b.max.x,b.max.y],[b.min.x,b.max.y]].forEach(function(c){
+              var p=d.localToWorld(new T.Vector3(c[0],c[1],0)).project(cam);xs.push(p.x);if(Math.abs(p.x)>.95||Math.abs(p.y)>.95)ok=false;});
+            return [ok,(Math.max.apply(null,xs)-Math.min.apply(null,xs))/2];});})()""")
+        for i, (ok, larg) in enumerate(fim):
+            check(ok, f"cena abertura: em t=10 o documento {i} sai do quadro")
+            check(larg >= .12, f"cena abertura: em t=10 o documento {i} tem {larg:.0%} da largura (mín. 12%)")
+        check(not erros, f"cena abertura: erros de JS: {erros}")
 
 
 def checar_passagem(caso):
@@ -480,6 +510,7 @@ def main():
     if "--navegador" in sys.argv:
         checar_kit()
         checar_render()
+        checar_cena_abertura()
         checar_cena_sige()
         checar_passagem("sige")
         checar_pagina()
