@@ -385,6 +385,11 @@ def checar_pagina_estatica():
         "modulares": ("O celeiro B-36 não cabia no caminhão: dividi em duas caixas.",
                       "Três viagens, telhado em kit, 37 decisões registradas. Pré-dimensionado, sujeito à revisão do engenheiro responsável."),
     }
+    # o caso 1 do spec (36 minutos) não tem cena própria: os prints originais não vêm e os de 760 px não podem ser ampliados.
+    # O número entra no caso do orçamento, cujo documento é a proposta feita nesses 36 minutos.
+    MEDIDAS = {"veks": "Esta proposta (ampliação de 328 m², 26 ambientes) saiu em 36 minutos, medidos do primeiro arquivo aberto ao PDF. À mão, cerca de 1 dia útil (estimativa)."}
+    LINKS = {"veks": ["sistema", "orcamento"], "sige": ["sige"], "modulares": ["modular"]}
+    portfolio = (SITE / "portfolio.html").read_text(encoding="utf-8")
     secoes = re.findall(r'<section class="caso cena" id="([a-z]+)" data-caso="\1">(.*?)</section>', p, re.S)
     check([s[0] for s in secoes] == list(CASOS), f"página: casos {[s[0] for s in secoes]}, esperava {list(CASOS)} nessa ordem")
     dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))
@@ -398,6 +403,10 @@ def checar_pagina_estatica():
             check(len(t.split()) <= 12 and re.search(r"\d", t), f"página {caso}: manchete fora da regra (≤ 12 palavras, com número): {t!r}")
         for t in a:
             check(len(texto_visivel(t).split()) <= 30, f"página {caso}: apoio com {len(texto_visivel(t).split())} palavras (máx. 30)")
+        md = [texto_visivel(t) for t in re.findall(r'<p class="medida"[^>]*>(.*?)</p>', corpo, re.S)]
+        check(md == ([MEDIDAS[caso]] if caso in MEDIDAS else []), f"página {caso}: linha da medida {md!r}")
+        for t in md:
+            check(len(t.split()) <= 30 and "(estimativa)" in t, f"página {caso}: medida fora da regra (≤ 30 palavras, com a ressalva da estimativa): {t!r}")
         doc = CASOS[caso]["doc"]
         d = dest[doc]
         x, y, w, h = d["destaque"]
@@ -408,8 +417,11 @@ def checar_pagina_estatica():
         rx, ry, rw, rh = d["recorte"]
         check(f'<img src="docs/{doc}-recorte.webp" width="{rw}" height="{rh}"' in corpo, f"página {caso}: recorte de {doc} com src/width/height errados")
         check(f'<figure class="clipe" data-clipe="video/v2-{caso}.mp4" data-dur="{CASOS[caso]["dur"]:g}" aria-hidden="true">' in corpo, f"página {caso}: figure.clipe")
-        alvo = re.search(r'<p class="caso-link"><a href="portfolio\.html#([a-z-]+)">', corpo)
-        check(alvo and f'id="{alvo.group(1)}"' in (SITE / "portfolio.html").read_text(encoding="utf-8"), f"página {caso}: link do caso completo sem âncora existente em portfolio.html")
+        elo = re.search(r'<p class="caso-link">(.*?)</p>', corpo, re.S)
+        alvos = re.findall(r'<a href="portfolio\.html#([a-z-]+)">', elo.group(1)) if elo else []
+        check(alvos == LINKS[caso], f"página {caso}: links do caso completo {alvos}, esperava {LINKS[caso]}")
+        for alvo in alvos:
+            check(f'id="{alvo}"' in portfolio, f"página {caso}: link do caso completo sem âncora existente em portfolio.html (#{alvo})")
     for proibido in PROIBIDOS:
         check(proibido not in vis, f"página: texto proibido {proibido!r}")
     check(re.search(r"\bItu\b", vis) is None, "página: nome do município do cliente (Itu)")
@@ -555,6 +567,10 @@ def checar_celular():
             r = b["recorte"]
             check(r and r[5] != "none" and r[0] >= 0 and r[1] >= 0 and r[0] + r[2] <= 390 and r[1] + r[3] <= 844, f"celular {caso}: recorte fora da tela {r}")
             check(r and r[2] <= dest[CASOS[caso]["doc"]]["recorte"][2], f"celular {caso}: recorte ampliado")
+            m = pg.evaluate(f"""(function(){{var t=document.querySelector('#{caso} .rotulo').getBoundingClientRect(),
+              e=document.querySelector('#{caso} .caso-link').getBoundingClientRect(),
+              barra=document.querySelector('.barra').getBoundingClientRect();return [t.top,barra.bottom,e.bottom];}})()""")
+            check(m[0] >= m[1] and m[2] <= 844, f"celular {caso}: o texto não cabe entre a barra e o fim da tela (topo {m[0]:.0f}, barra {m[1]:.0f}, base {m[2]:.0f})")
         check(not erros, f"celular: erros/404: {erros}")
         ctx.close()
         ctx, pg, erros = abrir_pagina(nav, base, 1920, 1080, reduced_motion="reduce")
@@ -584,9 +600,9 @@ def checar_recorte_viewports():
                 r = b["recorte"]
                 check(r and r[5] != "none" and r[0] >= 0 and r[1] >= 0 and r[0] + r[2] <= w and r[1] + r[3] <= h, f"recorte {caso} {w}×{h}: recorte fora da tela {r and r[:4]}")
                 check(r and r[2] <= dest[CASOS[caso]["doc"]]["recorte"][2], f"recorte {caso} {w}×{h}: recorte ampliado")
-                m = pg.evaluate(f"""(function(){{var e=document.querySelector('#{caso} .apoio').getBoundingClientRect(),
+                m = pg.evaluate(f"""(function(){{var e=(document.querySelector('#{caso} .medida')||document.querySelector('#{caso} .apoio')).getBoundingClientRect(),
                   t=document.querySelector('#{caso} .manchete').getBoundingClientRect();return [t.top,e.bottom];}})()""")
-                check(m[0] >= 0 and m[1] <= h, f"recorte {caso} {w}×{h}: manchete/apoio fora da tela (topo {m[0]:.0f}, base {m[1]:.0f})")
+                check(m[0] >= 0 and m[1] <= h, f"recorte {caso} {w}×{h}: manchete/apoio/medida fora da tela (topo {m[0]:.0f}, base {m[1]:.0f})")
             check(not erros, f"recorte {w}×{h}: erros/404: {erros}")
             ctx.close()
 

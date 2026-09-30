@@ -58,7 +58,8 @@ img{display:block;max-width:100%;height:auto}
 .texto{padding:28px 20px 48px;max-width:40rem;margin:0 auto;color:var(--texto-palco)}
 .rotulo{font-family:var(--mono);font-size:.8rem;color:var(--laranja);margin:0 0 .6em;text-transform:uppercase;letter-spacing:.04em}
 .manchete{font-family:var(--display);font-size:clamp(1.9rem,3.2vw,2.8rem);line-height:1.08;margin:0 0 .5em}
-.apoio{color:var(--apoio-palco);margin:0 0 1em}
+.apoio,.medida{color:var(--apoio-palco);margin:0 0 1em}
+.medida{border-left:2px solid var(--laranja);padding-left:.7em}
 .recorte{display:none;margin:0 0 1em}
 .recorte img{max-height:30vh;width:auto;max-width:100%}
 .caso-link a{color:var(--texto-palco)}
@@ -91,7 +92,7 @@ img{display:block;max-width:100%;height:auto}
   .doc{display:none}
   .recorte{display:block}
   .js-v2 .quadro{transform:translate(-50%,-50%)}
-  .js-v2 .texto{left:0;right:0;top:auto;bottom:0;width:auto;transform:none;padding:20px;background:linear-gradient(transparent,rgba(10,14,18,.92) 14%)}
+  .js-v2 .texto{left:0;right:0;top:auto;bottom:0;width:auto;transform:none;padding:40px 20px 20px;background:linear-gradient(transparent,rgba(10,14,18,.92) 40px)}
 }
 @media (prefers-reduced-motion: reduce){.clipe video{display:none}}
 </style>
@@ -150,8 +151,9 @@ img{display:block;max-width:100%;height:auto}
         <p class="rotulo">Sistema de orçamento (VEKS) · mar → set/2026 · da planta do cliente à proposta</p>
         <h2 class="manchete">Orcei 13 obras, de R$ 29 mil a R$ 24,5 milhões.</h2>
         <p class="apoio">11 com proposta. Conferência com a SINAPI: desvio máximo de 0,25% nos 19 serviços conferidos. A gestão de obra deste sistema ainda não rodou numa obra real.</p>
+        <p class="medida">Esta proposta (ampliação de 328 m², 26 ambientes) saiu em 36 minutos, medidos do primeiro arquivo aberto ao PDF. À mão, cerca de 1 dia útil (estimativa).</p>
         <figure class="recorte"><img src="docs/veks-proposta-modelo-recorte.webp" width="1016" height="372" alt="Recorte da proposta: a planta baixa do cliente com as paredes a construir em vermelho."></figure>
-        <p class="caso-link"><a href="portfolio.html#sistema">Ver o caso completo →</a></p>
+        <p class="caso-link"><a href="portfolio.html#sistema">Ver o caso completo →</a> · <a href="portfolio.html#orcamento">Ver os 36 minutos medidos →</a></p>
       </div>
     </div>
   </section>
@@ -164,7 +166,7 @@ img{display:block;max-width:100%;height:auto}
           <img src="video/v2-sige.webp" alt="" width="1920" height="1080">
         </figure>
         <div class="doc" style="left:20%;top:16.6667%;width:60%;height:66.6667%">
-          <img src="docs/sige-portal.webp" width="1600" height="1000" alt="Portal do cliente no SIGE: obra com 44,7% concluído, 109 etapas e 65 relatórios diários; o nome do cliente aparece borrado.">
+          <img src="docs/sige-portal.webp" width="1600" height="1000" alt="Portal do cliente no SIGE: obra com 44,7% concluído, 109 etapas e 65 relatórios diários; o nome do cliente e o endereço estão cobertos.">
           <span class="destaque" style="left:6.8750%;top:27.8000%;width:12.5000%;height:7.8000%"></span>
         </div>
       </div>
