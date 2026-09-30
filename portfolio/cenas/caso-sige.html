@@ -13,7 +13,7 @@
 // brita, carrinho, baldes, tambores), vala cercada com fita zebrada, caixa d'água elevada, gerador com cabo, banheiro
 // químico, contêiner, caçamba, caminhonete, caminhão de painéis na porteira, cerca de arame, estrada, moitas, árvores e
 // gado ao longe; e o escritório com cadeira, capacete, garrafa térmica, quadro de cortiça e o cabo do notebook.
-import {THREE, criarPalco, material, arvore as arvoreKit, vidro, documento, trajeto, enquadrarPlano, publicar, rampa} from './kit.js';
+import {THREE, criarPalco, material, arvore as arvoreKit, vidro, emMetros, documento, trajeto, enquadrarPlano, publicar, rampa} from './kit.js';
 
 const palco = criarPalco({ceu: 0xD9E2EA, nevoa: [140, 340]});
 const {cena, camera, sol} = palco;
@@ -35,8 +35,8 @@ const LOCAL = {
   amarelo: new THREE.MeshStandardMaterial({color: 0xE3B72B, roughness: .55}),
   verdeMaquina: new THREE.MeshStandardMaterial({color: 0x4C5B4A, roughness: .6, metalness: .3}),
   // areia e brita: a cor própria com o relevo (mapa de normais) do solo do kit, que já tem grãos e pedriscos
-  areia: new THREE.MeshStandardMaterial({color: 0xC9B98F, roughness: 1, normalMap: material('solo').normalMap, normalScale: new THREE.Vector2(1.5, 1.5)}),
-  brita: new THREE.MeshStandardMaterial({color: 0x7E7B76, roughness: 1, normalMap: material('solo').normalMap, normalScale: new THREE.Vector2(3, 3)}),
+  areia: emMetros(new THREE.MeshStandardMaterial({color: 0xC9B98F, roughness: 1, normalMap: material('solo').normalMap, normalScale: new THREE.Vector2(1.5, 1.5)}), 'solo'),
+  brita: emMetros(new THREE.MeshStandardMaterial({color: 0x7E7B76, roughness: 1, normalMap: material('solo').normalMap, normalScale: new THREE.Vector2(3, 3)}), 'solo'),
   cortica: new THREE.MeshStandardMaterial({color: 0xB88A5A, roughness: .95}),
   pvc: new THREE.MeshStandardMaterial({color: 0xE8E4D8, roughness: .5}),
   agua: new THREE.MeshPhysicalMaterial({color: 0x5C4A3A, roughness: .04, metalness: 0, envMapIntensity: 1.6, clearcoat: 1, clearcoatRoughness: .03}),

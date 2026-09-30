@@ -114,46 +114,159 @@ export function criarPalco({ceu = 0xD9E2EA, nevoa = null, solPos = [-40, 60, 30]
   return {THREE, renderer, cena, camera, sol, hemi, composer, ao};
 }
 
-// textura procedural: ruído de valor em 3 oitavas (grade G×G, periódica) + grão fino; semente fixa por tipo.
-// Devolve o mapa de cor (cor-base em sRGB modulada pelo ruído), o mapa de normais (derivado do mesmo relevo, com a
-// força `relevo`) e o mapa de rugosidade (a rugosidade-base variando com o relevo): é o que dá às superfícies o
-// micro-relevo e o brilho irregular que a luz real revela (o mesmo princípio dos materiais PBR do Lumion).
-function ruido(cor, variacao, G, tam, semente, relevo, rug) {
+// ---------- materiais PBR procedurais ----------
+// Cada tipo tem um tamanho real de ladrilho (L, em metros) e um desenho próprio do revestimento: veios na madeira,
+// réguas no assoalho, peças e rejunte no porcelanato, ondas trapezoidais na telha, aço escovado, poros no concreto,
+// casca de laranja na tinta, agregado no asfalto, sulcos na casca da árvore. O desenho dá três mapas: cor (sRGB),
+// normais (derivadas da altura em metros pela inclinação real: o relevo tem o tamanho de verdade) e rugosidade.
+// Mapeamento em metros (box mapping no espaço do objeto): a textura é projetada pela posição local de cada fragmento,
+// no plano perpendicular ao eixo dominante da normal local, então o ladrilho tem o mesmo tamanho numa peça de 5 cm ou
+// numa água de telhado de 7 m (antes, as UVs 0..1 de cada face esticavam o ruído em manchas), e acompanha a peça quando
+// ela se move (o guindaste, os painéis subindo). Faces em x: (z, y); em y: (x, z); em z: (x, y). O "u" da textura
+// (o eixo x do canvas) é o comprimento dos veios, das réguas e das ondas da telha.
+
+// ruído de valor periódico com frequências independentes em u e v (escU, escV inteiros ≤ 256): fecha sem emenda
+function geradorRuido(semente) {
   let s = semente;
   const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
-  const grade = [];
-  for (let i = 0; i < G * G * 16; i++) grade.push(rnd());
-  const GG = G * 4;
-  const v = (a, b) => grade[((b % GG + GG) % GG) * GG + ((a % GG + GG) % GG)];
-  // cada oitava é periódica no seu próprio passo `esc` (índices módulo esc): a textura fecha sem emenda no ladrilho
-  const oitava = (x, y, esc) => { const gx = x * esc, gy = y * esc, ix = Math.floor(gx), iy = Math.floor(gy), fx = suave(gx - ix), fy = suave(gy - iy);
-    const a = ix % esc, b = (ix + 1) % esc, c = iy % esc, e = (iy + 1) % esc;
-    return lerp(lerp(v(a, c), v(b, c), fx), lerp(v(a, e), v(b, e), fx), fy); };
-  const alt = new Float32Array(tam * tam);
+  const N = 256, grade = new Float32Array(N * N);
+  for (let i = 0; i < N * N; i++) grade[i] = rnd();
+  const n = (u, v, escU, escV = escU) => {
+    const gx = u * escU, gy = v * escV, ix = Math.floor(gx), iy = Math.floor(gy), fx = suave(gx - ix), fy = suave(gy - iy);
+    const a = ((ix % escU) + escU) % escU, b = (a + 1) % escU, c = ((iy % escV) + escV) % escV, e = (c + 1) % escV;
+    return lerp(lerp(grade[c * N + a], grade[c * N + b], fx), lerp(grade[e * N + a], grade[e * N + b], fx), fy);
+  };
+  const fbm = (u, v, esc, escV = esc) => .55 * n(u, v, esc, escV) + .27 * n(u, v, 2 * esc, 2 * escV) + .18 * n(u, v, 4 * esc, 4 * escV);
+  return {rnd, n, fbm};
+}
+
+// desenhos: (u, v ∈ [0,1), px = coluna, py = linha, R = gerador, P = pré-cálculo do tipo) → [altura em m, fator de cor, rugosidade]
+// (ou [h, k, r, [r, g, b]] quando o pixel tem cor própria, como o rejunte); `prep` roda uma vez por tipo
+const DESENHOS = {
+  pasto: (u, v, px, py, R) => { const f = R.fbm(u, v, 10); return [.004 * f, 1 + (f - .5) * .4 + (R.rnd() - .5) * .14, 1]; },
+  solo: (u, v, px, py, R) => { const f = R.fbm(u, v, 12); return [.003 * f, 1 + (f - .5) * .34 + (R.rnd() - .5) * .12, 1]; },
+  concreto: {
+    // poros (bolhas de ar na superfície) e agregado fino; manchas leves de cura
+    prep: (tam, R) => { const h = new Float32Array(tam * tam);
+      for (let i = 0; i < 2600; i++) { const cx = R.rnd() * tam, cy = R.rnd() * tam, r = .6 + R.rnd() * 1.8;
+        for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) { const d = Math.hypot(dx, dy) / r; if (d < 1) {
+          const x = ((Math.round(cx) + dx) % tam + tam) % tam, y = ((Math.round(cy) + dy) % tam + tam) % tam; h[y * tam + x] = Math.min(h[y * tam + x], -(1 - d * d)); } } }
+      return h; },
+    f: (u, v, px, py, R, P, tam) => { const f = R.fbm(u, v, 6), g = R.n(u, v, 128), poro = P[py * tam + px];
+      return [.0006 * g + .0012 * poro + .0004 * f, 1 + (f - .5) * .1 + (g - .5) * .06 + (R.rnd() - .5) * .05 + .28 * poro, .9 - .1 * poro]; },
+  },
+  aco: (u, v, px, py, R) => { const s = R.n(u, v, 4, 220), m = R.fbm(u, v, 3); // escovado ao longo de u
+    return [.00004 * s, 1 + (s - .5) * .08 + (m - .5) * .05, .3 + (s - .5) * .12 + (m - .5) * .1]; },
+  acoPintado: (u, v, px, py, R) => { const f = R.fbm(u, v, 40), m = R.fbm(u, v, 3); // pintura eletrostática: casca de laranja fina
+    return [.00012 * f, 1 + (f - .5) * .04 + (m - .5) * .04, .45 + (f - .5) * .1]; },
+  plastico: (u, v, px, py, R) => { const f = R.fbm(u, v, 48); return [.00004 * f, 1 + (f - .5) * .03, .45 + (f - .5) * .08]; },
+  papel: (u, v, px, py, R) => { const f = R.n(u, v, 96, 64), m = R.fbm(u, v, 4); // placa pintada: fibra fina, sem manchas
+    return [.00004 * f, 1 + (f - .5) * .025 + (m - .5) * .02, .9]; },
+  tinta: (u, v, px, py, R) => { const f = R.fbm(u, v, 56), m = R.fbm(u, v, 3); // parede pintada com rolo: casca de laranja
+    return [.00018 * f, 1 + (f - .5) * .025 + (m - .5) * .02, .88 + (f - .5) * .08]; },
+  madeira: (u, v, px, py, R) => { // veios ao longo de u: anéis deformados pelo ruído, fibras finas, nós raros
+    const anel = v * 9 + 2.2 * R.n(u, v, 2, 5) + .6 * R.n(u, v, 8, 24), fr = anel - Math.floor(anel);
+    const veio = Math.pow(Math.abs(Math.sin(fr * Math.PI)), 8), fibra = R.n(u, v, 6, 200), tom = R.fbm(u, v, 2, 3);
+    return [-.00015 * veio + .00005 * fibra, 1 + (tom - .5) * .16 - .11 * veio + (fibra - .5) * .07, .62 + .14 * veio];
+  },
+  assoalho: { // réguas de 15 cm (16 por ladrilho de 2,4 m), topo alternado; junta rebaixada escura entre réguas
+    prep: (tam, R) => Array.from({length: 16}, () => ({tom: (R.rnd() - .5) * .24, corte: R.rnd(), des: R.rnd() * 40})),
+    f: (u, v, px, py, R, P, tam) => {
+      const i = Math.floor(v * 16), p = P[i], lv = v * 16 - i, lu = (u + p.corte) % 1;
+      const junta = Math.min(lv, 1 - lv) * tam / 16 < 1.2 || Math.min(lu, 1 - lu) * tam < 1.2;
+      if (junta) return [-.0015, .45, 1];
+      const anel = (lv + p.des) * 3 + 2 * R.n(u, v, 3, 16) + .5 * R.n(u, v, 12, 64), fr = anel - Math.floor(anel);
+      const veio = Math.pow(Math.abs(Math.sin(fr * Math.PI)), 5), fibra = R.n(u, v, 8, 256);
+      return [-.0002 * veio + .00005 * fibra, 1 + p.tom - .18 * veio + (fibra - .5) * .07, .45 + .2 * veio];
+    },
+  },
+  porcelanato: { // peças de 60 × 60 cm (2 × 2 no ladrilho de 1,2 m), rejunte de 3 mm cinza, leve marmorizado, polido
+    prep: (tam, R) => [0, 1, 2, 3].map(() => (R.rnd() - .5) * .05),
+    f: (u, v, px, py, R, P, tam) => {
+      const meia = tam / 2, x = px % meia, y = py % meia, e = Math.min(x, meia - 1 - x, y, meia - 1 - y);
+      if (e < 1.3) return [-.0015, 1, 1, [0x8E, 0x8A, 0x83]];
+      const f = R.fbm(u, v, 6), veio = Math.pow(1 - Math.abs(2 * R.n(u, v, 4, 10) - 1), 18);
+      return [.00002 * f, 1 + P[(py < meia ? 0 : 2) + (px < meia ? 0 : 1)] + (f - .5) * .05 - .06 * veio, .28 + (f - .5) * .06];
+    },
+  },
+  telha: { // telha trapezoidal de aço galvalume: ondas de 25 cm (crista 5 cm, alma inclinada, vale plano), altura 3 cm
+    f: (u, v, px, py, R) => {
+      const p = (u * 4) % 1, crista = .2, alma = .16;
+      const h = p < crista ? 1 : p < crista + alma ? 1 - (p - crista) / alma : p < 1 - alma ? 0 : (p - (1 - alma)) / alma;
+      const escorrido = R.n(u, v, 64, 3), m = R.fbm(u, v, 2);  // escorridos de chuva ao longo da onda
+      return [.03 * h, 1 + (escorrido - .5) * .08 + (m - .5) * .05 + .04 * h, .38 + (escorrido - .5) * .14];
+    },
+  },
+  folha: (u, v, px, py, R) => { const f = R.fbm(u, v, 12), g = R.n(u, v, 64); return [.004 * f + .001 * g, 1 + (f - .5) * .34 + (g - .5) * .18, .9]; },
+  tronco: (u, v, px, py, R) => { // casca com sulcos verticais (ao longo de v), placas quebradas pelo ruído
+    const s = Math.abs(Math.sin((u * 18 + 1.4 * R.n(u, v, 6, 3)) * Math.PI)), placa = R.fbm(u, v, 12, 4);
+    return [.006 * Math.pow(s, .5) + .002 * placa, .78 + .3 * Math.pow(s, .5) + (placa - .5) * .2, 1];
+  },
+  asfalto: { // agregado: pedriscos claros e escuros no ligante, com vazios
+    prep: (tam, R) => { const h = new Float32Array(tam * tam), c = new Float32Array(tam * tam);
+      for (let i = 0; i < 9000; i++) { const cx = R.rnd() * tam, cy = R.rnd() * tam, r = .8 + R.rnd() * 2.2, k = R.rnd() < .5 ? .35 : -.25;
+        for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) { const d = Math.hypot(dx, dy) / r; if (d < 1) {
+          const j = (((Math.round(cy) + dy) % tam + tam) % tam) * tam + (((Math.round(cx) + dx) % tam + tam) % tam); h[j] = Math.max(h[j], 1 - d * d); c[j] = k; } } }
+      return {h, c}; },
+    f: (u, v, px, py, R, P, tam) => { const j = py * tam + px, f = R.fbm(u, v, 4);
+      return [.0015 * P.h[j], 1 + P.c[j] * P.h[j] + (f - .5) * .12 + (R.rnd() - .5) * .08, .92 - .1 * P.h[j]]; },
+  },
+  carpete: (u, v, px, py, R) => { // carpete de fios em laço: grão denso e irregular, fosco, sem brilho
+    const g = R.n(u, v, 200), f = R.fbm(u, v, 24), m = R.fbm(u, v, 2);
+    return [.0008 * g + .0005 * f, 1 + (g - .5) * .16 + (f - .5) * .08 + (m - .5) * .05, 1]; },
+  acento: (u, v, px, py, R) => { const f = R.fbm(u, v, 40); return [.0001 * f, 1 + (f - .5) * .03, .55]; },
+  vermelho: (u, v, px, py, R) => { const f = R.fbm(u, v, 40); return [.0001 * f, 1 + (f - .5) * .03, .65]; },
+};
+// cor-base, ladrilho L (m), resolução, rugosidade-base (multiplica o mapa), metal, reflexo do céu, macro (manchas de dezenas de m)
+const TIPOS = {
+  pasto: {cor: 0x5E7F3C, L: 10, tam: 1024, macro: .5},
+  solo: {cor: 0xA3714F, L: 8, tam: 1024, macro: .35},
+  concreto: {cor: 0xBAB5AB, L: 2, tam: 1024},
+  aco: {cor: 0xC3CAD0, L: 1, tam: 512, metal: .8, env: 1.2},
+  acoPintado: {cor: 0x5E6B78, L: .5, tam: 512, metal: .35, env: 1.1},
+  madeira: {cor: 0xA27B52, L: 1, tam: 1024},
+  assoalho: {cor: 0x9C7048, L: 2.4, tam: 1024, env: 1.1},
+  porcelanato: {cor: 0xE4E0D8, L: 1.2, tam: 1024, env: .55},
+  carpete: {cor: 0x67728A, L: .4, tam: 512},
+  tinta: {cor: 0xEEEAE2, L: .6, tam: 512},
+  plastico: {cor: 0x2E3237, L: .3, tam: 256, env: 1.2},
+  papel: {cor: 0xF4F1EA, L: 1, tam: 512},
+  telha: {cor: 0xAEB6BD, L: 1, tam: 512, metal: .55, env: 1.2},
+  folha: {cor: 0x587B3E, L: .8, tam: 256},
+  tronco: {cor: 0x7A6048, L: .6, tam: 512},
+  asfalto: {cor: 0x4A4D50, L: 2, tam: 1024},
+  acento: {cor: LARANJA, L: .3, tam: 256},
+  vermelho: {cor: 0xC0392B, L: .3, tam: 256},  // as paredes a construir, na cor da planta
+};
+
+// os três mapas de um tipo, em canvas de tam × tam
+function mapasDoTipo(tipo, semente) {
+  const d = TIPOS[tipo], tam = d.tam, px = d.L / tam, R = geradorRuido(semente);
+  const des = DESENHOS[tipo], fn = des.f || des, P = des.prep ? des.prep(tam, R) : null;
+  const H = new Float32Array(tam * tam), K = new Float32Array(tam * tam), Rg = new Float32Array(tam * tam), C = new Array(tam * tam);
   for (let y = 0; y < tam; y++) for (let x = 0; x < tam; x++) {
-    const u = x / tam, w = y / tam;
-    alt[y * tam + x] = .62 * oitava(u, w, G) + .26 * oitava(u, w, 2 * G) + .12 * oitava(u, w, 4 * G);
+    const o = fn(x / tam, y / tam, x, y, R, P, tam), i = y * tam + x;
+    H[i] = o[0]; K[i] = o[1]; Rg[i] = o[2]; if (o[3]) C[i] = o[3];
   }
-  const r0 = (cor >> 16) & 255, g0 = (cor >> 8) & 255, b0 = cor & 255;
+  const r0 = (d.cor >> 16) & 255, g0 = (d.cor >> 8) & 255, b0 = d.cor & 255;
   const mk = () => { const c = document.createElement('canvas'); c.width = c.height = tam; const g = c.getContext('2d'); return [c, g, g.createImageData(tam, tam)]; };
   const [cc, gc, ic] = mk(), [cn, gn, inn] = mk(), [cr, gr, ir] = mk();
   for (let y = 0; y < tam; y++) for (let x = 0; x < tam; x++) {
-    const i = (y * tam + x) * 4, n = alt[y * tam + x];
-    const k = 1 + (n - .5) * variacao + (rnd() - .5) * variacao * .35;
-    ic.data[i] = Math.min(255, r0 * k); ic.data[i + 1] = Math.min(255, g0 * k); ic.data[i + 2] = Math.min(255, b0 * k); ic.data[i + 3] = 255;
-    // normal por diferenças finitas (periódica), espaço tangente: x → R, y → G, z → B
-    const dx = (alt[y * tam + (x + 1) % tam] - alt[y * tam + (x + tam - 1) % tam]) * tam * relevo * .5;
-    const dy = (alt[((y + 1) % tam) * tam + x] - alt[((y + tam - 1) % tam) * tam + x]) * tam * relevo * .5;
-    const L = Math.hypot(dx, dy, 1);
-    inn.data[i] = 128 + 127 * (-dx / L); inn.data[i + 1] = 128 + 127 * (-dy / L); inn.data[i + 2] = 128 + 127 * (1 / L); inn.data[i + 3] = 255;
-    const rr = Math.min(1, Math.max(.05, rug + (n - .5) * .5)) * 255;
-    ir.data[i] = ir.data[i + 1] = ir.data[i + 2] = rr; ir.data[i + 3] = 255;
+    const i = y * tam + x, q = i * 4, k = K[i], c = C[i];
+    ic.data[q] = Math.min(255, (c ? c[0] : r0) * (c ? 1 : k)); ic.data[q + 1] = Math.min(255, (c ? c[1] : g0) * (c ? 1 : k));
+    ic.data[q + 2] = Math.min(255, (c ? c[2] : b0) * (c ? 1 : k)); ic.data[q + 3] = 255;
+    // inclinação real (m/m) por diferenças centrais periódicas; canvas y para baixo = v para cima (flipY)
+    const dhu = (H[y * tam + (x + 1) % tam] - H[y * tam + (x + tam - 1) % tam]) / (2 * px);
+    const dhv = -(H[((y + 1) % tam) * tam + x] - H[((y + tam - 1) % tam) * tam + x]) / (2 * px);
+    const L = Math.hypot(dhu, dhv, 1);
+    inn.data[q] = 128 + 127 * (-dhu / L); inn.data[q + 1] = 128 + 127 * (-dhv / L); inn.data[q + 2] = 128 + 127 / L; inn.data[q + 3] = 255;
+    ir.data[q] = ir.data[q + 1] = ir.data[q + 2] = Math.min(1, Math.max(.04, Rg[i])) * 255; ir.data[q + 3] = 255;
   }
   gc.putImageData(ic, 0, 0); gn.putImageData(inn, 0, 0); gr.putImageData(ir, 0, 0);
   return {cor: cc, normal: cn, rugosidade: cr};
 }
-// pasto e solo têm um pintor próprio por cima do ruído: milhares de fios de capim (com tons de verde e de palha) ou
-// pedriscos e marcas, desenhados com cópias deslocadas para a textura continuar periódica
+// pasto e solo têm um pintor próprio por cima: milhares de fios de capim (com tons de verde e de palha) ou pedriscos e
+// marcas, desenhados com cópias deslocadas para a textura continuar periódica
 function pintarDetalhe(tipo, mapas, tam, semente) {
   let s = semente * 7 + 3;
   const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
@@ -179,39 +292,51 @@ function pintarDetalhe(tipo, mapas, tam, semente) {
     }
   }
 }
-// relevo: força do mapa de normais (0 = liso); env: intensidade do reflexo do céu no material
-const TIPOS = {
-  pasto: {cor: 0x5E7F3C, variacao: .4, G: 10, rug: 1, relevo: .008, macro: .5},
-  solo: {cor: 0xA3714F, variacao: .34, G: 12, rug: 1, relevo: .01, macro: .35},
-  concreto: {cor: 0xBAB5AB, variacao: .16, G: 16, rug: .9, relevo: .004},
-  aco: {cor: 0xC3CAD0, variacao: .08, G: 24, rug: .34, metal: .8, relevo: .0015, env: 1.2},
-  acoPintado: {cor: 0x5E6B78, variacao: .06, G: 12, rug: .5, metal: .35, relevo: .001, env: 1.1},
-  madeira: {cor: 0xA27B52, variacao: .28, G: 6, rug: .75, relevo: .006},
-  plastico: {cor: 0x2E3237, variacao: .04, G: 4, rug: .45, relevo: .001, env: 1.2},
-  papel: {cor: 0xF4F1EA, variacao: .03, G: 4, rug: .92, relevo: .002},
-  telha: {cor: 0xAEB6BD, variacao: .1, G: 10, rug: .45, metal: .55, relevo: .003, env: 1.2},
-  folha: {cor: 0x587B3E, variacao: .34, G: 6, rug: .95, relevo: .01},
-  tronco: {cor: 0x7A6048, variacao: .22, G: 6, rug: 1, relevo: .012},
-  asfalto: {cor: 0x4A4D50, variacao: .1, G: 12, rug: .95, relevo: .006},
-  acento: {cor: LARANJA, variacao: .05, G: 4, rug: .55, relevo: .001},
-  vermelho: {cor: 0xC0392B, variacao: .05, G: 4, rug: .65, relevo: .001},  // as paredes a construir, na cor da planta
-};
+
+// o box mapping no shader: a posição e a normal locais viram varyings; no fragmento, a UV em metros / L substitui as
+// UVs da geometria nos mapas de cor, normais e rugosidade (e na base do espaço tangente, que o three deriva da UV)
+const TROCA_UV = s => s.replace(/v(Map|NormalMap|RoughnessMap)Uv/g, 'uvCaixa');
+function boxMapping(m, L, macro, macroMap) {
+  m.onBeforeCompile = sh => {
+    sh.uniforms.ladrilho = {value: L};
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vPosLocal; varying vec3 vNormLocal;')
+      .replace('#include <uv_vertex>', '#include <uv_vertex>\n\tvPosLocal = position; vNormLocal = normal;');
+    let fs = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vPosLocal; varying vec3 vNormLocal; uniform float ladrilho; vec2 uvCaixa;');
+    for (const c of ['map_fragment', 'normal_fragment_begin', 'normal_fragment_maps', 'roughnessmap_fragment'])
+      fs = fs.replace(`#include <${c}>`, TROCA_UV(THREE.ShaderChunk[c]));
+    fs = fs.replace('void main() {', `void main() {
+\tvec3 an = abs(vNormLocal);
+\tuvCaixa = (an.x >= an.y && an.x >= an.z ? vPosLocal.zy : an.y >= an.z ? vPosLocal.xz : vPosLocal.xy) / ladrilho;`);
+    if (macro) {
+      sh.uniforms.macroMap = {value: macroMap}; sh.uniforms.macroEscala = {value: L / 40};
+      fs = fs.replace('uniform float ladrilho;', 'uniform float ladrilho; uniform sampler2D macroMap; uniform float macroEscala;')
+        .replace('#include <color_fragment>', '#include <color_fragment>\n\tdiffuseColor.rgb *= 2.0 * texture2D(macroMap, uvCaixa * macroEscala).rgb;');
+    }
+    sh.fragmentShader = fs;
+  };
+  m.customProgramCacheKey = () => 'caixa' + (macro ? '-macro' : '');
+}
+
+// para materiais das cenas que emprestam um mapa do kit (a areia e a brita usam as normais do solo): o mesmo box mapping
+export function emMetros(m, tipo) { boxMapping(m, TIPOS[tipo].L, false, null); return m; }
+
 const cache = {};
+// `repetir` fica na assinatura por compatibilidade, sem efeito: o tamanho do ladrilho é o real de cada tipo (TIPOS.L)
 export function material(tipo, {repetir = 1} = {}) {
-  const chave = tipo + '|' + repetir;
-  if (cache[chave]) return cache[chave];
+  if (cache[tipo]) return cache[tipo];
   const d = TIPOS[tipo];
   if (!d) throw new Error('material desconhecido: ' + tipo);
   let semente = 7;
   for (const ch of tipo) semente = (semente * 31 + ch.charCodeAt(0)) % 2147483647;
-  const tam = tipo === 'pasto' || tipo === 'solo' ? 1024 : 512;
-  const mapas = ruido(d.cor, d.variacao, d.G, tam, semente || 1, d.relevo || 0, d.rug);
-  pintarDetalhe(tipo, mapas, tam, semente || 1);
+  semente = semente || 1;
+  const mapas = mapasDoTipo(tipo, semente);
+  pintarDetalhe(tipo, mapas, d.tam, semente);
   const textura = (canvas, srgb) => {
     const tx = new THREE.CanvasTexture(canvas);
     if (srgb) tx.colorSpace = THREE.SRGBColorSpace;
     tx.wrapS = tx.wrapT = THREE.RepeatWrapping;
-    tx.repeat.set(repetir, repetir);
     tx.anisotropy = 8;
     return tx;
   };
@@ -219,19 +344,20 @@ export function material(tipo, {repetir = 1} = {}) {
     map: textura(mapas.cor, true), normalMap: textura(mapas.normal, false), roughnessMap: textura(mapas.rugosidade, false),
     roughness: 1, metalness: d.metal || 0, envMapIntensity: d.env || 1,
   });
-  if (d.macro) {
-    // variação em grande escala (manchas de dezenas de metros) por cima do ladrilho: esconde a repetição do pasto e do solo
-    const macro = textura(ruido(0x808080, d.macro, 5, 256, semente * 3 + 1, 0, 1).cor, false);
-    macro.repeat.set(1, 1);
-    m.onBeforeCompile = sh => {
-      sh.uniforms.macroMap = {value: macro}; sh.uniforms.macroEscala = {value: 1 / 24};
-      sh.fragmentShader = sh.fragmentShader
-        .replace('#include <map_pars_fragment>', '#include <map_pars_fragment>\nuniform sampler2D macroMap; uniform float macroEscala;')
-        .replace('#include <map_fragment>', '#include <map_fragment>\n\tdiffuseColor.rgb *= 2.0 * texture2D(macroMap, vMapUv * macroEscala).rgb;');
-    };
-    m.customProgramCacheKey = () => 'macro';
+  // variação em grande escala (manchas de dezenas de metros) por cima do ladrilho: esconde a repetição do pasto e do solo
+  const macro = d.macro ? textura(macroCanvas(d.macro, semente * 3 + 1), false) : null;
+  boxMapping(m, d.L, !!d.macro, macro);
+  return (cache[tipo] = m);
+}
+function macroCanvas(variacao, semente) {
+  const tam = 256, R = geradorRuido(semente), c = document.createElement('canvas'); c.width = c.height = tam;
+  const g = c.getContext('2d'), img = g.createImageData(tam, tam);
+  for (let y = 0; y < tam; y++) for (let x = 0; x < tam; x++) {
+    const k = Math.min(255, 128 * (1 + (R.fbm(x / tam, y / tam, 5) - .5) * variacao)), i = (y * tam + x) * 4;
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = k; img.data[i + 3] = 255;
   }
-  return (cache[chave] = m);
+  g.putImageData(img, 0, 0);
+  return c;
 }
 
 // uma árvore: tronco cônico e copa de sete esferas irregulares (icosaedros com vértices deslocados); `s` é a escala

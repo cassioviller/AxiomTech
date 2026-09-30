@@ -83,3 +83,8 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Caso 4: telhado em kit montado peça a peça pelo guindaste (pedido do Cássio); `v2-modulares.mp4` regravado.
 - Prints de aprovação em `portfolio/cenas/saida/prints-fase-2/` (fora do git).
 - Próximo: a fase 3 (texto do `portfolio.html` e do currículo pelas regras do spec §5); push, deploy, `--origem`, iPhone real.
+
+## Estado em 30/09/2026 (21h) — rodada 14 (realismo das cenas), EM ANDAMENTO
+- Commit `ded4016`: céu pintado com PMREM, materiais PBR procedurais, capim, vidro, árvores no kit; caso 4 monta o telhado com a câmera na obra.
+- Depois dele, sem commit (a sessão caiu às 20:49): as quatro cenas ganharam o entorno — canteiro completo no SIGE e nos modulares (relevo na praça, vala, poças, veículos, materiais, cercas, gado), sala mobiliada na abertura e no orçamento (janela, estante, objetos na mesa). `portfolio/cenas/_sige_antes.html` = cópia do `caso-sige.html` do HEAD (comparação antes/depois; não versionar).
+- Materiais do kit refeitos (mapeamento em metros, um desenho por revestimento, relevo em metros; ver CHANGELOG rodada 14); fase 3 do texto feita (portfolio.html, currículo 1 página, folha dos 36 min). Suítes OK (check_filme falha como desde a fase 2: testa o filme antigo). Quadros de conferência em `portfolio/cenas/saida/prints-r14b` e `-r14c`. Vídeos: regravar em cadeia abertura, veks, sige, modulares.

@@ -49,7 +49,6 @@ function real(textura, mesh, nome) { // textura de documento real num plano já 
 // materiais locais desta cena (tipos que o kit ainda não tem): cor lisa com rugosidade/metalicidade plausíveis
 const cor = (c, roughness = .8, metalness = 0, extra = {}) => new THREE.MeshStandardMaterial({color: c, roughness, metalness, ...extra});
 const MAT = {
-  tinta: cor(0xE9E6DF, .93),                                       // a pintura das paredes
   rodape: cor(0x4A3A2C, .7),                                       // rodapé de madeira escura
   aluminio: cor(0xE6E8EA, .38, .75, {envMapIntensity: 1.1}),       // esquadria
   cromado: cor(0xD5D9DD, .28, .92, {envMapIntensity: 1.3}),        // coluna da cadeira, puxadores
@@ -73,15 +72,15 @@ const MAT = {
 };
 
 // a sala 8 × 6 m: piso de madeira, três paredes pintadas com rodapé; a do fundo tem a abertura da janela
-const piso = new THREE.Mesh(new THREE.PlaneGeometry(8, 6), material('madeira', {repetir: 4}));
+const piso = new THREE.Mesh(new THREE.PlaneGeometry(8, 6), material('assoalho'));
 piso.rotation.x = -Math.PI / 2; piso.receiveShadow = true; cena.add(piso);
 const JX = 1.4, JY = 1.6, JL = 1.6, JA = 1.2;  // a janela: centro, largura e altura
-bloco(4.6, 3, .1, -1.7, 1.5, -3, cena, MAT.tinta);          // parede do fundo, à esquerda da janela
-bloco(1.8, 3, .1, 3.1, 1.5, -3, cena, MAT.tinta);           // à direita
-bloco(JL, JY - JA / 2, .1, JX, (JY - JA / 2) / 2, -3, cena, MAT.tinta);                    // abaixo da janela
-bloco(JL, 3 - JY - JA / 2, .1, JX, (3 + JY + JA / 2) / 2, -3, cena, MAT.tinta);            // acima
-bloco(.1, 3, 6, -4, 1.5, 0, cena, MAT.tinta);
-bloco(.1, 3, 6, 4, 1.5, 0, cena, MAT.tinta);
+bloco(4.6, 3, .1, -1.7, 1.5, -3, cena, material('tinta'));          // parede do fundo, à esquerda da janela
+bloco(1.8, 3, .1, 3.1, 1.5, -3, cena, material('tinta'));           // à direita
+bloco(JL, JY - JA / 2, .1, JX, (JY - JA / 2) / 2, -3, cena, material('tinta'));                    // abaixo da janela
+bloco(JL, 3 - JY - JA / 2, .1, JX, (3 + JY + JA / 2) / 2, -3, cena, material('tinta'));            // acima
+bloco(.1, 3, 6, -4, 1.5, 0, cena, material('tinta'));
+bloco(.1, 3, 6, 4, 1.5, 0, cena, material('tinta'));
 bloco(8, .1, .015, 0, .05, -2.942, cena, MAT.rodape);
 bloco(.015, .1, 6, -3.942, .05, 0, cena, MAT.rodape);
 bloco(.015, .1, 6, 3.942, .05, 0, cena, MAT.rodape);

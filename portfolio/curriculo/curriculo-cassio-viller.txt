@@ -17,7 +17,7 @@ Construtora de Light Steel Frame · São José dos Campos/SP · contrato de 6 me
   serviço.
   Idealizei e dirigi o sistema de orçamento da empresa: lê o desenho do cliente, mede, orça, gera cronograma e proposta; a
   mesma obra sai em três tamanhos de proposta sem mover nenhum número.
-  Reduzi o tempo de uma proposta de mão de obra (26 ambientes, 328 m²) de cerca de 2 dias úteis para 36 minutos medidos.
+  Reduzi uma proposta de mão de obra (26 ambientes, 328 m²) de 1 dia útil (estimativa) para 36 minutos medidos.
   Dei suporte à obra de 2 galpões e 22 baias em Itu/SP: requisições, cotações e quadro de concorrência, especificação de
   concreto e aditivos de escopo.
   Reorcei uma residência de R$ 1,18 milhão para caber no teto do cliente: R$ 452 mil, 54 dias de obra, cada acréscimo

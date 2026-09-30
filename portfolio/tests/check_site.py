@@ -18,15 +18,15 @@ FALHAS = []
 
 # Casos já reescritos em Minto (título exato do <h4>). As Tasks 3–5 preenchem.
 CASOS_MINTO = [
-    "O cliente impôs um teto — e a resposta foi outra casa",
-    "R$ 24,5 milhões — e nenhuma quantidade no pacote do cliente",
-    "As regras do cliente viraram regra do sistema",
+    "Redesenhei a casa para caber no teto de R$ 500 mil",
+    "R$ 24,5 milhões medidos no desenho, sem quantidades do cliente",
+    "71 → 0 menções internas numa proposta de R$ 964.917",
     "O diário que estava no WhatsApp",
     "O cliente confirma que leu",
     "Da venda à obra",
     "Compras com governança",
     "O celeiro não cabe inteiro no caminhão",
-    "Empilhar encarece, geminar barateia",
+    "Geminar 4 unidades corta cerca de 28% do custo por unidade",
     "A planta do cliente não cabia no terreno dele",
 ]
 
@@ -108,7 +108,8 @@ class Balanco(HTMLParser):
 
 
 def checar_invariantes(atual, base):
-    na, nb = numeros(atual), numeros(base)
+    # fase 3 do site v2 (spec §5): o multiplicador "≈ 27×" saiu do portfólio; nenhum outro número pode sumir ou aparecer
+    na, nb = numeros(atual), numeros(base) - {"27"}
     check(na == nb, f"números mudaram — novos: {sorted(na - nb)}; sumiram: {sorted(nb - na)}")
     t = texto(atual)
     for r in RESSALVAS:

@@ -26,13 +26,9 @@ window.__cena = S;
 let semente = 7;
 const rnd = () => (semente = (semente * 16807) % 2147483647) / 2147483647;
 
-// materiais locais (candidatos ao kit: tinta, porcelanato, tecido, branco, aluminio, borracha, amarelo, ceramica, vidroJanela)
+// materiais locais (candidatos ao kit: tecido, branco, aluminio, borracha, amarelo, ceramica, vidroJanela)
 const M = o => new THREE.MeshStandardMaterial(o);
-const concreto = material('concreto');
 const mat = {
-  tinta: M({color: 0xEEEAE2, roughness: .9}),
-  porcelanato: M({map: concreto.map, normalMap: concreto.normalMap, color: 0xE4E0D8, roughness: .3, envMapIntensity: .9}),
-  rejunte: M({color: 0x8A867F, roughness: 1}),
   tecido: M({color: 0x67728A, roughness: 1}),
   tecidoCadeira: M({color: 0x2B333F, roughness: 1}),
   branco: M({color: 0xF3F3F0, roughness: .4}),
@@ -72,30 +68,20 @@ function folha(textura, larg, alt, x, y, z, giro, pai) {
 // ---- a sala: 5,2 × 6 m (x −2,6..2,6, z −2,5..3,5), pé-direito 3 m ----
 const chao = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), material('pasto', {repetir: 20}));  // o terreno lá fora
 chao.rotation.x = -Math.PI / 2; chao.receiveShadow = true; cena.add(chao);
-const rejunte = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 6.2), mat.rejunte);
-rejunte.rotation.x = -Math.PI / 2; rejunte.position.set(0, .003, .5); rejunte.receiveShadow = true; cena.add(rejunte);
-// porcelanato 60 × 60 com junta de 3 mm: uma instância por peça, com leve variação de tom
-{
-  const NX = 9, NZ = 10, pecas = new THREE.InstancedMesh(new THREE.BoxGeometry(.597, .012, .597), mat.porcelanato, NX * NZ);
-  const m4 = new THREE.Matrix4(), cor = new THREE.Color();
-  let i = 0;
-  for (let ix = 0; ix < NX; ix++) for (let iz = 0; iz < NZ; iz++) {
-    m4.makeTranslation((ix - (NX - 1) / 2) * .6, .012, .5 + (iz - (NZ - 1) / 2) * .6);
-    pecas.setMatrixAt(i, m4); pecas.setColorAt(i, cor.setScalar(.95 + .07 * rnd())); i++;
-  }
-  pecas.castShadow = pecas.receiveShadow = true; cena.add(pecas);
-}
+// porcelanato 60 × 60 com junta de 3 mm (desenhado no material do kit, em metros): uma laje só, topo em PISO = 0,018
+const porcelanato = bloco(5.4, .018, 6.2, 0, .009, .5, cena, material('porcelanato'));
+porcelanato.castShadow = false;
 // tapete sob a mesa
-bloco(2.7, .012, 2.0, 0, .024, .25, cena, mat.tecido);
+bloco(2.7, .012, 2.0, 0, .024, .25, cena, material('carpete'));
 // paredes (a da esquerda com o vão da janela: z −0,5..1,5, y 0,9..2,6) e rodapés
 const PISO = .018;
-bloco(5.35, 3, .15, 0, 1.5, -2.5, cena, mat.tinta);
-bloco(5.35, 3, .15, 0, 1.5, 3.5, cena, mat.tinta);
-bloco(.15, 3, 6, 2.6, 1.5, .5, cena, mat.tinta);
-bloco(.15, .9, 6, -2.6, .45, .5, cena, mat.tinta);
-bloco(.15, .4, 6, -2.6, 2.8, .5, cena, mat.tinta);
-bloco(.15, 1.7, 2, -2.6, 1.75, -1.5, cena, mat.tinta);
-bloco(.15, 1.7, 2, -2.6, 1.75, 2.5, cena, mat.tinta);
+bloco(5.35, 3, .15, 0, 1.5, -2.5, cena, material('tinta'));
+bloco(5.35, 3, .15, 0, 1.5, 3.5, cena, material('tinta'));
+bloco(.15, 3, 6, 2.6, 1.5, .5, cena, material('tinta'));
+bloco(.15, .9, 6, -2.6, .45, .5, cena, material('tinta'));
+bloco(.15, .4, 6, -2.6, 2.8, .5, cena, material('tinta'));
+bloco(.15, 1.7, 2, -2.6, 1.75, -1.5, cena, material('tinta'));
+bloco(.15, 1.7, 2, -2.6, 1.75, 2.5, cena, material('tinta'));
 bloco(5.2, .09, .014, 0, PISO + .045, -2.418, cena, mat.branco);
 bloco(.014, .09, 6, -2.518, PISO + .045, .5, cena, mat.branco);
 bloco(.014, .09, 6, 2.518, PISO + .045, .5, cena, mat.branco);
