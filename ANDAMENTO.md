@@ -80,5 +80,6 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - O Cássio não manda mais prints: o caso 1 (36 minutos) fica sem cena própria (emenda de 30/09 no spec) e entra como linha da medida no caso do orçamento.
 - Sigilo: tarjas opacas nos prints do portal do SIGE (`p-portal`, `p-celular`, `p-diario-portal`), docs regerados, `v2-sige.mp4` regravado.
 - Conferir: `python3 portfolio/tests/check_v2.py && python3 portfolio/tests/check_v2.py --navegador && python3 portfolio/tests/check_v2.py --video && python3 portfolio/tests/check_historia.py && python3 portfolio/tests/check_site.py`.
+- Caso 4: telhado em kit montado peça a peça pelo guindaste (pedido do Cássio); `v2-modulares.mp4` regravado.
 - Prints de aprovação em `portfolio/cenas/saida/prints-fase-2/` (fora do git).
 - Próximo: a fase 3 (texto do `portfolio.html` e do currículo pelas regras do spec §5); push, deploy, `--origem`, iPhone real.

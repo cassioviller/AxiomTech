@@ -281,21 +281,30 @@ def checar_cena_veks():
 
 
 def checar_cena_modulares():
-    """O B-36: 2 caixas, o caminhão chega, o guindaste iça a caixa 1 até a fundação, o telhado desce; a prancha no
-    cavalete é o alvo; t=0: caixa 2 e guindaste inteiros e ≥ 60% da largura; t=10 tudo em repouso e a prancha em RETANGULO."""
+    """O B-36: 2 caixas, o caminhão chega, o guindaste iça a caixa 1 até a fundação e depois monta o telhado peça a peça
+    a partir da pilha do kit (6 peças: 2 frontões e 4 águas); a prancha no cavalete é o alvo; t=0: caixa 2 e guindaste
+    inteiros e ≥ 60% da largura, nenhuma peça montada e a pilha no chão; t=7: montagem a meio, o gancho sobre a peça
+    que está no ar; t=10 tudo em repouso, as 6 peças no pose final, e a prancha em RETANGULO."""
     from render import abrir_cena, navegador, servidor
     with servidor() as base, navegador() as nav:
         pg, erros = abrir_cena(nav, f"{base}/cenas/caso-modulares.html")
         fim = pg.evaluate("""(function(){var S=window.__cena;renderCena(10);var c=S.caixas[0].position,r=S.repouso;
           return [S.caixas.length,S.alvo===S.prancha,S.docs.slice().sort(),
                   Math.hypot(c.x-r.caixa1[0],c.y-r.caixa1[1],c.z-r.caixa1[2])<1e-3, Math.abs(S.telhado.position.y-r.telhado)<1e-3,
-                  Math.abs(S.caminhao.position.z)<1e-3, S.telhado.visible];})()""")
-        check(fim == [2, True, ["b36-ata.webp", "b36-caixas.webp", "b36-transporte.webp"], True, True, True, True], f"cena modulares: fim {fim}")
-        meio = pg.evaluate("""(function(){var S=window.__cena,r=[];[0,2,5,7.5].forEach(function(t){renderCena(t);
-          r.push([S.caminhao.position.z.toFixed(1),S.caixas[0].position.y.toFixed(2),S.telhado.visible]);});return r;})()""")
-        check(float(meio[0][0]) < -30 and float(meio[1][0]) < 0 and float(meio[2][0]) == 0, f"cena modulares: o caminhão não entra (z em t=0, 2, 5: {[m[0] for m in meio]})")
-        check(float(meio[2][1]) > 4, f"cena modulares: em t=5 a caixa 1 não está no ar (y {meio[2][1]})")
-        check(not meio[0][2] and meio[3][2], "cena modulares: o telhado aparece cedo demais ou não aparece em t=7,5")
+                  Math.abs(S.caminhao.position.z)<1e-3, S.pecas.length,
+                  S.pecas.every(function(p){return p.userData.montada&&p.position.distanceTo(p.userData.fim.p)<1e-3&&p.quaternion.angleTo(p.userData.fim.q)<1e-3;})];})()""")
+        check(fim == [2, True, ["b36-ata.webp", "b36-caixas.webp", "b36-transporte.webp"], True, True, True, 6, True], f"cena modulares: fim {fim}")
+        meio = pg.evaluate("""(function(){var S=window.__cena,r=[],T=window.__cena.telhado;[0,2,4.2,7].forEach(function(t){renderCena(t);
+          var montadas=S.pecas.filter(function(p){return p.userData.montada;}).length;
+          var noAr=S.pecas.filter(function(p){return !p.userData.montada&&p.position.distanceTo(p.userData.ini.p)>1e-3;});
+          var alturas=S.pecas.map(function(p){return T.localToWorld(p.position.clone()).y;});
+          var g=S.guindaste.gancho.position,d=noAr.length?T.localToWorld(noAr[0].position.clone()).distanceTo(g):null;
+          r.push([S.caminhao.position.z.toFixed(1),S.caixas[0].position.y.toFixed(2),montadas,noAr.length,Math.max.apply(null,alturas),d]);});return r;})()""")
+        check(float(meio[0][0]) < -30 and float(meio[1][0]) < 0 and float(meio[2][0]) == 0, f"cena modulares: o caminhão não entra (z em t=0, 2, 4,2: {[m[0] for m in meio]})")
+        check(float(meio[2][1]) > 4, f"cena modulares: em t=4,2 a caixa 1 não está no ar (y {meio[2][1]})")
+        check(meio[0][2] == 0 and meio[0][3] == 0 and meio[0][4] < 1.5, f"cena modulares: em t=0 o telhado não está todo na pilha, no chão (montadas {meio[0][2]}, no ar {meio[0][3]}, topo {meio[0][4]:.2f} m)")
+        check(1 <= meio[3][2] <= 5 and meio[3][3] == 1, f"cena modulares: em t=7 a montagem não está a meio (montadas {meio[3][2]}, no ar {meio[3][3]})")
+        check(meio[3][5] is not None and meio[3][5] < 1.6, f"cena modulares: em t=7 o gancho não está sobre a peça no ar ({meio[3][5]} m)")
         inicio = inicio_da_cena(pg, "window.__cena.assunto")
         check(inicio[0], "cena modulares: em t=0 a caixa 2 ou o guindaste saem do quadro")
         check(inicio[1] >= 1.2, f"cena modulares: em t=0 o assunto ocupa {inicio[1] / 2:.0%} da largura, esperava ≥ 60%")
