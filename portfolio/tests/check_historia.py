@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Checagens da página principal, site/index.html (a história na linha do tempo).
+"""Checagens da página principal, site/historia.html (a história na linha do tempo).
 
 Estático: roteiro exato dos 17 capítulos, datas e ordem cronológica, ressalvas,
 números (só os que o portfólio, site/portfolio.html, já sustenta), links para o
@@ -32,7 +32,7 @@ from render_clipes import CLIPES  # noqa: E402  (mapa capítulo → cena → tre
 LONGAS = {"casa", "icamento", "zip"}  # capítulos de 200 svh (10 s, 8 s e 10 s de clipe, mas com mais a dizer)
 FOCO = {"obra": "alto", "casa": "alto", "whatsapp": "alto", "icamento": "alto"}  # assunto encostado no alto / no pé do quadro 16:9
 SITE = ROOT / "site"
-PAGINA = SITE / "index.html"
+PAGINA = SITE / "historia.html"
 PORTFOLIO = SITE / "portfolio.html"
 FALHAS = []
 
@@ -281,7 +281,7 @@ def checar_marcacao(pagina, portfolio):
     check(not {4, 5, 8} & {v[0] for v in CLIPES.values()}, "as cenas 36 min do filme (SC4), abertura (SC5) e celeiro (SC8) nunca vão à página")
     check(all(v[1] < v[2] for v in CLIPES.values()), "cada trecho anda para a frente (t0 < t1)")
     for proibido in ("<canvas", 'class="hud"', "data-relogio", "data-legenda", "data-cena", "<track", "<source"):
-        check(proibido not in corpo(pagina), f"index.html não tem mais {proibido}")  # só a marcação: o CSS tem --data-cena
+        check(proibido not in corpo(pagina), f"historia.html não tem mais {proibido}")  # só a marcação: o CSS tem --data-cena
     check(re.search(r"<video [^>]*\bsrc=", pagina) is None, "nenhum <video> com src no HTML (o JS atribui na hora de carregar)")
     datadas = [data_iso(c["data"][1][0]) for c in ROTEIRO if c["data"]]
     check(datadas == sorted(datadas), f"capítulos fora da ordem cronológica: {datadas}")
@@ -492,11 +492,11 @@ def checar_servidor():
     if not (ROOT / "servir.py").exists():
         return
     with servidor(PORTA):
-        req = urllib.request.Request(f"http://127.0.0.1:{PORTA}/site/index.html", headers={"Range": "bytes=0-99"})
+        req = urllib.request.Request(f"http://127.0.0.1:{PORTA}/site/historia.html", headers={"Range": "bytes=0-99"})
         with urllib.request.urlopen(req) as r:
             check(r.status == 206 and r.headers.get("Content-Range", "").startswith("bytes 0-99/") and len(r.read()) == 100,
                   "servir.py: Range: bytes=0-99 deve responder 206, Content-Range e exatamente 100 bytes")
-        with urllib.request.urlopen(f"http://127.0.0.1:{PORTA}/site/index.html") as r:
+        with urllib.request.urlopen(f"http://127.0.0.1:{PORTA}/site/historia.html") as r:
             check(r.status == 200 and r.headers.get("Accept-Ranges") == "bytes", "servir.py: sem Range, 200 com Accept-Ranges: bytes")
 
 
@@ -524,7 +524,7 @@ def gravar_baseline():
     base = {"alturaMain": {}}
     for largura in (390, 1280):
         with chromium(largura, ("--enable-unsafe-swiftshader",)) as ws:
-            ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/site/index.html")
+            ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/site/historia.html")
             time.sleep(2.5)
             if largura == 390:
                 base["taskDuration"] = round(medir_desempenho(ws), 3)
@@ -730,7 +730,7 @@ def checar_ficha_a_vista():
            "return e&&e.closest(sel)?'visivel':(e&&e.closest('.palco')?'coberto pelo palco':'coberto por '+(e&&e.tagName));})")
     for largura in (390, 1280):
         with chromium(largura, ("--disable-3d-apis",)) as ws:
-            ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/site/index.html")
+            ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/site/historia.html")
             time.sleep(1.5)
             ws.avaliar("window.scrollTo(0,document.documentElement.scrollHeight)")
             time.sleep(1)
@@ -804,7 +804,7 @@ def esperar(ws, expressao, prazo):
         time.sleep(0.25)
 
 
-def navegar(ws, caminho="site/index.html"):
+def navegar(ws, caminho="site/historia.html"):
     """Abre a página e espera o load da janela (o clipes.js só carrega depois dele) e o historia.js."""
     ws.comando("Page.navigate", url=f"http://127.0.0.1:{PORTA}/{caminho}")
     check(esperar(ws, "document.readyState==='complete'&&!!window.Historia", 15), f"{caminho}: a página não carregou em 15 s")
@@ -894,7 +894,7 @@ def checar_clipe_real():
               f"clipe inexistente (404): fica o pôster, sem .viva e sem src (estado: {c})")
         check(e["erros"] == [], f"console limpo com um clipe em 404: {e['erros']}")
         # ?clipes=nao na mesma página: nenhum vídeo, pôster visível, API presente (o historia.js continua chamando seek)
-        navegar(ws, "site/index.html?clipes=nao")
+        navegar(ws, "site/historia.html?clipes=nao")
         rolar_ate(ws, "icamento", 0.4)
         time.sleep(3)
         c, e = ler_clipe(ws, "icamento"), ler_clipes(ws)
@@ -1154,7 +1154,7 @@ def main():
     if "--gravar-baseline" in sys.argv:
         gravar_baseline()
         return
-    check(PAGINA.exists(), "portfolio/site/index.html (a história) não existe")
+    check(PAGINA.exists(), "portfolio/site/historia.html (a história) não existe")
     if PAGINA.exists():
         pagina = PAGINA.read_text(encoding="utf-8")
         portfolio = PORTFOLIO.read_text(encoding="utf-8")

@@ -3,375 +3,228 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Cássio Viller — a história</title>
-<meta name="description" content="Cássio Viller — orçamento, planejamento e custos. A história na linha do tempo, de 2017 a 2026: contabilidade, obra e os sistemas que dão origem a cada número.">
-<meta property="og:type" content="website">
-<meta property="og:locale" content="pt_BR">
-<meta property="og:title" content="Cássio Viller — um número sem origem custa caro na obra">
-<meta property="og:description" content="A história em cenas: contabilidade, obra e os sistemas que dão origem a cada número.">
-<meta property="og:image" content="og.png">
+<title>Cássio Viller — orçamento, planejamento e custos de obra</title>
+<meta name="description" content="Cássio Viller, estudante de Engenharia Civil (7º semestre): orçamento, planejamento e custos de obra. Casos reais com os documentos produzidos.">
 <meta name="theme-color" content="#12171D">
+<link rel="icon" href="data:,"><!-- sem ícone ainda: evita o pedido automático de /favicon.ico (404 no console) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="preload" as="image" href="img/o-quantitativos.webp" fetchpriority="high">
 <style>
 :root{
   --ground:#ECEBE6; --surface:#FFFFFF; --ink:#171F29; --ink-2:#3C4652; --muted:#5B6672;
   --accent:#B5440E; --accent-ink:#FFFFFF; --rule:#D3D1CA;
-  --tinta:#12171D; --scrim:rgba(12,16,21,.78); --texto-cena:#FFFFFF; --ressalva-cena:#D7E1EC; --data-cena:#F2B896; --relogio:#F07A3E;
+  --palco:#0F1419; --texto-palco:#F2F1EC; --apoio-palco:#D4DCE4; --laranja:#F07A3E;
   --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
   --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --ground:#12171D; --surface:#1A2129; --ink:#E9E7E1; --ink-2:#C4C8CC; --muted:#93A0AD;
-    --accent:#F07A3E; --accent-ink:#161616; --rule:#2E3A47;
-  }
+  :root:not([data-theme="light"]){--ground:#12171D; --surface:#1A2129; --ink:#E9E7E1; --ink-2:#C4C8CC; --muted:#93A0AD; --accent:#F07A3E; --accent-ink:#161616; --rule:#2E3A47;}
 }
-:root[data-theme="dark"]{
-  --ground:#12171D; --surface:#1A2129; --ink:#E9E7E1; --ink-2:#C4C8CC; --muted:#93A0AD;
-  --accent:#F07A3E; --accent-ink:#161616; --rule:#2E3A47;
-}
+:root[data-theme="dark"]{--ground:#12171D; --surface:#1A2129; --ink:#E9E7E1; --ink-2:#C4C8CC; --muted:#93A0AD; --accent:#F07A3E; --accent-ink:#161616; --rule:#2E3A47;}
 *{box-sizing:border-box}
-body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
-img{max-width:100%;height:auto;display:block}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%;height:auto}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.pular{position:absolute;left:-9999px;top:8px;z-index:50;background:var(--accent);color:var(--accent-ink);padding:10px 14px;font-family:var(--mono);font-size:.8rem;text-decoration:none}
+.pular{position:absolute;left:-9999px;top:8px;z-index:50;background:var(--accent);color:var(--accent-ink);padding:10px 14px;font-family:var(--mono);font-size:.8rem}
 .pular:focus{left:12px}
-/* barra: nome, cargo-alvo e contato sempre à mão */
-.barra{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:10px 16px;background:var(--ground);border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:.78rem}
-.barra .nome{font-family:var(--display);font-weight:700;font-size:1.15rem;letter-spacing:.01em;text-transform:uppercase;color:var(--ink);text-decoration:none}
-.barra .cargo{flex:1 1 auto;color:var(--ink-2)}
-.barra .acoes{display:flex;flex-wrap:wrap;gap:10px}
-.barra .acoes a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--accent);padding:4px 0}
-.barra .acoes .zap{background:var(--accent);color:var(--accent-ink);border:0;padding:6px 10px;border-radius:2px}
-/* régua de tempo: um marco por capítulo; sem JS é só uma lista de links */
-.regua{flex:1 1 100%;display:flex;align-items:center;gap:8px;min-width:0}
-.regua ol{list-style:none;margin:0;padding:0;display:flex;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none;position:relative}
-.regua ol::-webkit-scrollbar{display:none}
-.regua li{flex:1 0 28px;display:flex}
-.regua a{flex:1;min-width:28px;height:28px;display:flex;align-items:center;justify-content:center;position:relative;color:var(--ink);text-decoration:none}
-.regua a::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px solid var(--rule)}
-.regua a::after{content:"";position:relative;width:2px;height:10px;background:var(--muted)}
-.regua a[aria-current="step"]::after{width:12px;height:12px;border-radius:50%;background:var(--accent)}
-.regua a:hover::after{background:var(--accent)}
-.regua a:focus-visible{outline-offset:-3px}
-.regua time,.regua .marco{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.regua-ponta,.regua-data{font-family:var(--mono);font-size:.7rem;color:var(--muted);white-space:nowrap}
-.regua-data{color:var(--accent);min-width:10ch;text-align:right}
-/* modo empilhado (padrão): sem JS, sem IntersectionObserver ou com movimento reduzido */
-.palco{display:none}
-.historia{display:block;max-width:880px;margin:0 auto;padding:0 16px}
-.cena{padding:40px 0;border-bottom:1px solid var(--rule)}
-.fundo{position:relative;margin:0 0 18px}
-.fundo img{width:100%;max-height:60vh;object-fit:cover;border:1px solid var(--rule)}
-.fundo video{display:none}
-.cena{scroll-margin-top:9rem}
-.data{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
-.caso{margin:14px 0 0;font-family:var(--mono);font-size:.8rem}
-.caso a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--accent);padding:4px 0}
-.fundo.tipo{display:flex;align-items:center;justify-content:center;min-height:28vh;background:var(--surface);border:1px solid var(--rule);overflow:hidden}
-.fundo.tipo .ano{font-family:var(--display);font-weight:700;font-size:clamp(4rem,18vw,9rem);line-height:1;color:var(--accent);opacity:.3;white-space:nowrap}
-.frase{font-family:var(--display);font-weight:700;font-size:clamp(2rem,6vw,3.6rem);line-height:1.02;letter-spacing:.005em;margin:0;text-wrap:balance}
-.ressalva{font-family:var(--mono);font-size:.86rem;line-height:1.55;color:var(--ink-2);margin:12px 0 0;max-width:62ch}
-.cta{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
-.btn{display:inline-block;font-family:var(--mono);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;padding:13px 16px;border-radius:2px;background:var(--accent);color:var(--accent-ink)}
-.btn.fantasma{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
-.ficha{max-width:880px;margin:0 auto;padding:48px 16px 24px}
-.ficha h2{font-family:var(--display);font-weight:600;font-size:2rem;line-height:1.05;margin:0 0 12px}
-.ficha p{color:var(--ink-2);max-width:66ch;margin:0 0 10px}
-.ficha .nota{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
-footer{max-width:880px;margin:0 auto;padding:20px 16px 40px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:.74rem;color:var(--muted);border-top:1px solid var(--rule)}
-footer a{color:var(--ink)}
-/* modo cenas: historia.js liga .js-historia no <html> e leva cada .fundo para o .palco */
-/* overflow:clip corta o palco (sticky, margin-bottom:-100vh) no fim da história: sem ele, o palco cobre a ficha */
-.js-historia .historia{max-width:none;padding:0;position:relative;background:var(--tinta);overflow:clip}
-.js-historia .palco{display:block;position:sticky;top:var(--barra,0px);height:calc(100vh - var(--barra,0px));margin-bottom:calc(-100vh + var(--barra,0px));overflow:hidden;background:var(--tinta)}
-.js-historia .palco .fundo{position:absolute;inset:0;margin:0;opacity:0;transition:opacity .6s ease}
-.js-historia .palco .fundo.ativo{opacity:1}
-.js-historia .palco .fundo img{width:100%;height:100%;max-height:none;object-fit:cover;border:0;filter:brightness(.6) saturate(.85)}
-.js-historia .palco .fundo.clipe img{filter:none;object-position:68% 50%}
-/* quando a janela é mais larga que 16:9 (o palco perde a altura da barra), o recorte vertical favorece o lado onde está o assunto */
-.js-historia .palco .fundo.foco-alto video,.js-historia .palco .fundo.foco-alto img{object-position:68% 0%}
-.js-historia .palco .fundo.foco-baixo video,.js-historia .palco .fundo.foco-baixo img{object-position:68% 100%}
-/* o clipe cobre o palco sem filtro (paleta do filme); a imagem (pôster = último quadro) só some quando há quadro pronto (.viva) */
-.js-historia .palco .fundo video{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:68% 50%;opacity:0;transition:opacity .4s}
-.js-historia .palco .fundo.viva video{opacity:1}
-.js-historia .palco .fundo.viva img{visibility:hidden;transition:visibility 0s .4s}
-.js-historia .cena{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:96px 16px;border:0}
-.js-historia .cena.longa{min-height:200vh;min-height:200svh;align-items:flex-start}
-.js-historia .cena.longa .texto{position:sticky;top:max(28vh,calc(var(--barra,0px) + 8px))}
-/* svh só onde existe: com var() dentro, uma declaração svh inválida não cai no parse e anularia a vh */
-@supports (height:100svh){.js-historia .palco{height:calc(100svh - var(--barra,0px));margin-bottom:calc(-100svh + var(--barra,0px))}.js-historia .cena.longa .texto{top:max(28svh,calc(var(--barra,0px) + 8px))}}
-.js-historia .texto{max-width:960px;text-align:center;background:var(--scrim);padding:22px 24px}
-.js-historia .frase{color:var(--texto-cena);font-size:clamp(2.2rem,7vw,5rem);max-width:18ch;margin:0 auto}
-.js-historia .ressalva{color:var(--ressalva-cena);margin:14px auto 0}
-.js-historia .cta{justify-content:center}
-.js-historia .btn.fantasma{color:var(--texto-cena);box-shadow:inset 0 0 0 1.5px var(--texto-cena)}
-.js-historia .data{color:var(--data-cena)}
-.js-historia .caso a{color:var(--texto-cena);border-bottom-color:var(--data-cena)}
-.js-historia .palco .fundo.tipo{min-height:0;background:var(--tinta);border:0;align-items:flex-end;justify-content:flex-start;padding:0 0 3vh 4vw}
-.js-historia .palco .fundo.tipo .ano{font-size:clamp(6rem,26vw,20rem);opacity:.22;color:var(--relogio)}
-/* movimento reduzido ligado no meio da história: o CSS esconde o vídeo e mostra a imagem na hora, sem JS; clipes.js descarrega */
-@media (prefers-reduced-motion: reduce){.js-historia .palco .fundo,.js-historia .palco .fundo video{transition:none}.js-historia .palco .fundo video{display:none}.js-historia .palco .fundo.viva img{visibility:visible}.js-historia .palco .fundo.viva img{transition:none}}
-/* tela larga: a faixa de texto à esquerda, como no filme; o assunto do clipe fica a ~68 % da largura */
-@media (min-width:900px) and (orientation:landscape){.js-historia .cena{justify-content:flex-start}.js-historia .texto{max-width:min(620px,48vw);margin-left:max(24px,6vw);text-align:left}.js-historia .frase{margin:0}.js-historia .ressalva{margin-left:0}.js-historia .cta{justify-content:flex-start}.js-historia .palco .fundo.tipo{justify-content:flex-end;padding:0 4vw 3vh 0}.js-historia .palco .fundo.tipo .ano{font-size:clamp(5rem,13vw,20rem)}}
-/* celular deitado (≤ 520 px de altura): faixa à esquerda, estreita e com o título menor, para o clipe continuar à mostra */
-@media (orientation:landscape) and (max-height:520px){.js-historia .cena{justify-content:flex-start;padding:calc(var(--barra,0px) + 12px) 16px 24px}.js-historia .texto{max-width:min(560px,54vw);margin-left:16px;text-align:left;padding:12px 16px}.js-historia .frase{font-size:clamp(1.4rem,6.5vh,2.4rem);margin:0}.js-historia .ressalva{margin:8px 0 0;font-size:.78rem}.js-historia .cta{justify-content:flex-start;margin-top:12px}.js-historia .cena.longa .texto{top:calc(var(--barra,0px) + 8px)}.js-historia .palco .fundo.tipo{justify-content:flex-end;padding:0 4vw 3vh 0}.js-historia .palco .fundo.tipo .ano{font-size:clamp(4rem,11vw,20rem)}}
+.barra{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;padding:10px 20px;background:var(--ground);border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:.8rem}
+.barra .nome{font-family:var(--display);font-weight:700;font-size:1.15rem;text-transform:uppercase;color:var(--ink);text-decoration:none}
+.barra nav{display:flex;flex-wrap:wrap;gap:6px 16px;flex:1 1 auto}
+.barra a{color:var(--ink)}
+.abertura,.fechamento{max-width:62rem;margin:0 auto;padding:10vh 20px}
+.abertura h1{font-family:var(--display);font-size:clamp(2.6rem,7vw,5rem);line-height:1;margin:0 0 .25em;text-transform:uppercase}
+.vaga{font-size:1.35rem;font-weight:500;margin:0 0 .6em}
+.posicionamento{font-size:1.15rem;color:var(--ink-2);max-width:42rem;margin:0}
+.ficha{list-style:none;padding:0;margin:1.2em 0;color:var(--ink-2)}
+.contato{display:flex;flex-wrap:wrap;gap:10px 18px;margin:0}
+.contato a{color:var(--ink)}
+.contato .zap{background:var(--accent);color:var(--accent-ink);padding:8px 12px;text-decoration:none;border-radius:2px}
+.fechamento h2{font-family:var(--display);font-size:2rem;margin:0 0 .5em}
+.fechamento ul{padding-left:1.1em;margin:0 0 1.2em}
+/* caso, sem JS ou com movimento reduzido: quadro (pôster + documento + destaque) e texto empilhados */
+.caso{position:relative;background:var(--palco)}
+.palco{position:relative;overflow:hidden}
+.quadro{position:relative;width:100%;aspect-ratio:16/9}
+.clipe{position:absolute;inset:0;margin:0}
+.clipe img,.clipe video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.clipe video{opacity:0}
+.clipe.viva video{opacity:1}
+.clipe.viva img{visibility:hidden;transition:visibility 0s .2s}
+.doc{position:absolute;overflow:hidden;opacity:var(--doc,1)}
+.doc img{width:100%;height:100%}
+.destaque{position:absolute;border:3px solid var(--laranja);border-radius:3px;opacity:var(--destaque,1);transform:scale(calc(1.25 - .25*var(--destaque,1)));box-shadow:0 0 0 200vmax rgba(10,14,18,calc(.38*var(--destaque,1)))}
+.texto{padding:28px 20px 48px;max-width:40rem;margin:0 auto;color:var(--texto-palco)}
+.rotulo{font-family:var(--mono);font-size:.8rem;color:var(--laranja);margin:0 0 .6em;text-transform:uppercase;letter-spacing:.04em}
+.manchete{font-family:var(--display);font-size:clamp(1.9rem,3.2vw,2.8rem);line-height:1.08;margin:0 0 .5em}
+.apoio{color:var(--apoio-palco);margin:0 0 1em}
+.recorte{display:none;margin:0 0 1em}
+.recorte img{max-height:30vh;width:auto;max-width:100%}
+.caso-link a{color:var(--texto-palco)}
+/* a cena da abertura: só o vídeo, 200 vh de rolagem, sem documento nem texto */
+.js-v2 .caso.so-cena{height:200vh}
+/* trajetória: uma faixa em HTML, sem cena */
+.trajetoria{max-width:62rem;margin:0 auto;padding:10vh 20px}
+.trajetoria h2{font-family:var(--display);font-size:2rem;margin:0 0 .6em}
+.faixa{list-style:none;padding:0;margin:0 0 1.2em;display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:18px;border-top:2px solid var(--accent)}
+.faixa li{padding-top:12px;display:grid;gap:4px}
+.faixa time{font-family:var(--mono);font-size:.78rem;color:var(--accent);text-transform:uppercase;letter-spacing:.04em}
+.faixa b{font-family:var(--display);font-size:1.35rem;line-height:1.1}
+.faixa span{color:var(--ink-2)}
+.ferramentas{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin:0}
+/* trilho lateral (spec §4): só em telas largas; nunca sobre o palco do caso, que abre 13 vw à esquerda */
+.trilho{display:none}
+@media (min-width:1200px){
+  .trilho{display:flex;flex-direction:column;gap:10px;position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:20;width:9.5rem;font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+  .trilho a{color:var(--muted);text-decoration:none;padding:4px 0 4px 12px;border-left:2px solid var(--rule)}
+  .trilho a[aria-current="true"]{color:var(--accent);border-color:var(--accent)}
+}
+/* com JS e movimento: o palco fica preso na tela por 300vh; a cena anda na 1ª metade, o documento e o texto na 2ª */
+.js-v2 .caso{height:300vh}
+.js-v2 .palco{position:sticky;top:0;height:100vh}
+.js-v2 .quadro{position:absolute;left:50%;top:50%;width:max(100vw,177.78vh);transform:translate(-50%,-50%) translateX(calc(var(--lado,0)*-21%)) scale(calc(1 - .24*var(--lado,0)))}
+.js-v2 .texto{position:absolute;right:3vw;top:50%;width:min(30rem,26vw);transform:translateY(-50%);opacity:var(--lado,0);visibility:var(--vis,hidden);padding:0;margin:0}
+@media (max-aspect-ratio:3/2) and (min-width:901px){.js-v2 .quadro{width:100vw}}
+/* documento inteiro ilegível (tela estreita ou baixa): entra o recorte; em tela baixa o v2.js deixa a página empilhada */
+@media (max-width:900px), (max-height:520px){
+  .doc{display:none}
+  .recorte{display:block}
+  .js-v2 .quadro{transform:translate(-50%,-50%)}
+  .js-v2 .texto{left:0;right:0;top:auto;bottom:0;width:auto;transform:none;padding:20px;background:linear-gradient(transparent,rgba(10,14,18,.92) 14%)}
+}
+@media (prefers-reduced-motion: reduce){.clipe video{display:none}}
 </style>
 </head>
 <body>
-<a class="pular" href="#tese">Pular para o texto</a>
+<a class="pular" href="#veks">Pular para os casos</a>
 <header class="barra">
-  <a class="nome" href="portfolio.html">Cássio Viller</a>
-  <span class="cargo">7º semestre de Eng. Civil · orçamento, planejamento e custos · CLT ou PJ</span>
-  <nav class="acoes" aria-label="Contato">
-    <a href="curriculo-cassio-viller.pdf" target="_blank" rel="noopener">Currículo (PDF)</a>
-    <a class="zap" href="https://wa.me/5512982071116?text=Ol%C3%A1%2C%20C%C3%A1ssio.%20Vi%20seu%20portf%C3%B3lio%20e%20quero%20te%20mandar%20uma%20obra%20para%20or%C3%A7ar." target="_blank" rel="noopener">WhatsApp</a>
-  </nav>
-  <nav class="regua" aria-label="Linha do tempo">
-    <span class="regua-ponta" aria-hidden="true">2017</span>
-    <ol>
-      <li><a href="#tese" aria-current="step"><span class="marco">Início</span></a></li>
-      <li><a href="#origem"><time datetime="2017">2017 → 2024</time> <span class="marco">Contabilidade e UNIFEI</span></a></li>
-      <li><a href="#mudanca"><time datetime="2025">2025</time> <span class="marco">Mudança para São José dos Campos</span></a></li>
-      <li><a href="#obra"><time datetime="2025-02">fev/2025 → mar/2026</time> <span class="marco">Entrada na obra</span></a></li>
-      <li><a href="#veks"><time datetime="2026-03">mar/2026 → set/2026</time> <span class="marco">VEKS Engenharia</span></a></li>
-      <li><a href="#ferramentas"><time datetime="2026-03">mar → abr/2026</time> <span class="marco">Ferramentas</span></a></li>
-      <li><a href="#sige"><time datetime="2026-05">mai → set/2026</time> <span class="marco">SIGE, versão atual</span></a></li>
-      <li><a href="#galpoes"><time datetime="2026-06-08">jun/2026</time> <span class="marco">Obra dos galpões</span></a></li>
-      <li><a href="#escala"><time datetime="2026-07-09">jul → set/2026</time> <span class="marco">Sistema de orçamento</span></a></li>
-      <li><a href="#precisao"><time datetime="2026-07-09">jul → set/2026</time> <span class="marco">Conferência SINAPI</span></a></li>
-      <li><a href="#casa"><time datetime="2026-08">ago/2026</time> <span class="marco">Celeiro B-36</span></a></li>
-      <li><a href="#icamento"><time datetime="2026-08">ago/2026</time> <span class="marco">Içamento do módulo</span></a></li>
-      <li><a href="#whatsapp"><time datetime="2026-08-11">ago/2026</time> <span class="marco">Diário no WhatsApp</span></a></li>
-      <li><a href="#recuperado"><time datetime="2026-09">set/2026</time> <span class="marco">Diários recuperados</span></a></li>
-      <li><a href="#zip"><time datetime="2026-09">set/2026</time> <span class="marco">36 minutos</span></a></li>
-      <li><a href="#metodo"><span class="marco">O método</span></a></li>
-      <li><a href="#convite"><span class="marco">Convite</span></a></li>
-    </ol>
-    <span class="regua-data" aria-hidden="true" data-padrao="2017–2026">2017–2026</span>
-  </nav>
+  <a class="nome" href="#inicio">Cássio Viller</a>
+  <nav aria-label="Seções"><a href="#veks">Orçamento</a><a href="#sige">SIGE na obra</a><a href="#modulares">Casas modulares</a><a href="#trajetoria">Trajetória</a><a href="#contato">Contato</a></nav>
+  <a href="curriculo-cassio-viller.pdf">Currículo (PDF)</a>
 </header>
+<nav class="trilho" aria-label="Seções">
+  <a href="#inicio">Início</a>
+  <a href="#veks">Orçamento</a>
+  <a href="#sige">SIGE na obra</a>
+  <a href="#modulares">Casas modulares</a>
+  <a href="#trajetoria">Trajetória</a>
+  <a href="#contato">Contato</a>
+</nav>
+<main id="conteudo">
+  <section class="abertura" id="inicio">
+    <h1>Cássio Viller</h1>
+    <p class="vaga">Orçamento, planejamento e custos de obra</p>
+    <p class="posicionamento">Orço obras, acompanho a execução e construí os sistemas que uso para isso.</p>
+    <ul class="ficha">
+      <li>Engenharia Civil, 7º semestre (faltam 3), Cruzeiro do Sul, após 6 semestres na UNIFEI</li>
+      <li>São José dos Campos/SP · CLT ou PJ · presencial ou remoto</li>
+    </ul>
+    <p class="contato"><a class="zap" href="https://wa.me/5512982071116">WhatsApp (12) 98207-1116</a><a href="mailto:cassiovillers@gmail.com">cassiovillers@gmail.com</a><a href="curriculo-cassio-viller.pdf">Currículo (PDF)</a></p>
+  </section>
 
-<main id="historia" class="historia">
-  <div class="palco" aria-hidden="true"></div>
-
-  <section class="cena" id="tese" data-passo="tese">
-    <figure class="fundo" data-passo="tese" aria-hidden="true"><img src="img/o-quantitativos.webp" alt="" width="1040" height="1000" fetchpriority="high"></figure>
-    <div class="texto">
-      <h1 class="frase" tabindex="-1">Um número sem origem custa caro na obra.</h1>
-      <p class="ressalva">Cássio Viller, estudante de Engenharia Civil (7º semestre), mira orçamento, planejamento e custos.</p>
+  <section class="caso cena so-cena" id="mesa" data-caso="mesa">
+    <div class="palco">
+      <div class="quadro">
+        <figure class="clipe" data-clipe="video/v2-abertura.mp4" data-dur="8" aria-hidden="true">
+          <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
+          <img src="video/v2-abertura.webp" alt="" width="1920" height="1080" fetchpriority="high">
+        </figure>
+      </div>
     </div>
   </section>
 
-  <section class="cena" id="origem" data-passo="origem">
-    <figure class="fundo clipe" data-passo="origem" data-dur="8" data-clipe="video/cena-origem.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-origem.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2017">2017</time> → <time datetime="2024">2024</time></p>
-      <h2 class="frase" tabindex="-1">Comecei pela contabilidade, não pela obra.</h2>
-      <p class="ressalva">Escritório contábil da família desde 2017; na UNIFEI, fiscal do DCE em 2022 e diretor de vendas da InLoco Jr. de 2023 a 2024.</p>
-      <p class="caso"><a href="portfolio.html#curriculo">Ver no currículo: contabilidade e UNIFEI →</a></p>
+  <section class="caso cena" id="veks" data-caso="veks">
+    <div class="palco">
+      <div class="quadro">
+        <figure class="clipe" data-clipe="video/v2-veks.mp4" data-dur="10" aria-hidden="true">
+          <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
+          <img src="video/v2-veks.webp" alt="" width="1920" height="1080">
+        </figure>
+        <div class="doc" style="left:20%;top:16.6667%;width:60%;height:66.6667%">
+          <img src="docs/veks-proposta-modelo.webp" width="1152" height="720" alt="Página da proposta no modelo da empresa: quadro de áreas (328 m² em 26 ambientes), parâmetros construtivos e a planta baixa do cliente com as paredes a construir em vermelho.">
+          <span class="destaque" style="left:5.9028%;top:47.7778%;width:88.1944%;height:47.0833%"></span>
+        </div>
+      </div>
+      <div class="texto">
+        <p class="rotulo">Sistema de orçamento (VEKS) · mar → set/2026 · da planta do cliente à proposta</p>
+        <h2 class="manchete">Orcei 13 obras, de R$ 29 mil a R$ 24,5 milhões.</h2>
+        <p class="apoio">11 com proposta. Conferência com a SINAPI: desvio máximo de 0,25% nos 19 serviços conferidos. A gestão de obra deste sistema ainda não rodou numa obra real.</p>
+        <figure class="recorte"><img src="docs/veks-proposta-modelo-recorte.webp" width="1016" height="372" alt="Recorte da proposta: a planta baixa do cliente com as paredes a construir em vermelho."></figure>
+        <p class="caso-link"><a href="portfolio.html#sistema">Ver o caso completo →</a></p>
+      </div>
     </div>
   </section>
 
-  <section class="cena" id="mudanca" data-passo="mudanca">
-    <figure class="fundo tipo" data-passo="mudanca" aria-hidden="true"><span class="ano">2025</span></figure>
-    <div class="texto">
-      <p class="data"><time datetime="2025">2025</time></p>
-      <h2 class="frase" tabindex="-1">Em 2025, mudei de cidade e de curso.</h2>
-      <p class="ressalva">Cruzeiro do Sul (EAD), morando em São José dos Campos: hoje no 7º semestre, faltam 3. Sistemas de Informação na PUC, em paralelo.</p>
-      <p class="caso"><a href="portfolio.html#curriculo">Ver no currículo: formação →</a></p>
+  <section class="caso cena" id="sige" data-caso="sige">
+    <div class="palco">
+      <div class="quadro">
+        <figure class="clipe" data-clipe="video/v2-sige.mp4" data-dur="10" aria-hidden="true">
+          <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
+          <img src="video/v2-sige.webp" alt="" width="1920" height="1080">
+        </figure>
+        <div class="doc" style="left:20%;top:16.6667%;width:60%;height:66.6667%">
+          <img src="docs/sige-portal.webp" width="1600" height="1000" alt="Portal do cliente no SIGE: obra com 44,7% concluído, 109 etapas e 65 relatórios diários; o nome do cliente aparece borrado.">
+          <span class="destaque" style="left:6.8750%;top:27.8000%;width:12.5000%;height:7.8000%"></span>
+        </div>
+      </div>
+      <div class="texto">
+        <p class="rotulo">SIGE na obra dos galpões · jun → set/2026</p>
+        <h2 class="manchete">Implantei a gestão de obra em dois galpões com 22 baias.</h2>
+        <p class="apoio">Depois de 11/08 o diário ficou 23 dias só no WhatsApp. Recuperado, o avanço passou de 27,6% para 44,7%, lido numa cópia do sistema.</p>
+        <figure class="recorte"><img src="docs/sige-portal-recorte.webp" width="800" height="400" alt="Recorte do portal do cliente: 44,7% concluído, 109 etapas, 65 relatórios."></figure>
+        <p class="caso-link"><a href="portfolio.html#sige">Ver o caso completo →</a></p>
+      </div>
     </div>
   </section>
 
-  <section class="cena" id="obra" data-passo="obra">
-    <figure class="fundo clipe foco-alto" data-passo="obra" data-dur="8" data-clipe="video/cena-obra.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-obra.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2025-02">fev/2025</time> → <time datetime="2026-03">mar/2026</time></p>
-      <h2 class="frase" tabindex="-1">Mas na obra, vi a mesma informação digitada cinco vezes.</h2>
-      <p class="ressalva">V Alves (gerente de produção, CLT meio período) e Estruturas do Vale (estágio, meio período), em paralelo. No estágio nasceu o SIGE.</p>
-      <p class="caso"><a href="portfolio.html#curriculo">Ver no currículo: V Alves e Estruturas do Vale →</a></p>
+  <section class="caso cena" id="modulares" data-caso="modulares">
+    <div class="palco">
+      <div class="quadro">
+        <figure class="clipe" data-clipe="video/v2-modulares.mp4" data-dur="12" aria-hidden="true">
+          <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
+          <img src="video/v2-modulares.webp" alt="" width="1920" height="1080">
+        </figure>
+        <div class="doc" style="left:20%;top:16.6667%;width:60%;height:66.6667%">
+          <img src="docs/b36-caixas.webp" width="1442" height="901" alt="Prancha do celeiro B-36: como cada caixa de 3,00 × 6,00 m viaja e como ficam unidas na obra, em 6,00 × 6,00 m.">
+          <span class="destaque" style="left:6.2413%;top:24.4173%;width:83.2178%;height:44.3951%"></span>
+        </div>
+      </div>
+      <div class="texto">
+        <p class="rotulo">Casas modulares (VEKS) · ago/2026</p>
+        <h2 class="manchete">O celeiro B-36 não cabia no caminhão: dividi em duas caixas.</h2>
+        <p class="apoio">Três viagens, telhado em kit, 37 decisões registradas. Pré-dimensionado, sujeito à revisão do engenheiro responsável.</p>
+        <figure class="recorte"><img src="docs/b36-caixas-recorte.webp" width="1340" height="520" alt="Recorte da prancha: as duas caixas do B-36, de 3,00 × 6,00 m cada."></figure>
+        <p class="caso-link"><a href="portfolio.html#modular">Ver o caso completo →</a></p>
+      </div>
     </div>
   </section>
 
-  <section class="cena" id="veks" data-passo="veks">
-    <figure class="fundo clipe" data-passo="veks" data-dur="8" data-clipe="video/cena-veks.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-veks.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-03">mar/2026</time> → <time datetime="2026-09">set/2026</time></p>
-      <h2 class="frase" tabindex="-1">Em março de 2026, entrei na VEKS Engenharia.</h2>
-      <p class="ressalva">PJ, contrato de 6 meses cumprido até o fim; a V Alves, em meio período, seguiu até julho.</p>
-      <p class="caso"><a href="portfolio.html#obra">Ver o caso completo: obras na VEKS →</a></p>
-    </div>
+  <section class="trajetoria" id="trajetoria">
+    <h2>Trajetória</h2>
+    <ol class="faixa">
+      <li><time datetime="2017">2017 → hoje</time><b>AZ Contabilidade</b><span>Analista contábil no escritório da família: folha, notas, balancete.</span></li>
+      <li><time datetime="2020">2020 → 2024</time><b>UNIFEI</b><span>6 semestres de Engenharia Civil; fiscal financeiro do DCE (2022); diretor de vendas da InLoco Jr. (2023 → 2024).</span></li>
+      <li><time datetime="2025-02">fev/2025 → jul/2026</time><b>V Alves Construção</b><span>Gerente de produção. Em paralelo, estágio na Estruturas do Vale (abr/2025 → mar/2026): orçamentos e propostas; o SIGE nasceu aqui.</span></li>
+      <li><time datetime="2026-03">mar → set/2026</time><b>VEKS Engenharia</b><span>PJ, 6 meses: orçamentos, compras de obra, contratos, fluxo de caixa, casas modulares e o sistema de orçamento.</span></li>
+    </ol>
+    <p class="ferramentas">No caminho, duas ferramentas: a calculadora de parede em LSF e drywall e o classificador de fluxo de caixa.</p>
   </section>
 
-  <section class="cena" id="ferramentas" data-passo="ferramentas">
-    <figure class="fundo clipe" data-passo="ferramentas" data-dur="8" data-clipe="video/cena-ferramentas.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-ferramentas.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-03">mar</time> → <time datetime="2026-04">abr/2026</time></p>
-      <h2 class="frase" tabindex="-1">Toda conta repetida virou ferramenta.</h2>
-      <p class="ressalva">Nos primeiros meses na VEKS: a calculadora de parede em LSF e drywall e o classificador do fluxo de caixa.</p>
-      <p class="caso"><a href="portfolio.html#ferramentas">Ver as ferramentas: calculadora e classificador →</a></p>
-    </div>
-  </section>
-
-  <section class="cena" id="sige" data-passo="sige">
-    <figure class="fundo clipe" data-passo="sige" data-dur="8" data-clipe="video/cena-sige.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-sige.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-05">mai</time> → <time datetime="2026-09">set/2026</time></p>
-      <h2 class="frase" tabindex="-1">De maio a setembro, o SIGE ganhou versão nova.</h2>
-      <p class="ressalva">Cerca de 50 módulos em 6 áreas, entregas registradas de 22/07 a 14/09/2026; código escrito com assistente de IA, sob a minha direção.</p>
-      <p class="caso"><a href="portfolio.html#sige">Ver o caso completo: SIGE →</a></p>
-    </div>
-  </section>
-
-  <section class="cena" id="galpoes" data-passo="galpoes">
-    <figure class="fundo tipo" data-passo="galpoes" aria-hidden="true"><span class="ano">22 baias</span></figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-06-08">jun/2026</time></p>
-      <h2 class="frase" tabindex="-1">Em junho, começou a obra que testaria o SIGE.</h2>
-      <p class="ressalva">Dois galpões e 22 baias numa fazenda, em Light Steel Frame: a obra real do portal do cliente e do diário.</p>
-      <p class="caso"><a href="portfolio.html#obra">Ver o caso completo: galpões e baias →</a></p>
-    </div>
-  </section>
-
-  <section class="cena" id="escala" data-passo="escala">
-    <figure class="fundo clipe" data-passo="escala" data-dur="8.5" data-clipe="video/cena-escala.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-escala.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-07-09">jul</time> → <time datetime="2026-09-21">set/2026</time></p>
-      <h2 class="frase" tabindex="-1">13 obras no sistema, até R$ 24,5 milhões.</h2>
-      <p class="ressalva">11 com proposta; a menor, R$ 29 mil. A gestão de obra deste sistema ainda não rodou numa obra real.</p>
-      <p class="caso"><a href="portfolio.html#sistema">Ver o caso completo: sistema de orçamento →</a></p>
-    </div>
-  </section>
-
-  <section class="cena" id="precisao" data-passo="precisao">
-    <figure class="fundo" data-passo="precisao" aria-hidden="true"><img src="img/o-orcamento.webp" alt="" width="1040" height="1080" loading="lazy"></figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-07-09">jul</time> → <time datetime="2026-09-21">set/2026</time></p>
-      <h2 class="frase" tabindex="-1">Desvio máximo de 0,25% nos 19 serviços conferidos.</h2>
-      <p class="ressalva">Serviço a serviço, contra a tabela SINAPI da Caixa; acima de 1% de desvio, a importação é recusada.</p>
-      <p class="caso"><a href="portfolio.html#sistema">Ver o caso completo: conferência SINAPI →</a></p>
-    </div>
-  </section>
-
-  <section class="cena longa" id="casa" data-passo="casa">
-    <figure class="fundo clipe foco-alto" data-passo="casa" data-dur="10" data-clipe="video/cena-casa.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-casa.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-08">ago/2026</time></p>
-      <h2 class="frase" tabindex="-1">O celeiro não cabe inteiro no caminhão.</h2>
-      <p class="ressalva">B-36, pré-dimensionado e sujeito à revisão do engenheiro responsável: duas caixas, três viagens, 37 decisões registradas.</p>
-      <p class="caso"><a href="portfolio.html#modular">Ver o caso completo: celeiro B-36 →</a></p>
-    </div>
-  </section>
-
-  <section class="cena longa" id="icamento" data-passo="icamento">
-    <figure class="fundo clipe foco-alto" data-passo="icamento" data-dur="8" data-clipe="video/cena-icamento.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-icamento.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-08">ago/2026</time></p>
-      <h2 class="frase" tabindex="-1">No estudo, o módulo sobe pelo balancim, cabos na vertical.</h2>
-      <p class="ressalva">Estudo 3D de agosto: com os cabos na vertical, a parede não é comprimida. Balancim de içamento e guindaste da classe certa viraram itens de regra no orçamento.</p>
-      <p class="caso"><a href="portfolio.html#modular">Ver o caso completo: casas modulares →</a></p>
-    </div>
-  </section>
-
-  <section class="cena" id="whatsapp" data-passo="whatsapp">
-    <figure class="fundo clipe foco-alto" data-passo="whatsapp" data-dur="8" data-clipe="video/cena-whatsapp.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-whatsapp.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-08-11">ago/2026</time></p>
-      <h2 class="frase" tabindex="-1">Depois de 11/08, o diário saiu do sistema.</h2>
-      <p class="ressalva">42 diários lançados até ali; os 23 dias seguintes ficaram só no grupo de WhatsApp, e 28 atividades prontas apareciam como atrasadas.</p>
-      <p class="caso"><a href="portfolio.html#sige">Ver o caso completo: o diário no WhatsApp →</a></p>
-    </div>
-  </section>
-
-  <section class="cena" id="recuperado" data-passo="recuperado">
-    <figure class="fundo clipe" data-passo="recuperado" data-dur="8" data-clipe="video/cena-recuperado.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-recuperado.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-09">set/2026</time></p>
-      <h2 class="frase" tabindex="-1">Recuperado, o diário mostrou 44,7% de avanço.</h2>
-      <p class="ressalva">Antes, 27,6%; planejado para 07/09, 60,8%. Lido numa cópia do sistema; no sistema em uso, a carga ainda não foi aplicada.</p>
-      <p class="caso"><a href="portfolio.html#sige">Ver o caso completo: diários recuperados →</a></p>
-    </div>
-  </section>
-
-  <section class="cena longa" id="zip" data-passo="zip">
-    <figure class="fundo clipe" data-passo="zip" data-dur="10" data-clipe="video/cena-zip.mp4" aria-hidden="true">
-      <video muted playsinline preload="none" disableremoteplayback width="960" height="540"></video>
-      <img src="video/cena-zip.webp" alt="" width="960" height="540">
-    </figure>
-    <div class="texto">
-      <p class="data"><time datetime="2026-09">set/2026</time></p>
-      <h2 class="frase" tabindex="-1">Em setembro, uma proposta assinável em 36 minutos.</h2>
-      <p class="ressalva">Medidos: 11:35 → 12:11, numa ampliação de unidade de saúde com 26 ambientes e 328 m². À mão, cerca de 2 dias úteis (estimativa).</p>
-      <p class="caso"><a href="portfolio.html#orcamento">Ver o caso completo: 36 minutos →</a></p>
-    </div>
-  </section>
-
-  <section class="cena" id="metodo" data-passo="metodo">
-    <figure class="fundo" data-passo="metodo" aria-hidden="true"><img src="img/o-proposta.webp" alt="" width="885" height="1060" loading="lazy"></figure>
-    <div class="texto">
-      <h2 class="frase" tabindex="-1">Construí o jeito de o número não sumir.</h2>
-      <p class="ressalva">De 2017 a 2026: contabilidade, obra e sistemas. Idealizei e dirigi; o código foi escrito com assistentes de IA, e as regras e a revisão são minhas.</p>
-    </div>
-  </section>
-
-  <section class="cena" id="convite" data-passo="convite">
-    <div class="texto">
-      <h2 class="frase" tabindex="-1">Faltam 3 semestres para o diploma. Não falta obra feita.</h2>
-      <p class="ressalva">Você me manda o pacote do projeto; eu devolvo levantamento, orçamento com faixa e proposta no seu modelo.</p>
-      <p class="cta">
-        <a class="btn" href="https://wa.me/5512982071116?text=Ol%C3%A1%2C%20C%C3%A1ssio.%20Vi%20seu%20portf%C3%B3lio%20e%20quero%20te%20mandar%20uma%20obra%20para%20or%C3%A7ar." target="_blank" rel="noopener">Me mande uma obra ↗</a>
-        <a class="btn fantasma" href="portfolio.html">Ver o portfólio completo</a>
-        <a class="btn fantasma" href="curriculo-cassio-viller.pdf" target="_blank" rel="noopener">Baixar currículo (PDF)</a>
-      </p>
-    </div>
+  <section class="fechamento" id="contato">
+    <h2>O que faço numa construtora</h2>
+    <ul>
+      <li>Levantamento de quantitativos no projeto</li>
+      <li>Orçamento com composições SINAPI e BDI</li>
+      <li>Cronograma físico-financeiro com curva S</li>
+      <li>Diário de obra e medição</li>
+      <li>Compras com cotação e quadro de concorrência</li>
+      <li>Fluxo de caixa e custo previsto × realizado</li>
+    </ul>
+    <p class="contato"><a class="zap" href="https://wa.me/5512982071116">WhatsApp (12) 98207-1116</a><a href="mailto:cassiovillers@gmail.com">cassiovillers@gmail.com</a><a href="curriculo-cassio-viller.pdf">Currículo (PDF)</a><a href="portfolio.html">Portfólio completo</a></p>
   </section>
 </main>
-
-<section class="ficha" aria-labelledby="ficha-titulo">
-  <h2 id="ficha-titulo">O que faço numa construtora</h2>
-  <p>Levantamento de quantitativos no projeto, orçamento com composições SINAPI e BDI, cronograma físico-financeiro com curva S, diário de obra e medição, compras com cotação e quadro de concorrência, fluxo de caixa e custo previsto × realizado.</p>
-  <p>Engenharia Civil, 7º semestre, faltam 3 · CLT ou PJ · São José dos Campos/SP, presencial ou remoto.</p>
-  <p class="nota">As cenas ao fundo da história são dioramas em 3D feitos para este portfólio; as telas e fotos reais estão no portfólio completo.</p>
-</section>
-<footer>
-  <span>Cássio Viller · São José dos Campos/SP</span>
-  <a href="portfolio.html">Ver o portfólio completo</a>
-</footer>
 <script src="clipes.js" defer></script>
-<script src="historia.js" defer></script>
+<script src="v2.js" defer></script>
 </body>
 </html>

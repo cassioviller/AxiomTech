@@ -355,7 +355,7 @@ def checar_video():
             check(render.psnr(cartaz, q[n - 1]) >= 40, f"vídeo {caso}: o pôster não é o último quadro (PSNR < 40 dB)")
 
 
-PAGINA = SITE / "v2.html"
+PAGINA = SITE / "index.html"
 PROIBIDOS = ["27×", "≈ 27", "≈27", "2 dias úteis", "dois dias úteis", "Kabod", "Santa Mônica", "UPA", "Bertioga", "203.1809",
              "número não sumir", "Não falta obra feita", "número sem origem"]
 RETANGULO_CSS = "left:20%;top:16.6667%;width:60%;height:66.6667%"
@@ -371,7 +371,7 @@ def checar_pagina_estatica():
     """v2.html: textos aprovados; regras de texto (§5); proibidos; documentos com width/height reais; .doc em RETANGULO;
     destaque em % igual ao destaques.json; figure.clipe apontando para o vídeo publicado com a duração de CENAS."""
     import render
-    check(PAGINA.exists(), "página: portfolio/site/v2.html não existe")
+    check(PAGINA.exists(), "página: portfolio/site/index.html não existe")
     if not PAGINA.exists():
         return
     p = PAGINA.read_text(encoding="utf-8")
@@ -438,7 +438,7 @@ def abrir_pagina(nav, base, largura, altura, **kw):
     pg.on("pageerror", lambda e: erros.append(str(e)))
     pg.on("console", lambda m: erros.append(m.text) if m.type == "error" else None)
     pg.on("response", lambda r: erros.append(f"{r.status} {r.url}") if r.status >= 400 else None)
-    pg.goto(f"{base}/site/v2.html")
+    pg.goto(f"{base}/site/index.html")
     pg.wait_for_load_state("load")
     return ctx, pg, erros
 
@@ -648,8 +648,19 @@ def checar_troca_de_clipes():
 
 def checar_readme():
     readme = (RAIZ / "README.md").read_text(encoding="utf-8")
-    for trecho in ("site/v2.html", "cenas/render.py --so sige", "cenas/documentos.py", "tests/check_v2.py --navegador"):
+    for trecho in ("site/index.html", "site/historia.html", "cenas/render.py --so", "cenas/documentos.py", "tests/check_v2.py --navegador", "zip:"):
         check(trecho in readme, f"README do portfólio sem {trecho!r}")
+
+
+def checar_renomeacao():
+    """O site v2 é o index.html; o protótipo continua inteiro em historia.html; v2.html redireciona (o link do piloto circulou)."""
+    check((SITE / "historia.html").exists() and '<section class="cena" id="tese"' in (SITE / "historia.html").read_text(encoding="utf-8"),
+          "renomeação: site/historia.html não é o protótipo (sem #tese)")
+    v2 = SITE / "v2.html"
+    check(v2.exists() and re.search(r'<meta http-equiv="refresh" content="0; ?url=\./">', v2.read_text(encoding="utf-8")), "renomeação: v2.html não redireciona para ./")
+    check('<section class="caso cena" id="veks"' in PAGINA.read_text(encoding="utf-8"), "renomeação: index.html não é o site v2")
+    hist = (RAIZ / "tests" / "check_historia.py").read_text(encoding="utf-8")
+    check("index.html" not in hist, "renomeação: check_historia.py ainda aponta para index.html")
 
 
 def main():
@@ -657,6 +668,7 @@ def main():
     checar_cena_estatica()
     checar_pagina_estatica()
     checar_readme()
+    checar_renomeacao()
     if "--navegador" in sys.argv:
         checar_kit()
         checar_render()
