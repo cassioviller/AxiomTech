@@ -8,18 +8,57 @@
 // Abertura: a mesa de trabalho com os documentos reais dos casos: a proposta dos 36 minutos (folha A4), a tela do
 // orçamento da VEKS (impressa, A4 deitada), o portal do SIGE (num tablet) e a prancha do B-36 (A3 deitada).
 // t: 0,5 → 2,5 a proposta desliza para o lugar; a câmera sai de três quartos à frente da mesa (t=0) e termina a pino (t=10).
-import {THREE, criarPalco, material, documento, trajeto, enquadrarPlano, publicar, rampa, lerp} from './kit.js';
+// A sala em volta: piso de porcelanato com juntas, tapete, paredes com rodapé, janela na parede da esquerda por onde
+// entra o sol (a parede faz sombra; só a janela deixa a luz passar), cadeira, armário baixo com pastas e rolos de
+// projeto, cesto de rolos, planta. Na mesa, o resto do escritório do orçamentista: capacete, trena, escalímetro,
+// calculadora, óculos, celular, notebook fechado, caneta, clipes, vaso, o cabo do tablet. Nada disso muda de lugar
+// nem cobre os documentos; a mesa (S.mesa) continua o assunto de t=0.
+import {THREE, criarPalco, material, vidro, arvore, documento, trajeto, enquadrarPlano, publicar, rampa, lerp} from './kit.js';
 
 const palco = criarPalco({ceu: 0xE3E7EA, nevoa: [30, 90]});
 const {cena, camera, sol} = palco;
-sol.position.set(-6, 9, 5);
+// o sol baixo (≈ 28°), vindo da esquerda: entra pela janela da parede da esquerda e cai sobre a mesa e o piso em volta
+sol.position.set(-12, 6.4, 1.5);
 Object.assign(sol.shadow.camera, {left: -6, right: 6, top: 6, bottom: -6});
 sol.shadow.camera.updateProjectionMatrix();
 const S = {mesa: null, proposta: null, docs: [], assunto: [], alvo: null};
 window.__cena = S;
+let semente = 7;
+const rnd = () => (semente = (semente * 16807) % 2147483647) / 2147483647;
+
+// materiais locais (candidatos ao kit: tinta, porcelanato, tecido, branco, aluminio, borracha, amarelo, ceramica, vidroJanela)
+const M = o => new THREE.MeshStandardMaterial(o);
+const concreto = material('concreto');
+const mat = {
+  tinta: M({color: 0xEEEAE2, roughness: .9}),
+  porcelanato: M({map: concreto.map, normalMap: concreto.normalMap, color: 0xE4E0D8, roughness: .3, envMapIntensity: .9}),
+  rejunte: M({color: 0x8A867F, roughness: 1}),
+  tecido: M({color: 0x67728A, roughness: 1}),
+  tecidoCadeira: M({color: 0x2B333F, roughness: 1}),
+  branco: M({color: 0xF3F3F0, roughness: .4}),
+  brancoBrilho: M({color: 0xF6F6F3, roughness: .22, envMapIntensity: 1.2}),
+  cinza: M({color: 0xC6C9CC, roughness: .55}),
+  aluminio: M({color: 0xA9AEB3, metalness: .7, roughness: .35, envMapIntensity: 1.2}),
+  vidroPreto: M({color: 0x0B0D10, roughness: .12, envMapIntensity: 1.4}),
+  borracha: M({color: 0x1F1F1F, roughness: .9}),
+  amarelo: M({color: 0xF0C130, roughness: .5}),
+  ceramica: M({color: 0xB9683F, roughness: .75}),
+  cafe: M({color: 0x2A1608, roughness: .15, envMapIntensity: 1.3}),
+  azul: M({color: 0x2E4A7A, roughness: .8}),
+  preto: M({color: 0x2A2B2E, roughness: .8}),
+  verde: M({color: 0x3E6B55, roughness: .8}),
+  grafite: M({color: 0x6F7780, roughness: .8}),
+  armacao: M({color: 0x3A2A1E, roughness: .35, metalness: .2}),
+};
+const vidroJanela = vidro().clone();
+Object.assign(vidroJanela, {color: new THREE.Color(0xC8DAE6), transparent: true, opacity: .28, side: THREE.DoubleSide});
 
 function bloco(c, a, p, x, y, z, pai, mat) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(c, a, p), mat);
+  m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; pai.add(m); return m;
+}
+function cilindro(r1, r2, h, x, y, z, pai, mat, seg = 20) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r2, h, seg), mat);
   m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; pai.add(m); return m;
 }
 // documento real deitado sobre a mesa (papel ou tela): plano com a proporção do arquivo, textura de ../site/docs/
@@ -30,12 +69,123 @@ function folha(textura, larg, alt, x, y, z, giro, pai) {
   return m;
 }
 
-// a sala: piso de madeira, parede do fundo
-const piso = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), material('madeira', {repetir: 6}));
-piso.rotation.x = -Math.PI / 2; piso.receiveShadow = true; cena.add(piso);
-bloco(12, 3, .1, 0, 1.5, -2.5, cena, material('papel'));
+// ---- a sala: 5,2 × 6 m (x −2,6..2,6, z −2,5..3,5), pé-direito 3 m ----
+const chao = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), material('pasto', {repetir: 20}));  // o terreno lá fora
+chao.rotation.x = -Math.PI / 2; chao.receiveShadow = true; cena.add(chao);
+const rejunte = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 6.2), mat.rejunte);
+rejunte.rotation.x = -Math.PI / 2; rejunte.position.set(0, .003, .5); rejunte.receiveShadow = true; cena.add(rejunte);
+// porcelanato 60 × 60 com junta de 3 mm: uma instância por peça, com leve variação de tom
+{
+  const NX = 9, NZ = 10, pecas = new THREE.InstancedMesh(new THREE.BoxGeometry(.597, .012, .597), mat.porcelanato, NX * NZ);
+  const m4 = new THREE.Matrix4(), cor = new THREE.Color();
+  let i = 0;
+  for (let ix = 0; ix < NX; ix++) for (let iz = 0; iz < NZ; iz++) {
+    m4.makeTranslation((ix - (NX - 1) / 2) * .6, .012, .5 + (iz - (NZ - 1) / 2) * .6);
+    pecas.setMatrixAt(i, m4); pecas.setColorAt(i, cor.setScalar(.95 + .07 * rnd())); i++;
+  }
+  pecas.castShadow = pecas.receiveShadow = true; cena.add(pecas);
+}
+// tapete sob a mesa
+bloco(2.7, .012, 2.0, 0, .024, .25, cena, mat.tecido);
+// paredes (a da esquerda com o vão da janela: z −0,5..1,5, y 0,9..2,6) e rodapés
+const PISO = .018;
+bloco(5.35, 3, .15, 0, 1.5, -2.5, cena, mat.tinta);
+bloco(5.35, 3, .15, 0, 1.5, 3.5, cena, mat.tinta);
+bloco(.15, 3, 6, 2.6, 1.5, .5, cena, mat.tinta);
+bloco(.15, .9, 6, -2.6, .45, .5, cena, mat.tinta);
+bloco(.15, .4, 6, -2.6, 2.8, .5, cena, mat.tinta);
+bloco(.15, 1.7, 2, -2.6, 1.75, -1.5, cena, mat.tinta);
+bloco(.15, 1.7, 2, -2.6, 1.75, 2.5, cena, mat.tinta);
+bloco(5.2, .09, .014, 0, PISO + .045, -2.418, cena, mat.branco);
+bloco(.014, .09, 6, -2.518, PISO + .045, .5, cena, mat.branco);
+bloco(.014, .09, 6, 2.518, PISO + .045, .5, cena, mat.branco);
+// a janela: esquadria branca (marco, montante e travessa), vidro do kit (transparente), peitoril
+{
+  const j = new THREE.Group(); j.position.set(-2.6, 0, .5); cena.add(j);
+  bloco(.08, .05, 2.0, 0, 2.575, 0, j, mat.branco); bloco(.08, .05, 2.0, 0, .925, 0, j, mat.branco);
+  bloco(.08, 1.7, .05, 0, 1.75, -.975, j, mat.branco); bloco(.08, 1.7, .05, 0, 1.75, .975, j, mat.branco);
+  // montante e travessa finos não projetam sombra (a 3 m a sombra real deles já vem toda difusa)
+  bloco(.06, 1.6, .04, 0, 1.75, 0, j, mat.branco).castShadow = false; bloco(.06, .04, 1.9, 0, 1.75, 0, j, mat.branco).castShadow = false;
+  const v = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.7), vidroJanela);
+  v.rotation.y = Math.PI / 2; v.position.set(0, 1.75, 0); j.add(v);
+  bloco(.24, .03, 2.2, .045, .885, 0, j, mat.brancoBrilho);
+}
+// lá fora, uma árvore que se vê pela janela
+const arv = arvore(1.3); arv.position.set(-5.5, 0, -2.6); cena.add(arv);  // fora do caminho do sol até a mesa
 
-// a mesa: tampo 1,6 × 0,8 m a 0,75 m, pernas de aço pintado
+// ---- o armário baixo ao fundo, com pastas e rolos de projeto em cima; o cesto de rolos; a planta ----
+{
+  const a = new THREE.Group(); a.position.set(-.7, PISO, -2.2); cena.add(a);
+  bloco(1.56, .08, .4, 0, .04, -.02, a, mat.preto);
+  bloco(1.6, .7, .45, 0, .43, 0, a, material('madeira'));
+  bloco(1.64, .03, .48, 0, .795, .015, a, material('madeira'));
+  [-.4, .4].forEach(x => { bloco(.77, .64, .02, x, .43, .235, a, mat.cinza); cilindro(.005, .005, .12, x + (x < 0 ? .3 : -.3), .43, .25, a, mat.aluminio, 8).rotation.z = Math.PI / 2; });
+  // pastas AZ, em pé, encostadas num aparador
+  const cores = [mat.azul, mat.preto, mat.grafite, mat.verde, mat.azul, mat.preto];
+  cores.forEach((c, i) => bloco(.07, .31, .28, -.72 + i * .076, .81 + .155, -.03, a, c));
+  bloco(.005, .16, .2, -.72 + 6 * .076 - .03, .81 + .08, -.03, a, mat.aluminio);
+  bloco(.1, .004, .2, -.72 + 6 * .076 + .02, .812, -.03, a, mat.aluminio);
+  // rolos de projeto deitados, com elásticos
+  const rolo = (x, y, z, L, pai) => {
+    const r = cilindro(.028, .028, L, x, y, z, pai, material('papel'), 16); r.rotation.z = Math.PI / 2;
+    [-.25, .25].forEach(d => { const e = new THREE.Mesh(new THREE.TorusGeometry(.0285, .003, 6, 20), mat.borracha); e.rotation.y = Math.PI / 2; e.position.set(x + d * L, y, z); e.castShadow = true; pai.add(e); });
+    return r;
+  };
+  rolo(.15, .838, -.08, .72, a); rolo(.1, .838, .0, .68, a); rolo(.13, .888, -.04, .7, a);
+  // o capacete branco fica em cima do armário (na mesa, à frente do tablet, ele cobriria a tela vista de três quartos)
+  const cap = new THREE.Group(); cap.position.set(.62, .81, -.02); cap.rotation.y = -.4; a.add(cap);
+  const aba = cilindro(.105, .105, .007, 0, .0035, 0, cap, mat.brancoBrilho, 32); aba.scale.x = 1.3;
+  const casco = new THREE.Mesh(new THREE.SphereGeometry(.1, 28, 14, 0, 2 * Math.PI, 0, Math.PI / 2), mat.brancoBrilho);
+  casco.scale.set(1.15, 1.05, .9); casco.position.y = .007; casco.castShadow = casco.receiveShadow = true; cap.add(casco);
+  bloco(.17, .014, .022, 0, .105, 0, cap, mat.brancoBrilho);  // o friso do topo
+}
+{
+  // cesto com rolos de projeto em pé
+  const c = new THREE.Group(); c.position.set(-1.85, PISO, -2.2); cena.add(c);
+  cilindro(.16, .14, .42, 0, .21, 0, c, material('acoPintado'), 24);
+  [[0, 0, .08], [.07, .05, -.05], [-.06, .06, .0], [.03, -.07, .12], [-.05, -.04, -.1], [.08, -.02, .04]].forEach((p, i) => {
+    const L = .7 + .1 * (i % 3), r = cilindro(.03, .03, L, p[0], .05 + L / 2, p[1], c, material('papel'), 12);
+    r.rotation.set(p[2] * .6, 0, -p[0] * 1.5);
+  });
+}
+{
+  // planta de chão ao lado direito do armário
+  const p = new THREE.Group(); p.position.set(.75, PISO, -2.15); cena.add(p);
+  cilindro(.15, .12, .32, 0, .16, 0, p, mat.ceramica, 24);
+  cilindro(.14, .14, .02, 0, .31, 0, p, material('solo'), 24);
+  for (let i = 0; i < 11; i++) {
+    const ang = i * 2.4, incl = .35 + .25 * rnd(), L = .5 + .3 * rnd();
+    const g = new THREE.Group(); g.position.set(0, .3, 0); g.rotation.set(0, ang, -incl, 'YXZ'); p.add(g);
+    cilindro(.006, .009, L, 0, L / 2, 0, g, material('tronco'), 6);
+    for (let k = 0; k < 5; k++) {
+      const f = new THREE.Mesh(new THREE.IcosahedronGeometry(.045, 1), material('folha'));
+      f.scale.set(.5, .35, 1.4); f.position.set(0, .3 + k * (L - .3) / 4, 0); f.rotation.set(k % 2 ? .6 : -.6, k * .8, 0);
+      f.castShadow = f.receiveShadow = true; g.add(f);
+    }
+  }
+}
+
+// ---- a cadeira, à frente e à esquerda da mesa, virada como se o orçamentista tivesse acabado de se levantar ----
+{
+  const c = new THREE.Group(); c.position.set(-.35, PISO + .012, 1.2); c.rotation.y = -.5; cena.add(c);
+  cilindro(.04, .05, .06, 0, .06, 0, c, material('plastico'), 12);
+  for (let i = 0; i < 5; i++) {
+    const ang = i * 2 * Math.PI / 5, g = new THREE.Group(); g.rotation.y = ang; c.add(g);
+    bloco(.3, .03, .045, .15, .06, 0, g, material('plastico'));
+    const roda = cilindro(.025, .025, .02, .3, .025, 0, g, mat.borracha, 12); roda.rotation.x = Math.PI / 2;
+  }
+  cilindro(.025, .025, .34, 0, .25, 0, c, material('aco'), 12);
+  cilindro(.036, .036, .16, 0, .19, 0, c, material('plastico'), 12);
+  bloco(.4, .03, .4, 0, .43, 0, c, material('plastico'));
+  bloco(.48, .07, .47, 0, .48, 0, c, mat.tecidoCadeira);
+  bloco(.06, .26, .08, 0, .57, .21, c, material('plastico'));
+  const enc = bloco(.45, .52, .06, 0, .84, .23, c, mat.tecidoCadeira); enc.rotation.x = -.14;
+  [-.25, .25].forEach(x => { bloco(.03, .2, .05, x, .6, .04, c, material('plastico')); bloco(.05, .02, .26, x, .705, .0, c, material('plastico')); });
+}
+// lixeira ao lado da mesa
+cilindro(.13, .11, .28, -1.05, PISO + .14, .15, cena, material('plastico'), 24);
+
+// ---- a mesa: tampo 1,6 × 0,8 m a 0,75 m, pernas de aço pintado ----
 S.mesa = new THREE.Group(); cena.add(S.mesa); S.assunto = [S.mesa];
 bloco(1.6, .04, .8, 0, .73, 0, S.mesa, material('madeira', {repetir: 2}));
 [[-.75, -.35], [.75, -.35], [-.75, .35], [.75, .35]].forEach(p => bloco(.05, .71, .05, p[0], .355, p[1], S.mesa, material('acoPintado')));
@@ -49,11 +199,81 @@ bloco(.26, .008, .17, 0, .004, 0, tablet, material('plastico'));
 folha(documento('../site/docs/sige-portal.webp'), .24, .15, 0, .0085, 0, 0, tablet);
 S.proposta = folha(documento('../site/docs/veks-proposta.webp'), .21, .2515, -.62, .754, -.34, .4, S.mesa); // começa na beira da mesa
 
-// o resto da mesa: uma caneca, um lápis laranja (o acento da cena)
+// o resto da mesa: uma caneca (com café e asa), um lápis laranja (o acento da cena)
 const caneca = new THREE.Mesh(new THREE.CylinderGeometry(.04, .036, .095, 24), material('papel'));
 caneca.position.set(.66, .7975, -.25); caneca.castShadow = true; S.mesa.add(caneca);
 const lapis = new THREE.Mesh(new THREE.CylinderGeometry(.004, .004, .18, 8), material('acento'));
 lapis.rotation.set(0, 0, Math.PI / 2); lapis.rotation.y = .5; lapis.position.set(.2, .754, .3); lapis.castShadow = true; S.mesa.add(lapis);
+
+// ---- os outros objetos da mesa (grupo próprio: não entram na caixa do assunto), nos cantos livres ----
+const T = .754, itens = new THREE.Group(); cena.add(itens);
+{
+  const cafe = cilindro(.035, .035, .003, .66, .836, -.25, itens, mat.cafe, 24);
+  const asa = new THREE.Mesh(new THREE.TorusGeometry(.024, .005, 8, 20), material('papel'));
+  asa.position.set(.705, .80, -.25); asa.castShadow = true; itens.add(asa);
+  // regra dos objetos da mesa: a câmera chega pela frente e pela direita, então nada fica à frente/à direita de um
+  // documento (cobriria um canto dele visto de três quartos); os objetos baixos ficam entre os documentos, os altos nos cantos
+  // trena amarela com cinta de borracha, atrás da caneca
+  const tr = new THREE.Group(); tr.position.set(.72, T, -.14); tr.rotation.y = -.3; itens.add(tr);
+  bloco(.062, .032, .068, 0, .016, 0, tr, mat.amarelo); bloco(.066, .012, .072, 0, .016, 0, tr, mat.borracha);
+  bloco(.02, .006, .01, 0, .003, .039, tr, mat.aluminio);
+  // celular (moldura de alumínio, tela apagada), entre o tablet e a beira direita
+  const cel = new THREE.Group(); cel.position.set(.72, T, .06); cel.rotation.y = .2; itens.add(cel);
+  bloco(.073, .008, .15, 0, .004, 0, cel, mat.aluminio); bloco(.068, .001, .145, 0, .0085, 0, cel, mat.vidroPreto);
+  // notebook fechado atrás do orçamento
+  const nb = new THREE.Group(); nb.position.set(.405, T, -.26); nb.rotation.y = .06; itens.add(nb);
+  bloco(.30, .01, .21, 0, .005, 0, nb, mat.aluminio); bloco(.30, .008, .21, 0, .014, .004, nb, mat.grafite);
+  const dob = cilindro(.006, .006, .26, 0, .011, -.103, nb, mat.preto, 10); dob.rotation.z = Math.PI / 2;
+  // calculadora lisa (visor e teclas sem dígitos) à frente do orçamento
+  const calc = new THREE.Group(); calc.position.set(-.03, T, .24); calc.rotation.y = .12; itens.add(calc);
+  bloco(.085, .012, .16, 0, .006, 0, calc, mat.cinza); bloco(.07, .002, .028, 0, .012, -.058, calc, mat.vidroPreto);
+  const teclas = new THREE.InstancedMesh(new THREE.BoxGeometry(.015, .005, .011), mat.branco, 20), m4 = new THREE.Matrix4(), cor = new THREE.Color();
+  for (let k = 0; k < 20; k++) { m4.makeTranslation(-.03 + (k % 4) * .02, .0135, -.03 + Math.floor(k / 4) * .017); teclas.setMatrixAt(k, m4); teclas.setColorAt(k, cor.set(k % 4 === 3 ? 0x8A9098 : 0xF1F1EE)); }
+  teclas.castShadow = teclas.receiveShadow = true; calc.add(teclas);
+  // clipes ao lado da calculadora
+  for (let k = 0; k < 4; k++) {
+    const cl = new THREE.Mesh(new THREE.TorusGeometry(.007, .0007, 6, 16), material('aco'));
+    cl.scale.set(1, 1.9, 1); cl.rotation.set(Math.PI / 2, 0, .4 + k * .9); cl.position.set(.075 + k * .012, T + .0008, .03 + k * .013); cl.castShadow = true; itens.add(cl);
+  }
+  // óculos dobrados, no canto da frente à direita (baixos: não cobrem o tablet)
+  const oc = new THREE.Group(); oc.position.set(.69, T, .33); oc.rotation.y = .5; itens.add(oc);
+  [-.024, .024].forEach(x => { const aro = new THREE.Mesh(new THREE.TorusGeometry(.021, .0018, 8, 24), mat.armacao); aro.rotation.x = Math.PI / 2; aro.position.set(x, .003, 0); aro.castShadow = true; oc.add(aro);
+    const lente = new THREE.Mesh(new THREE.CircleGeometry(.02, 24), vidroJanela); lente.rotation.x = -Math.PI / 2; lente.position.set(x, .003, 0); oc.add(lente); });
+  const ponte = cilindro(.0015, .0015, .01, 0, .004, 0, oc, mat.armacao, 6); ponte.rotation.z = Math.PI / 2;
+  [0, 1].forEach(i => { const h = cilindro(.0018, .0018, .12, i ? .015 : -.015, .006 + i * .004, .03 + i * .004, oc, mat.armacao, 6); h.rotation.z = Math.PI / 2; });  // as hastes dobradas
+  // escalímetro triangular (branco, com os frisos coloridos das faces) à esquerda da prancha, ao longo da beira
+  const tri = new THREE.Shape(); const R = .0095;
+  [90, 210, 330].forEach((g, i) => { const a = g * Math.PI / 180; i ? tri.lineTo(R * Math.cos(a), R * Math.sin(a)) : tri.moveTo(R * Math.cos(a), R * Math.sin(a)); });
+  tri.closePath();
+  const esc = new THREE.Group(); esc.position.set(-.72, T + R / 2, .25); esc.rotation.y = .04; itens.add(esc);
+  const prisma = new THREE.Mesh(new THREE.ExtrudeGeometry(tri, {depth: .3, bevelEnabled: false}), mat.branco);
+  prisma.position.z = -.15; prisma.castShadow = prisma.receiveShadow = true; esc.add(prisma);
+  [[30, mat.verde], [150, mat.azul]].forEach(([g, c]) => { const a = g * Math.PI / 180, f = bloco(.0025, .0008, .28, R / 2 * Math.cos(a), R / 2 * Math.sin(a), 0, esc, c); f.rotation.z = a - Math.PI / 2; });
+  // uma caneta esferográfica azul, à frente da calculadora
+  const can = new THREE.Group(); can.position.set(-.03, T + .0045, .365); can.rotation.y = .1; itens.add(can);
+  const corpo = cilindro(.0045, .0045, .13, 0, 0, 0, can, mat.azul, 10); corpo.rotation.z = Math.PI / 2;
+  const ponta = cilindro(.0045, .0015, .012, .071, 0, 0, can, mat.aluminio, 10); ponta.rotation.z = -Math.PI / 2;
+  bloco(.04, .002, .004, -.045, .005, 0, can, mat.aluminio);
+  // vaso pequeno (suculenta) no canto do fundo à esquerda
+  const vs = new THREE.Group(); vs.position.set(-.73, T, -.04); itens.add(vs);
+  cilindro(.042, .042, .005, 0, .0025, 0, vs, mat.ceramica, 24);
+  cilindro(.035, .028, .075, 0, .0425, 0, vs, mat.ceramica, 24);
+  cilindro(.032, .032, .008, 0, .078, 0, vs, material('solo'), 24);
+  for (let k = 0; k < 9; k++) {
+    const f = new THREE.Mesh(new THREE.IcosahedronGeometry(.018, 1), material('folha'));
+    const ang = k * 2.4, r = k < 3 ? .006 : .02;
+    f.scale.set(1, .55, 1.6); f.position.set(Math.cos(ang) * r, .085 + (k < 3 ? .012 : .004), Math.sin(ang) * r);
+    f.rotation.set(k < 3 ? .2 : .55, -ang + Math.PI / 2, 0, 'YXZ'); f.castShadow = f.receiveShadow = true; vs.add(f);
+  }
+  // o cabo do tablet: sai da lateral direita, corre até a beira do fundo e cai até o chão
+  const curva = new THREE.CatmullRomCurve3([
+    [.579, .758, .107], [.60, .757, .05], [.595, .757, -.1], [.595, .757, -.28], [.595, .756, -.40],
+    [.605, .73, -.425], [.62, .55, -.42], [.66, .3, -.4], [.72, .03, -.36], [.95, .022, -.62], [1.3, .022, -1.1],
+  ].map(p => new THREE.Vector3(...p)));
+  const cabo = new THREE.Mesh(new THREE.TubeGeometry(curva, 110, .0018, 6, false), mat.branco);
+  cabo.castShadow = cabo.receiveShadow = true; itens.add(cabo);
+  bloco(.012, .006, .008, .578, .758, .107, itens, mat.preto);  // o plugue
+}
 
 // câmera: de três quartos, à frente da mesa, a 2,7 m (t=0; a mesa inteira, pés no chão) a pino sobre ela (t=10), com 1,05 m do tampo no retângulo (cada documento com ≥ 12 % da largura)
 cena.updateMatrixWorld(true);

@@ -611,7 +611,11 @@ def checar_recorte_viewports():
                 check(r and r[2] <= dest[CASOS[caso]["doc"]]["recorte"][2], f"recorte {caso} {w}×{h}: recorte ampliado")
                 m = pg.evaluate(f"""(function(){{var e=(document.querySelector('#{caso} .medida')||document.querySelector('#{caso} .apoio')).getBoundingClientRect(),
                   t=document.querySelector('#{caso} .manchete').getBoundingClientRect();return [t.top,e.bottom];}})()""")
-                check(m[0] >= 0 and m[1] <= h, f"recorte {caso} {w}×{h}: manchete/apoio/medida fora da tela (topo {m[0]:.0f}, base {m[1]:.0f})")
+                if h <= 520:  # tela baixa: a página fica empilhada (sem palco preso) e p=1 mostra o fim da seção (recorte e
+                    # links); o leitor rola à vontade, então o que importa é manchete → medida caber inteiro numa tela
+                    check(m[1] - m[0] <= h, f"recorte {caso} {w}×{h}: manchete/apoio/medida mais altos que a tela ({m[1] - m[0]:.0f} px)")
+                else:
+                    check(m[0] >= 0 and m[1] <= h, f"recorte {caso} {w}×{h}: manchete/apoio/medida fora da tela (topo {m[0]:.0f}, base {m[1]:.0f})")
             check(not erros, f"recorte {w}×{h}: erros/404: {erros}")
             ctx.close()
 
