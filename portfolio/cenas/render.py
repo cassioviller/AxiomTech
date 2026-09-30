@@ -142,17 +142,27 @@ def psnr(a, b):
 
 
 def renderizar(pg, dur, mestre):
-    """Quadro a quadro: renderCena(t) → PNG 1920×1080 do canvas (capturar) → ffmpeg (mestre crf 16)."""
-    mestre.parent.mkdir(parents=True, exist_ok=True)
-    ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", str(FPS), "-vcodec", "png", "-i", "-",
-                           "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", str(mestre)], stdin=subprocess.PIPE)
+    """Quadro a quadro: renderCena(t) → PNG 1920×1080 do canvas (capturar) → <mestre>-quadros/q0000.png… → ffmpeg (mestre crf 16).
+    Os PNGs ficam em disco e um quadro já gravado não é refeito: se a sessão cair no meio (≈ 1 h por cena no Replit),
+    rodar de novo retoma de onde parou. A pasta é apagada quando o mestre fica pronto."""
+    pasta = mestre.with_name(f"{mestre.stem}-quadros")
+    pasta.mkdir(parents=True, exist_ok=True)
     n = quadros(dur)
+    feitos = 0
     for k in range(n):
+        png = pasta / f"q{k:04d}.png"
+        if png.exists() and png.stat().st_size > 0:
+            feitos += 1
+            continue
         pg.evaluate(f"renderCena({tempo_local(k / FPS, dur)!r})")
-        ff.stdin.write(capturar(pg))
-    ff.stdin.close()
-    if ff.wait() != 0:
-        sys.exit(f"{mestre.name}: ffmpeg falhou no mestre")
+        parcial = png.with_suffix(".parcial")
+        parcial.write_bytes(capturar(pg))
+        parcial.replace(png)  # só aparece com o nome final depois de inteiro em disco
+    if feitos:
+        print(f"{mestre.name}: {feitos} quadros já estavam em {pasta.name}", flush=True)
+    ffmpeg("-framerate", str(FPS), "-i", str(pasta / "q%04d.png"), "-frames:v", str(n),
+           "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", str(mestre))
+    shutil.rmtree(pasta)
     print(f"{mestre.name}: {n} quadros", flush=True)
 
 

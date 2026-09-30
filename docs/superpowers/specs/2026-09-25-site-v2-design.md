@@ -142,6 +142,8 @@ Cada fase tem o próprio plano de implementação. Este spec cobre as três; o p
 
 Emenda (25/09): o piloto é o caso 3. O caso 1 só tem prints de 760 px (t1–t4) e a planta de 1400 px, e a regra §7.7 proíbe ampliar documento; ele fica para a fase 2, com os originais que o Cássio mandar.
 
+Emenda (30/09): os originais do caso 1 não virão (decisão do Cássio). O caso 1 não ganha cena própria: a proposta feita nos 36 minutos (a página 1, re-diagramada em 1152 px) já é o documento real do caso 2, e uma terceira cena de mesa entre a abertura e o caso 2 repetiria o mesmo caminho (planta do cliente → orçamento → proposta). O número entra no caso 2 como uma linha da medida sob a linha de apoio (≤ 30 palavras, com a ressalva da estimativa) e um segundo link, para a folha 01 do `portfolio.html`, onde ficam os quatro prints com o relógio. O site fica com três casos com cena e o menu lateral com 6 entradas. Sigilo: nos prints do portal do SIGE o desfoque deixava adivinhar o nome do cliente e o endereço; foram cobertos por tarjas opacas e o vídeo do caso 3 regravado.
+
 ## 11. Fora do escopo
 
 Publicar e fazer deploy; push para o GitHub; o trailer de envio (`render.py` do filme); o teste num iPhone real; novas fotos ou prints que ainda não existem nos zips.

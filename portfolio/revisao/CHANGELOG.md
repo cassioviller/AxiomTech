@@ -225,3 +225,11 @@ Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO
 - `site/index.html` é o site v2; o protótipo fica em `site/historia.html`; `v2.html` redireciona.
 - Vídeos da abertura (crf 30), do caso 2 (crf 33) e do caso 4 (crf 34), todos dentro de 2,5 MB. Quadro em p=1 recuado de −21 % / 0,76 para −17 % / 0,72 e trilho mais estreito: o trilho tinha sido desenhado para o quadro a 13 vw da revisão anterior e cobria o documento em 1366 e 1920 px; em 2560 px o documento do caso 2 saía ampliado.
 - Fica para depois: o caso 1 (36 minutos), à espera dos prints originais; a fase 3 (texto do `portfolio.html` e do currículo pelas regras do spec §5).
+
+---
+
+# Rodada 13 — sigilo do portal e os 36 minutos sem cena própria, 30/09/2026
+
+- [sigilo] `site/img/p-portal.webp`, `p-celular.webp`, `p-diario-portal.webp`: o desfoque do nome do cliente, do subtítulo e do endereço deixava adivinhar as palavras; agora são tarjas opacas (`#CBD3DC`, cantos arredondados). `documentos.py` regerou `site/docs/sige-portal`, `sige-portal-recorte` e `sige-rdo`; o vídeo do caso 3 (`v2-sige.mp4`) foi regravado com a textura nova, e a cena da abertura ficou como estava (o tablet ocupa 270 px do quadro; as palavras cobertas não passam de manchas). Os arquivos antigos ficam no histórico do git.
+- Caso 1 (36 minutos) sem cena própria, por decisão do Cássio de não mandar os prints originais (emenda de 30/09 no spec §10): o caso do orçamento ganha a linha da medida ("Esta proposta (ampliação de 328 m², 26 ambientes) saiu em 36 minutos…", `p.medida`, com a ressalva da estimativa) e o link "Ver os 36 minutos medidos →" para `portfolio.html#orcamento`. `check_v2.py`: texto da medida e links por caso conferidos; no celular o texto inteiro (rótulo → links) cabe entre a barra e o fim da tela, e a faixa de texto passa a começar opaca (40 px) para o rótulo não cair sobre o pôster.
+- `cenas/render.py`: os quadros são gravados um a um em `saida/<caso>-mestre-quadros/` (escrita atômica) e o mestre é montado no fim; rodar de novo pula os quadros já em disco, então uma queda da sessão no meio da hora de render custa só o quadro em curso (antes o mestre saía truncado e tudo recomeçava). Conferido: mestre byte a byte igual ao render de uma vez só.

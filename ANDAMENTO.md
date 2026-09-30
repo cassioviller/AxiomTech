@@ -70,7 +70,15 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 ## Estado em 30/09/2026 — site v2, fase 2 CONCLUÍDA, aguardando aprovação do Cássio
 - Branch `site-v2-fase-2`; plano `docs/superpowers/plans/2026-09-29-site-v2-fase-2.md`; changelog rodada 12.
 - `site/index.html` = site v2 (abertura com cena, casos 2, 3 e 4, trajetória, fechamento); `site/historia.html` = protótipo; `site/v2.html` redireciona.
-- Vídeos: `python3 portfolio/cenas/render.py --so <caso>` (≈ 1 h cada no Replit, um de cada vez, em segundo plano; log em `portfolio/cenas/saida/render-<caso>.log`). Se a sessão cair no meio, o `<caso>-mestre.mp4` fica truncado (sem moov): apagar e rodar de novo.
+- Vídeos: `python3 portfolio/cenas/render.py --so <caso>` (≈ 1 h cada no Replit, um de cada vez, em segundo plano; log em `portfolio/cenas/saida/render-<caso>.log`). Se a sessão cair no meio, rodar o mesmo comando de novo: desde 30/09 os quadros ficam em `saida/<caso>-mestre-quadros/` e o render retoma do primeiro que falta.
 - Conferir: `python3 portfolio/tests/check_v2.py && python3 portfolio/tests/check_v2.py --navegador && python3 portfolio/tests/check_v2.py --video && python3 portfolio/tests/check_historia.py && python3 portfolio/tests/check_site.py`.
 - Pendente do Cássio: os prints originais do caso 1 (36 minutos); a decisão sobre o sigilo dos nomes borrados no portal do SIGE; a aprovação visual das três cenas novas.
 - Próximo: o caso 1 quando os originais chegarem (plano curto); a fase 3; push, deploy, `--origem`, iPhone real.
+
+## Estado em 30/09/2026 — rodada 13 (sigilo do portal, 36 minutos no caso do orçamento)
+- Branch `site-v2-fase-2`, depois do commit `c36eb06` (trilho ao lado do documento). Sem plano formal: três ajustes pequenos, changelog rodada 13.
+- O Cássio não manda mais prints: o caso 1 (36 minutos) fica sem cena própria (emenda de 30/09 no spec) e entra como linha da medida no caso do orçamento.
+- Sigilo: tarjas opacas nos prints do portal do SIGE (`p-portal`, `p-celular`, `p-diario-portal`), docs regerados, `v2-sige.mp4` regravado.
+- Conferir: `python3 portfolio/tests/check_v2.py && python3 portfolio/tests/check_v2.py --navegador && python3 portfolio/tests/check_v2.py --video && python3 portfolio/tests/check_historia.py && python3 portfolio/tests/check_site.py`.
+- Prints de aprovação em `portfolio/cenas/saida/prints-fase-2/` (fora do git).
+- Próximo: a fase 3 (texto do `portfolio.html` e do currículo pelas regras do spec §5); push, deploy, `--origem`, iPhone real.
