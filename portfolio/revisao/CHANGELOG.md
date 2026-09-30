@@ -214,3 +214,13 @@ Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO
 - Spec `2026-09-25-site-v2-design.md`: abertura, quatro casos fortes, trajetória curta e fechamento; em cada caso, a cena criada leva ao documento real; manchete com fato e número (≤ 12 palavras), sem metáfora.
 - Piloto = caso SIGE na obra dos galpões (o caso 1, dos 36 minutos, só tem prints de 760 px; espera os originais). Kit novo das cenas (three.js 0.186, GTAO, ambiente, render 2×, 1920×1080), documentos em `site/docs/`, página `site/v2.html`, checagens em `tests/check_v2.py`.
 - Render no Replit: a captura lê o framebuffer do WebGL (`readPixels`), porque o `screenshot` saía com o canvas vazio no primeiro quadro; o contexto WebGL se perde às vezes no aquecimento e a cena é reaberta. O vídeo do SIGE só coube em 2,5 MB em crf 33 (as texturas com grão custam caro com GOP 4).
+
+---
+
+# Rodada 12 — site v2, fase 2, 29–30/09/2026
+
+- Casos 2 (sistema de orçamento da VEKS: da planta do cliente à proposta; documento = a proposta no modelo da empresa, destaque no preço de venda em faixa) e 4 (celeiro B-36: o caminhão chega, o guindaste iça a caixa 1, o telhado desce; documento = a prancha "como cada caixa viaja", destaque nas duas caixas), com o padrão do piloto.
+- Abertura com a cena da mesa (proposta dos 36 min, tela do orçamento, portal do SIGE, prancha do B-36), trajetória em faixa, trilho lateral.
+- `documentos.py` lê fontes em zip e PDF (`pdftoppm`), sempre listadas em `LIBERADOS`.
+- `site/index.html` é o site v2; o protótipo fica em `site/historia.html`; `v2.html` redireciona.
+- Fica para depois: o caso 1 (36 minutos), à espera dos prints originais; a fase 3 (texto do `portfolio.html` e do currículo pelas regras do spec §5).

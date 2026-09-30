@@ -5,7 +5,7 @@ Plano e decisões: `../PLANO.md`. Nada aqui foi publicado nem commitado.
 ```
 curriculo/   curriculo.html → curriculo-cassio-viller.pdf (1 página) + .txt (para colar em portais de vaga)
 casos/       3 folhas de caso A4 (HTML → PDF), caso.css compartilhado, mensagens.md (modelos de WhatsApp/e-mail)
-site/        site estático: index.html (a história em cenas, página principal; 11 clipes de fundo em video/), portfolio.html (portfólio completo), historia.js, clipes.js, maquetes.js, img/, video/ (cena-*.mp4 + .webp), vendor/ (three.js 0.186), og.png, PDFs
+site/        site estático: index.html (o site v2: abertura com cena, casos com cena + documento real, trajetória), historia.html (o protótipo da história em cenas, com historia.js, maquetes.js e os cena-*.mp4), portfolio.html (portfólio completo), clipes.js, v2.js, img/, docs/, video/ (v2-*.mp4 + cena-*.mp4, com os .webp), vendor/ (three.js 0.186), og.png, PDFs
 filme/       o filme (film.html + three.js r128): render_clipes.py gera os clipes de fundo; render.py, o trailer de envio (fora do site)
 tests/       check_site.py, check_historia.py (--navegador: Chromium headless; --origem URL: Range na origem publicada), check_filme.py (--video), baseline.json
 servir.py    servidor estático com Range (HTTP 206): o único em que o vídeo busca pela rolagem
@@ -39,11 +39,11 @@ Só números do site original / brief. Clientes sempre genéricos. Nunca: margen
 salários, valores de contrato, endereço, nascimento, CPF/CNPJ, nomes de pessoas. `ref/img-nao-usadas/o1.webp` e `o2.webp` mostram
 o nome do cliente da unidade de saúde — não usar; (foram tirados de `site/img/` para não irem junto na publicação).
 
-## Site v2 (piloto, 25–29/09/2026)
+## Site v2 (fase 2, 29/09/2026 →)
 
-Página nova ao lado da história: `site/v2.html` (abertura, caso SIGE na obra dos galpões, fechamento). Cada caso mostra uma cena criada em 3D que leva ao documento real: no fim do vídeo, a imagem real do documento entra exatamente sobre a tela da cena, com o número da manchete destacado em laranja. Spec: `docs/superpowers/specs/2026-09-25-site-v2-design.md`.
+`site/index.html`: abertura (ficha + a cena da mesa), casos 2 (sistema de orçamento da VEKS), 3 (SIGE na obra dos galpões) e 4 (celeiro B-36), trajetória e fechamento. Cada caso mostra uma cena criada em 3D que leva ao documento real: no fim do vídeo, a imagem real entra exatamente sobre a tela da cena, com o número da manchete destacado em laranja. O caso 1 (36 minutos) espera os prints originais. Spec: `docs/superpowers/specs/2026-09-25-site-v2-design.md`; planos em `docs/superpowers/plans/2026-09-25-site-v2-piloto.md` e `2026-09-29-site-v2-fase-2.md`. O protótipo anterior continua em `site/historia.html`; `site/v2.html` (o link do piloto) redireciona para `./`.
 
-- Documentos reais (só de prints já anonimizados): `python3 portfolio/cenas/documentos.py` → `site/docs/`.
-- Cena em vídeo 1920×1080: `python3 portfolio/cenas/render.py --so sige` → `site/video/v2-sige.mp4` e `.webp`. No Replit (SwiftShader) cada quadro leva 15–35 s: os 240 quadros levam cerca de 1 h; rodar em segundo plano.
-- Conferir: `python3 portfolio/tests/check_v2.py && python3 portfolio/tests/check_v2.py --navegador && python3 portfolio/tests/check_v2.py --video`. A suíte de navegador leva uns 20 min pelo mesmo motivo.
-- Ver no navegador: `python3 portfolio/servir.py 5000 --directory portfolio/site` e abrir `/v2.html` (precisa de Range).
+- Documentos reais: `python3 portfolio/cenas/documentos.py` → `site/docs/`. As fontes ficam em `cenas/documentos.json` (`site/img/…`, `zip:<zip da raiz>!<membro>` ou `pdf:<zip>!<pdf>#<página>`); os zips não estão no git, mas os arquivos gerados estão.
+- Cenas em vídeo 1920×1080: `python3 portfolio/cenas/render.py --so <abertura|veks|sige|modulares>` → `site/video/v2-<caso>.mp4` e `.webp`. No Replit (SwiftShader) cada quadro leva 15–35 s: cerca de 1 h por cena, em segundo plano, nunca duas ao mesmo tempo.
+- Conferir: `python3 portfolio/tests/check_v2.py && python3 portfolio/tests/check_v2.py --navegador && python3 portfolio/tests/check_v2.py --video` (a suíte de navegador leva ≈ 35 min).
+- Ver no navegador: `python3 portfolio/servir.py 5000 --directory portfolio/site` (precisa de Range).

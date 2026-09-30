@@ -66,3 +66,11 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Conferir: `python3 portfolio/tests/check_v2.py && python3 portfolio/tests/check_v2.py --navegador && python3 portfolio/tests/check_v2.py --video`.
 - Ressalvas para o Cássio olhar: as texturas de pasto e terra têm manchas grandes e o conjunto ainda parece maquete; o vídeo ficou em crf 33 (2,43 MB) para caber no teto de 2,5 MB; nos prints anonimizados o contorno das palavras borradas ainda se adivinha.
 - Próximo: o Cássio aprova (ou corrige) o padrão visual do piloto; depois a fase 2 (casos 2 e 4, caso 1 com os originais, abertura com cena, `v2.html` vira `index.html`).
+
+## Estado em 30/09/2026 — site v2, fase 2 CONCLUÍDA, aguardando aprovação do Cássio
+- Branch `site-v2-fase-2`; plano `docs/superpowers/plans/2026-09-29-site-v2-fase-2.md`; changelog rodada 12.
+- `site/index.html` = site v2 (abertura com cena, casos 2, 3 e 4, trajetória, fechamento); `site/historia.html` = protótipo; `site/v2.html` redireciona.
+- Vídeos: `python3 portfolio/cenas/render.py --so <caso>` (≈ 1 h cada no Replit, um de cada vez, em segundo plano; log em `portfolio/cenas/saida/render-<caso>.log`). Se a sessão cair no meio, o `<caso>-mestre.mp4` fica truncado (sem moov): apagar e rodar de novo.
+- Conferir: `python3 portfolio/tests/check_v2.py && python3 portfolio/tests/check_v2.py --navegador && python3 portfolio/tests/check_v2.py --video && python3 portfolio/tests/check_historia.py && python3 portfolio/tests/check_site.py`.
+- Pendente do Cássio: os prints originais do caso 1 (36 minutos); a decisão sobre o sigilo dos nomes borrados no portal do SIGE; a aprovação visual das três cenas novas.
+- Próximo: o caso 1 quando os originais chegarem (plano curto); a fase 3; push, deploy, `--origem`, iPhone real.
