@@ -73,17 +73,17 @@ img{display:block;max-width:100%;height:auto}
 .faixa b{font-family:var(--display);font-size:1.35rem;line-height:1.1}
 .faixa span{color:var(--ink-2)}
 .ferramentas{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin:0}
-/* trilho lateral (spec §4): só em telas largas; nunca sobre o palco do caso, que abre 13 vw à esquerda */
+/* trilho lateral (spec §4): só em telas largas; nunca sobre o documento, que em p=1 começa em 11,4 vw (quadro −17 %, escala 0,72) */
 .trilho{display:none}
 @media (min-width:1200px){
-  .trilho{display:flex;flex-direction:column;gap:10px;position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:20;width:9.5rem;font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
-  .trilho a{color:var(--muted);text-decoration:none;padding:4px 0 4px 12px;border-left:2px solid var(--rule)}
+  .trilho{display:flex;flex-direction:column;gap:10px;position:fixed;left:12px;top:50%;transform:translateY(-50%);z-index:20;width:max-content;font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.04em}
+  .trilho a{color:var(--muted);text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid var(--rule)}
   .trilho a[aria-current="true"]{color:var(--accent);border-color:var(--accent)}
 }
 /* com JS e movimento: o palco fica preso na tela por 300vh; a cena anda na 1ª metade, o documento e o texto na 2ª */
 .js-v2 .caso{height:300vh}
 .js-v2 .palco{position:sticky;top:0;height:100vh}
-.js-v2 .quadro{position:absolute;left:50%;top:50%;width:max(100vw,177.78vh);transform:translate(-50%,-50%) translateX(calc(var(--lado,0)*-21%)) scale(calc(1 - .24*var(--lado,0)))}
+.js-v2 .quadro{position:absolute;left:50%;top:50%;width:max(100vw,177.78vh);transform:translate(-50%,-50%) translateX(calc(var(--lado,0)*-17%)) scale(calc(1 - .28*var(--lado,0)))}
 .js-v2 .texto{position:absolute;right:3vw;top:50%;width:min(30rem,26vw);transform:translateY(-50%);opacity:var(--lado,0);visibility:var(--vis,hidden);padding:0;margin:0}
 @media (max-aspect-ratio:3/2) and (min-width:901px){.js-v2 .quadro{width:100vw}}
 /* documento inteiro ilegível (tela estreita ou baixa): entra o recorte; em tela baixa o v2.js deixa a página empilhada */

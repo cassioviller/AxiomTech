@@ -223,4 +223,5 @@ Fontes: PDFs novos (`saida/portfolio/*.pdf`, 21/09), `afirmacoes.json`, `REVISAO
 - Abertura com a cena da mesa (proposta dos 36 min, tela do orçamento, portal do SIGE, prancha do B-36), trajetória em faixa, trilho lateral.
 - `documentos.py` lê fontes em zip e PDF (`pdftoppm`), sempre listadas em `LIBERADOS`.
 - `site/index.html` é o site v2; o protótipo fica em `site/historia.html`; `v2.html` redireciona.
+- Vídeos da abertura (crf 30), do caso 2 (crf 33) e do caso 4 (crf 34), todos dentro de 2,5 MB. Quadro em p=1 recuado de −21 % / 0,76 para −17 % / 0,72 e trilho mais estreito: o trilho tinha sido desenhado para o quadro a 13 vw da revisão anterior e cobria o documento em 1366 e 1920 px; em 2560 px o documento do caso 2 saía ampliado.
 - Fica para depois: o caso 1 (36 minutos), à espera dos prints originais; a fase 3 (texto do `portfolio.html` e do currículo pelas regras do spec §5).
