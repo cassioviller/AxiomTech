@@ -43,12 +43,6 @@
    400
   ]
  },
- "veks-planta": {
-  "largura": 600,
-  "altura": 500,
-  "destaque": null,
-  "recorte": null
- },
  "b36-caixas": {
   "largura": 1442,
   "altura": 901,
@@ -82,5 +76,39 @@
   "altura": 1060,
   "destaque": null,
   "recorte": null
+ },
+ "veks-levantamento": {
+  "largura": 1280,
+  "altura": 800,
+  "destaque": null,
+  "recorte": null
+ },
+ "veks-planta-cliente": {
+  "largura": 1400,
+  "altura": 440,
+  "destaque": null,
+  "recorte": null
+ },
+ "veks-proposta-pagina": {
+  "largura": 1152,
+  "altura": 1629,
+  "destaque": null,
+  "recorte": null
+ },
+ "veks-proposta-modelo": {
+  "largura": 1152,
+  "altura": 720,
+  "destaque": [
+   68,
+   344,
+   1016,
+   339
+  ],
+  "recorte": [
+   68,
+   316,
+   1016,
+   372
+  ]
  }
 }

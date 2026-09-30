@@ -1,22 +1,28 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><title>Cena · Sistema de orçamento (VEKS)</title>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Cena · Sistema de orçamento (VEKS): da planta à proposta</title>
 <link rel="icon" href="data:,"><!-- evita o pedido automático de /favicon.ico (viraria um "erro" de console falso) -->
 <style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
 <script type="importmap">{"imports":{"three":"../site/vendor/three.module.js"}}</script>
 </head><body>
 <script type="module">
-// Caso 2, o sistema de orçamento da VEKS: a estação de trabalho de um orçamentista. No monitor, a tela real do orçamento
-// (a obra de demonstração do sistema); sobre a mesa, a planta que o sistema desenhou. t: 0,5 → 2,5 a cadeira gira para a
-// mesa; a câmera sai da frente da sala (t=0), passa por trás da cadeira (t=4) e termina de frente para o monitor (t=10),
-// com a tela exatamente em RETANGULO.
-import {THREE, criarPalco, material, documento, trajeto, enquadrarPlano, publicar, rampa} from './kit.js';
+// Caso 2, o sistema de orçamento da VEKS, do desenho do cliente à proposta, numa estação de trabalho:
+// t 0 → 1: sobre a mesa, a planta baixa fornecida pelo cliente (a da unidade de saúde, já pública no site) e, no monitor,
+//   a tela da planta medida do sistema (o levantamento das paredes);
+// t 1 → 4,5: o levantamento: as paredes a construir se levantam da planta, em vermelho, da esquerda para a direita
+//   (os segmentos vêm de paredes-upa.js, extraídos da planta real por paredes.py);
+// t 5: o monitor passa à tela do orçamento (a de hoje: custo direto, BDI, preço de venda em faixa);
+// t 6,3 → 8: a proposta no modelo da empresa sai da impressora, página A4 (a página real re-diagramada em alta);
+// t 10: a câmera termina a pino sobre a faixa da página com o quadro de áreas e a planta (o alvo, em RETANGULO).
+import {THREE, criarPalco, material, documento, trajeto, enquadrarPlano, publicar, rampa, lerp} from './kit.js';
+import {GRADE, SEGMENTOS} from './paredes-upa.js';
 
 const palco = criarPalco({ceu: 0xE3E7EA, nevoa: [40, 120]});
 const {cena, camera, sol} = palco;
 sol.position.set(-8, 10, 6);
 Object.assign(sol.shadow.camera, {left: -8, right: 8, top: 8, bottom: -8});
 sol.shadow.camera.updateProjectionMatrix();
-const S = {mesa: null, monitor: null, tela: null, alvo: null, cadeira: null, estante: null, assunto: [], docs: []};
+const S = {mesa: null, monitor: null, tela: null, planta: null, paredes: null, estado: {erguidas: 0, n: 0}, impressora: null,
+           proposta: null, folha: null, alvo: null, repouso: {}, assunto: [], docs: []};
 window.__cena = S;
 
 function bloco(c, a, p, x, y, z, pai, mat) {
@@ -39,55 +45,109 @@ janela.position.set(1.4, 1.6, -2.94); cena.add(janela);
 [[.75, 0], [-.75, 0], [0, .55], [0, -.55]].forEach(p => bloco(p[1] ? 1.6 : .04, p[1] ? .04 : 1.2, .03, 1.4 + p[0], 1.6 + p[1], -2.93, cena, material('acoPintado')));
 
 // a estante contra a parede do fundo, com pastas
-S.estante = new THREE.Group(); S.estante.position.set(-2.3, 0, -2.7); cena.add(S.estante);
-[0, .45, .9, 1.35].forEach(y => bloco(1.2, .03, .35, 0, y + .03, 0, S.estante, material('madeira')));
-[-.6, .6].forEach(x => bloco(.03, 1.5, .35, x, .75, 0, S.estante, material('madeira')));
-for (let i = 0; i < 12; i++) bloco(.07, .3, .28, -.5 + (i % 6) * .16, .21 + Math.floor(i / 6) * .45, .01, S.estante, i % 3 ? material('acoPintado') : material('plastico'));
+const estante = new THREE.Group(); estante.position.set(-2.3, 0, -2.7); cena.add(estante);
+[0, .45, .9, 1.35].forEach(y => bloco(1.2, .03, .35, 0, y + .03, 0, estante, material('madeira')));
+[-.6, .6].forEach(x => bloco(.03, 1.5, .35, x, .75, 0, estante, material('madeira')));
+for (let i = 0; i < 12; i++) bloco(.07, .3, .28, -.5 + (i % 6) * .16, .21 + Math.floor(i / 6) * .45, .01, estante, i % 3 ? material('acoPintado') : material('plastico'));
 
-// a mesa 1,8 × 0,8 m, tampo a 0,75 m, virada para +z (a câmera vem de +z)
+// a mesa 1,8 × 0,8 m, tampo a 0,75 m, virada para +z (a câmera vem de +z); teclado e mouse à frente
 S.mesa = new THREE.Group(); S.mesa.position.set(0, 0, -1.6); cena.add(S.mesa);
 bloco(1.8, .04, .8, 0, .73, 0, S.mesa, material('madeira', {repetir: 2}));
 [[-.85, -.35], [.85, -.35], [-.85, .35], [.85, .35]].forEach(p => bloco(.05, .71, .05, p[0], .355, p[1], S.mesa, material('acoPintado')));
-bloco(.44, .015, .14, .05, .7575, .18, S.mesa, material('plastico'));   // teclado
-bloco(.06, .03, .1, .4, .765, .2, S.mesa, material('plastico'));        // mouse
+bloco(.44, .015, .14, .05, .7575, .30, S.mesa, material('plastico'));   // teclado
+bloco(.06, .03, .1, .32, .765, .32, S.mesa, material('plastico'));      // mouse
 
-// o monitor: pé, painel 0,68 × 0,44 e a tela 0,64 × 0,40 (proporção 1,6, a do corte 1280×800) na face da frente
+// o monitor: pé, painel 0,68 × 0,44 e a tela 0,64 × 0,40 (proporção 1,6, a dos cortes 1280×800) na face da frente;
+// mostra a planta medida (o levantamento) até t=5 e a tela do orçamento depois
 S.monitor = new THREE.Group(); S.monitor.position.set(0, .75, -.25); S.mesa.add(S.monitor);
 bloco(.26, .02, .18, 0, .01, 0, S.monitor, material('acoPintado'));
 bloco(.05, .34, .04, 0, .19, 0, S.monitor, material('acoPintado'));
 bloco(.68, .44, .03, 0, .42, .03, S.monitor, material('plastico'));
 S.tela = new THREE.Mesh(new THREE.PlaneGeometry(.64, .4), new THREE.MeshBasicMaterial({color: 0xffffff}));
 S.tela.position.set(0, .42, .046); S.monitor.add(S.tela);
-S.alvo = real(documento('../site/docs/veks-orcamento.webp'), S.tela, 'veks-orcamento.webp');
+const telas = {};
+documento('../site/docs/veks-levantamento.webp').then(tx => { telas.levantamento = tx; }); S.docs.push('veks-levantamento.webp');
+documento('../site/docs/veks-orcamento.webp').then(tx => { telas.orcamento = tx; }); S.docs.push('veks-orcamento.webp');
+function mostrar(nome) { if (telas[nome] && S.tela.material.map !== telas[nome]) { S.tela.material.map = telas[nome]; S.tela.material.needsUpdate = true; } }
 
-// a planta sobre a mesa (a que o sistema desenhou; 600×500) e o marca-texto laranja sobre ela (o acento da cena)
-const planta = new THREE.Mesh(new THREE.PlaneGeometry(.36, .3), new THREE.MeshStandardMaterial({color: 0xffffff, roughness: .95}));
-planta.rotation.set(-Math.PI / 2, 0, .12); planta.position.set(-.6, .752, .1); planta.receiveShadow = true; S.mesa.add(planta);
-real(documento('../site/docs/veks-planta.webp'), planta, 'veks-planta.webp');
+// a planta do cliente sobre a mesa: folha plotada de 0,84 × 0,264 m (1400×440), à esquerda do teclado
+const FOLHA_L = .84, FOLHA_A = .264, CEL = FOLHA_L / GRADE[0];
+S.planta = new THREE.Group(); S.planta.position.set(-.30, .752, .05); S.planta.rotation.y = .05; S.mesa.add(S.planta);
+const folhaPlanta = new THREE.Mesh(new THREE.PlaneGeometry(FOLHA_L, FOLHA_A), new THREE.MeshStandardMaterial({color: 0xffffff, roughness: .95}));
+folhaPlanta.rotation.x = -Math.PI / 2; folhaPlanta.receiveShadow = true; S.planta.add(folhaPlanta);
+real(documento('../site/docs/veks-planta-cliente.webp'), folhaPlanta, 'veks-planta-cliente.webp');
+
+// o levantamento: cada corrida de células vermelhas da planta vira uma parede de 3 m na escala da folha (1 m ≈ 16 mm),
+// que se levanta da esquerda para a direita entre t=1 e t=4,5 (instâncias de um cubo unitário)
+const ALT = 3 * FOLHA_L / 1400 * 27;  // 27 px por metro na planta
+S.paredes = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), material('vermelho'), SEGMENTOS.length);
+S.paredes.castShadow = S.paredes.receiveShadow = true; S.planta.add(S.paredes);
+S.estado.n = SEGMENTOS.length;
+const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), P = new THREE.Vector3(), E = new THREE.Vector3();
+function levantar(t) {
+  let erguidas = 0;
+  SEGMENTOS.forEach((s, i) => {
+    const inicio = 1 + 3 * (s[0] / GRADE[0]), f = rampa(t, inicio, inicio + .5), h = Math.max(.0004, ALT * f);
+    if (f >= .999) erguidas++;
+    P.set(-FOLHA_L / 2 + (s[0] + s[1]) / 2 * CEL, h / 2 + .0003, (s[2] + .5) * CEL - FOLHA_A / 2);
+    E.set((s[1] - s[0]) * CEL, h, CEL * 1.3);
+    S.paredes.setMatrixAt(i, M.compose(P, Q, E));
+  });
+  S.paredes.instanceMatrix.needsUpdate = true;
+  S.estado.erguidas = erguidas;
+}
+
+// o marca-texto laranja sobre a planta (o acento da cena)
 const marcador = new THREE.Mesh(new THREE.CylinderGeometry(.007, .007, .13, 12), material('acento'));
-marcador.rotation.set(0, .6, Math.PI / 2); marcador.position.set(-.52, .76, .2); marcador.castShadow = true; S.mesa.add(marcador);
+marcador.rotation.set(0, .6, Math.PI / 2); marcador.position.set(-.78, .76, .30); marcador.castShadow = true; S.mesa.add(marcador);
 
-// a cadeira, de frente para a mesa depois de girar
-S.cadeira = new THREE.Group(); S.cadeira.position.set(0, 0, -.8); cena.add(S.cadeira);
-bloco(.5, .06, .5, 0, .46, 0, S.cadeira, material('plastico'));
-bloco(.5, .55, .05, 0, .78, .24, S.cadeira, material('plastico'));
+// a impressora à direita: corpo, fenda de saída na frente e a bandeja; a proposta (A4 em pé, página inteira real) sai
+// pela fenda e pousa na bandeja; a faixa da página com o quadro de áreas e a planta é o alvo (proporção 1,6)
+S.impressora = new THREE.Group(); S.impressora.position.set(.62, .75, -.12); S.mesa.add(S.impressora);
+bloco(.40, .18, .34, 0, .09, 0, S.impressora, material('plastico'));
+bloco(.30, .012, .012, 0, .05, .173, S.impressora, material('acoPintado'));
+bloco(.32, .006, .25, 0, .013, .295, S.impressora, material('acoPintado'));  // bandeja: y = .766 na mesa
+S.proposta = new THREE.Group(); S.mesa.add(S.proposta);
+S.folha = new THREE.Mesh(new THREE.PlaneGeometry(.21, .297), new THREE.MeshBasicMaterial({color: 0xffffff}));
+S.folha.rotation.x = -Math.PI / 2; S.proposta.add(S.folha);   // o topo da página aponta para −z (para a impressora)
+real(documento('../site/docs/veks-proposta-pagina.webp'), S.folha, 'veks-proposta-pagina.webp');
+S.alvo = new THREE.Mesh(new THREE.PlaneGeometry(.21, .21 / 1.6), new THREE.MeshBasicMaterial({color: 0xffffff}));
+S.alvo.position.set(0, (.5 - (306 + 360) / 1629) * .297, .0004); S.folha.add(S.alvo);  // a faixa: linhas 306–1026 de 1629 (1152×720)
+real(documento('../site/docs/veks-proposta-modelo.webp'), S.alvo, 'veks-proposta-modelo.webp');
+S.repouso.proposta = [.62, .7665, .20];
+const dentro = [.62, .80, -.22];
+S.proposta.position.set(...dentro);
+
+// a cadeira, de frente para a mesa
+const cadeira = new THREE.Group(); cadeira.position.set(0, 0, -.8); cena.add(cadeira);
+bloco(.5, .06, .5, 0, .46, 0, cadeira, material('plastico'));
+bloco(.5, .55, .05, 0, .78, .24, cadeira, material('plastico'));
 const coluna = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .4, 12), material('acoPintado'));
-coluna.position.y = .23; coluna.castShadow = true; S.cadeira.add(coluna);
-for (let i = 0; i < 5; i++) { const b = bloco(.3, .03, .04, 0, .03, 0, S.cadeira, material('acoPintado')); b.rotation.y = i * Math.PI * 2 / 5; b.position.set(Math.sin(b.rotation.y) * .15, .03, Math.cos(b.rotation.y) * .15); }
-S.assunto = [S.mesa, S.cadeira, S.estante];
+coluna.position.y = .23; coluna.castShadow = true; cadeira.add(coluna);
+for (let i = 0; i < 5; i++) { const b = bloco(.3, .03, .04, 0, .03, 0, cadeira, material('acoPintado')); b.rotation.y = i * Math.PI * 2 / 5; b.position.set(Math.sin(b.rotation.y) * .15, .03, Math.cos(b.rotation.y) * .15); }
+S.assunto = [S.planta, S.monitor];
 
-// câmera: da frente da sala, alta, a 5,4 m (t=0: estante, mesa e cadeira inteiras) → atrás da cadeira (t=4) → aproximação (t=7) → de frente para a tela (t=10)
-cena.updateMatrixWorld(true);
-const centro = S.tela.getWorldPosition(new THREE.Vector3());
-const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(S.tela.getWorldQuaternion(new THREE.Quaternion()));
-const fim = enquadrarPlano(camera, centro, normal, .64);
-const aproximacao = centro.clone().addScaledVector(normal, 1.4).add(new THREE.Vector3(0, .15, 0));
+// câmera: a mesa de frente e do alto, a 1,7 m (t=0: a planta e o monitor inteiros) → baixa sobre as paredes que sobem (t=3,5)
+// → a tela do orçamento (t=5,5) → a impressora (t=7,5) → a pino sobre a faixa da proposta (t=10)
+S.proposta.position.set(...S.repouso.proposta); cena.updateMatrixWorld(true);
+const centro = S.alvo.getWorldPosition(new THREE.Vector3());
+const fim = enquadrarPlano(camera, centro, new THREE.Vector3(0, 1, 0), .21);
+S.proposta.position.set(...dentro);
 const cam = trajeto([
-  [0, [.06, 2.25, 2.96], [-1, .4, -2]],
-  [4, [.9, 1.6, .5], [0, 1.1, -1.8]],
-  [7, aproximacao.toArray(), centro.toArray()],
+  [0, [.1, 1.6, -.15], [-.15, .95, -1.7]],
+  [3.5, [-.6, 1.02, -.95], [-.3, .78, -1.5]],
+  [5.5, [0, 1.25, -.35], [0, 1.15, -1.8]],
+  [7.5, [.8, 1.25, -.55], [.62, .8, -1.45]],
   [10, fim[0], fim[1]],
 ]);
-publicar(palco, cam, t => { S.cadeira.rotation.y = .8 * (1 - rampa(t, .5, 2.5)); });
+const CIMA = new THREE.Vector3(0, 1, 0), FRENTE = new THREE.Vector3(0, 0, -1);
+publicar(palco, cam, t => {
+  levantar(t);
+  mostrar(t < 5 ? 'levantamento' : 'orcamento');
+  const f = rampa(t, 6.3, 8);
+  S.proposta.position.set(.62, lerp(dentro[1], S.repouso.proposta[1], f), lerp(dentro[2], S.repouso.proposta[2], f));
+  // a pino no fim: o "para cima" da câmera vira −z (o topo da página) enquanto ela desce para a vertical
+  camera.up.copy(CIMA).lerp(FRENTE, rampa(t, 8.3, 10)).normalize();
+});
 </script>
 </body></html>

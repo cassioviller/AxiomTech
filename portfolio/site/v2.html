@@ -62,6 +62,24 @@ img{display:block;max-width:100%;height:auto}
 .recorte{display:none;margin:0 0 1em}
 .recorte img{max-height:30vh;width:auto;max-width:100%}
 .caso-link a{color:var(--texto-palco)}
+/* a cena da abertura: só o vídeo, 200 vh de rolagem, sem documento nem texto */
+.js-v2 .caso.so-cena{height:200vh}
+/* trajetória: uma faixa em HTML, sem cena */
+.trajetoria{max-width:62rem;margin:0 auto;padding:10vh 20px}
+.trajetoria h2{font-family:var(--display);font-size:2rem;margin:0 0 .6em}
+.faixa{list-style:none;padding:0;margin:0 0 1.2em;display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:18px;border-top:2px solid var(--accent)}
+.faixa li{padding-top:12px;display:grid;gap:4px}
+.faixa time{font-family:var(--mono);font-size:.78rem;color:var(--accent);text-transform:uppercase;letter-spacing:.04em}
+.faixa b{font-family:var(--display);font-size:1.35rem;line-height:1.1}
+.faixa span{color:var(--ink-2)}
+.ferramentas{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin:0}
+/* trilho lateral (spec §4): só em telas largas; nunca sobre o palco do caso, que abre 13 vw à esquerda */
+.trilho{display:none}
+@media (min-width:1200px){
+  .trilho{display:flex;flex-direction:column;gap:10px;position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:20;width:9.5rem;font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+  .trilho a{color:var(--muted);text-decoration:none;padding:4px 0 4px 12px;border-left:2px solid var(--rule)}
+  .trilho a[aria-current="true"]{color:var(--accent);border-color:var(--accent)}
+}
 /* com JS e movimento: o palco fica preso na tela por 300vh; a cena anda na 1ª metade, o documento e o texto na 2ª */
 .js-v2 .caso{height:300vh}
 .js-v2 .palco{position:sticky;top:0;height:100vh}
@@ -79,12 +97,20 @@ img{display:block;max-width:100%;height:auto}
 </style>
 </head>
 <body>
-<a class="pular" href="#sige">Pular para o caso</a>
+<a class="pular" href="#veks">Pular para os casos</a>
 <header class="barra">
   <a class="nome" href="#inicio">Cássio Viller</a>
-  <nav aria-label="Seções"><a href="#sige">SIGE na obra</a><a href="#contato">Contato</a></nav>
+  <nav aria-label="Seções"><a href="#veks">Orçamento</a><a href="#sige">SIGE na obra</a><a href="#modulares">Casas modulares</a><a href="#trajetoria">Trajetória</a><a href="#contato">Contato</a></nav>
   <a href="curriculo-cassio-viller.pdf">Currículo (PDF)</a>
 </header>
+<nav class="trilho" aria-label="Seções">
+  <a href="#inicio">Início</a>
+  <a href="#veks">Orçamento</a>
+  <a href="#sige">SIGE na obra</a>
+  <a href="#modulares">Casas modulares</a>
+  <a href="#trajetoria">Trajetória</a>
+  <a href="#contato">Contato</a>
+</nav>
 <main id="conteudo">
   <section class="abertura" id="inicio">
     <h1>Cássio Viller</h1>
@@ -95,6 +121,39 @@ img{display:block;max-width:100%;height:auto}
       <li>São José dos Campos/SP · CLT ou PJ · presencial ou remoto</li>
     </ul>
     <p class="contato"><a class="zap" href="https://wa.me/5512982071116">WhatsApp (12) 98207-1116</a><a href="mailto:cassiovillers@gmail.com">cassiovillers@gmail.com</a><a href="curriculo-cassio-viller.pdf">Currículo (PDF)</a></p>
+  </section>
+
+  <section class="caso cena so-cena" id="mesa" data-caso="mesa">
+    <div class="palco">
+      <div class="quadro">
+        <figure class="clipe" data-clipe="video/v2-abertura.mp4" data-dur="8" aria-hidden="true">
+          <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
+          <img src="video/v2-abertura.webp" alt="" width="1920" height="1080" fetchpriority="high">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="caso cena" id="veks" data-caso="veks">
+    <div class="palco">
+      <div class="quadro">
+        <figure class="clipe" data-clipe="video/v2-veks.mp4" data-dur="10" aria-hidden="true">
+          <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
+          <img src="video/v2-veks.webp" alt="" width="1920" height="1080">
+        </figure>
+        <div class="doc" style="left:20%;top:16.6667%;width:60%;height:66.6667%">
+          <img src="docs/veks-proposta-modelo.webp" width="1152" height="720" alt="Página da proposta no modelo da empresa: quadro de áreas (328 m² em 26 ambientes), parâmetros construtivos e a planta baixa do cliente com as paredes a construir em vermelho.">
+          <span class="destaque" style="left:5.9028%;top:47.7778%;width:88.1944%;height:47.0833%"></span>
+        </div>
+      </div>
+      <div class="texto">
+        <p class="rotulo">Sistema de orçamento (VEKS) · mar → set/2026 · da planta do cliente à proposta</p>
+        <h2 class="manchete">Orcei 13 obras, de R$ 29 mil a R$ 24,5 milhões.</h2>
+        <p class="apoio">11 com proposta. Conferência com a SINAPI: desvio máximo de 0,25% nos 19 serviços conferidos. A gestão de obra deste sistema ainda não rodou numa obra real.</p>
+        <figure class="recorte"><img src="docs/veks-proposta-modelo-recorte.webp" width="1016" height="372" alt="Recorte da proposta: a planta baixa do cliente com as paredes a construir em vermelho."></figure>
+        <p class="caso-link"><a href="portfolio.html#sistema">Ver o caso completo →</a></p>
+      </div>
+    </div>
   </section>
 
   <section class="caso cena" id="sige" data-caso="sige">
@@ -117,6 +176,39 @@ img{display:block;max-width:100%;height:auto}
         <p class="caso-link"><a href="portfolio.html#sige">Ver o caso completo →</a></p>
       </div>
     </div>
+  </section>
+
+  <section class="caso cena" id="modulares" data-caso="modulares">
+    <div class="palco">
+      <div class="quadro">
+        <figure class="clipe" data-clipe="video/v2-modulares.mp4" data-dur="12" aria-hidden="true">
+          <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
+          <img src="video/v2-modulares.webp" alt="" width="1920" height="1080">
+        </figure>
+        <div class="doc" style="left:20%;top:16.6667%;width:60%;height:66.6667%">
+          <img src="docs/b36-caixas.webp" width="1442" height="901" alt="Prancha do celeiro B-36: como cada caixa de 3,00 × 6,00 m viaja e como ficam unidas na obra, em 6,00 × 6,00 m.">
+          <span class="destaque" style="left:6.2413%;top:24.4173%;width:83.2178%;height:44.3951%"></span>
+        </div>
+      </div>
+      <div class="texto">
+        <p class="rotulo">Casas modulares (VEKS) · ago/2026</p>
+        <h2 class="manchete">O celeiro B-36 não cabia no caminhão: dividi em duas caixas.</h2>
+        <p class="apoio">Três viagens, telhado em kit, 37 decisões registradas. Pré-dimensionado, sujeito à revisão do engenheiro responsável.</p>
+        <figure class="recorte"><img src="docs/b36-caixas-recorte.webp" width="1340" height="520" alt="Recorte da prancha: as duas caixas do B-36, de 3,00 × 6,00 m cada."></figure>
+        <p class="caso-link"><a href="portfolio.html#modular">Ver o caso completo →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="trajetoria" id="trajetoria">
+    <h2>Trajetória</h2>
+    <ol class="faixa">
+      <li><time datetime="2017">2017 → hoje</time><b>AZ Contabilidade</b><span>Analista contábil no escritório da família: folha, notas, balancete.</span></li>
+      <li><time datetime="2020">2020 → 2024</time><b>UNIFEI</b><span>6 semestres de Engenharia Civil; fiscal financeiro do DCE (2022); diretor de vendas da InLoco Jr. (2023 → 2024).</span></li>
+      <li><time datetime="2025-02">fev/2025 → jul/2026</time><b>V Alves Construção</b><span>Gerente de produção. Em paralelo, estágio na Estruturas do Vale (abr/2025 → mar/2026): orçamentos e propostas; o SIGE nasceu aqui.</span></li>
+      <li><time datetime="2026-03">mar → set/2026</time><b>VEKS Engenharia</b><span>PJ, 6 meses: orçamentos, compras de obra, contratos, fluxo de caixa, casas modulares e o sistema de orçamento.</span></li>
+    </ol>
+    <p class="ferramentas">No caminho, duas ferramentas: a calculadora de parede em LSF e drywall e o classificador de fluxo de caixa.</p>
   </section>
 
   <section class="fechamento" id="contato">

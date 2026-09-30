@@ -124,8 +124,8 @@ def checar_documentos():
             check(dims(DOCS / f"{i}-recorte.webp") == (rw, rh), f"documentos: recorte de {i} com dimensões erradas")
             if d.get("destaque"):
                 check(rx <= dx and ry <= dy and dx + dw <= rx + rw and dy + dh <= ry + rh, f"documentos: o recorte de {i} não contém o destaque")
-    check(set(man) >= {"sige-portal", "sige-fotos", "sige-rdo", "veks-orcamento", "veks-planta", "b36-caixas", "b36-transporte", "b36-ata", "veks-proposta"},
-          f"documentos: faltam ids no manifesto: {sorted({'sige-portal', 'sige-fotos', 'sige-rdo', 'veks-orcamento', 'veks-planta', 'b36-caixas', 'b36-transporte', 'b36-ata', 'veks-proposta'} - set(man))}")
+    check(set(man) >= {"sige-portal", "sige-fotos", "sige-rdo", "veks-orcamento", "veks-levantamento", "veks-planta-cliente", "veks-proposta-pagina", "veks-proposta-modelo", "b36-caixas", "b36-transporte", "b36-ata", "veks-proposta"},
+          f"documentos: faltam ids no manifesto: {sorted({'sige-portal', 'sige-fotos', 'sige-rdo', 'veks-orcamento', 'veks-levantamento', 'veks-planta-cliente', 'veks-proposta-pagina', 'veks-proposta-modelo', 'b36-caixas', 'b36-transporte', 'b36-ata', 'veks-proposta'} - set(man))}")
     for i, d in man.items():
         f = d["fonte"]
         check(f.startswith(("zip:", "pdf:")) or (RAIZ / f).exists(), f"documentos: fonte de {i} não existe: {f}")
@@ -136,7 +136,7 @@ def checar_documentos():
 
 
 CENAS_HTML = {"abertura.html": {"veks-proposta", "veks-orcamento", "sige-portal", "b36-caixas"},
-              "caso-orcamento.html": {"veks-orcamento", "veks-planta"},
+              "caso-orcamento.html": {"veks-levantamento", "veks-orcamento", "veks-planta-cliente", "veks-proposta-pagina", "veks-proposta-modelo"},
               "caso-sige.html": {"sige-portal", "sige-fotos", "sige-rdo"},
               "caso-modulares.html": {"b36-caixas", "b36-transporte", "b36-ata"}}
 
@@ -159,7 +159,7 @@ def checar_cena_estatica():
 
 
 CASOS = {
-    "veks": {"cena": "caso-orcamento.html", "doc": "veks-orcamento", "dur": 10},
+    "veks": {"cena": "caso-orcamento.html", "doc": "veks-proposta-modelo", "dur": 10},
     "sige": {"cena": "caso-sige.html", "doc": "sige-portal", "dur": 10},
     "modulares": {"cena": "caso-modulares.html", "doc": "b36-caixas", "dur": 12},
 }
@@ -252,23 +252,31 @@ def checar_cena_abertura():
 
 
 def checar_cena_veks():
-    """A estação de trabalho: o orçamento no monitor (alvo), a planta sobre a mesa; a cadeira gira e para;
-    t=0: mesa, cadeira e estante inteiras e ≥ 60% da largura; t=10: a tela do monitor exatamente em RETANGULO."""
+    """Da planta à proposta: a planta do cliente sobre a mesa, o monitor com o levantamento e depois o orçamento, as paredes
+    se levantam da planta (nenhuma em t=0, algumas em t=2,5, todas em t=5), a proposta sai da impressora (dentro em t=6,
+    em repouso na bandeja em t=10) e a faixa da página é o alvo; t=0: planta e monitor inteiros e ≥ 60% da largura;
+    t=10: a faixa exatamente em RETANGULO."""
     from render import abrir_cena, navegador, servidor
     with servidor() as base, navegador() as nav:
         pg, erros = abrir_cena(nav, f"{base}/cenas/caso-orcamento.html")
-        conteudo = pg.evaluate("""(function(){var S=window.__cena;renderCena(10);
-          return [S.alvo===S.tela,S.tela.material.map&&S.tela.material.map.image.src.split('/').pop(),S.docs.slice().sort(),S.assunto.length,
-                  Math.abs(S.cadeira.rotation.y)<1e-6];})()""")
-        check(conteudo == [True, "veks-orcamento.webp", ["veks-orcamento.webp", "veks-planta.webp"], 3, True], f"cena veks: conteúdo {conteudo}")
-        giro = pg.evaluate("(function(){var S=window.__cena;renderCena(0);return S.cadeira.rotation.y;})()")
-        check(giro > .5, f"cena veks: a cadeira não começa girada (rotation.y {giro:.2f})")
+        conteudo = pg.evaluate("""(function(){var S=window.__cena;renderCena(10);var p=S.proposta.position,r=S.repouso.proposta;
+          return [S.alvo.parent===S.folha,S.alvo.material.map&&S.alvo.material.map.image.src.split('/').pop(),
+                  S.tela.material.map&&S.tela.material.map.image.src.split('/').pop(),S.docs.slice().sort(),S.assunto.length,
+                  Math.hypot(p.x-r[0],p.y-r[1],p.z-r[2])<1e-3,S.estado.erguidas===S.estado.n&&S.estado.n>300];})()""")
+        check(conteudo == [True, "veks-proposta-modelo.webp", "veks-orcamento.webp",
+                           ["veks-levantamento.webp", "veks-orcamento.webp", "veks-planta-cliente.webp", "veks-proposta-modelo.webp", "veks-proposta-pagina.webp"],
+                           2, True, True], f"cena veks: conteúdo em t=10 {conteudo}")
+        meio = pg.evaluate("""(function(){var S=window.__cena,r=[];[0,2.5,5,6].forEach(function(t){renderCena(t);
+          r.push([S.estado.erguidas,S.tela.material.map&&S.tela.material.map.image.src.split('/').pop(),+S.proposta.position.z.toFixed(3)]);});return r;})()""")
+        check(meio[0][0] == 0 and 0 < meio[1][0] < meio[3][0] == meio[2][0], f"cena veks: paredes erguidas em t=0, 2,5, 5, 6: {[m[0] for m in meio]} (esperava 0, algumas, todas, todas)")
+        check(meio[1][1] == "veks-levantamento.webp" and meio[2][1] == "veks-orcamento.webp", f"cena veks: telas do monitor em t=2,5 e 5: {meio[1][1]}, {meio[2][1]}")
+        check(meio[3][2] < -.1, f"cena veks: em t=6 a proposta já saiu da impressora (z {meio[3][2]})")
         inicio = inicio_da_cena(pg, "window.__cena.assunto")
-        check(inicio[0], "cena veks: em t=0 mesa, cadeira ou estante saem do quadro")
+        check(inicio[0], "cena veks: em t=0 a planta ou o monitor saem do quadro")
         check(inicio[1] >= 1.2, f"cena veks: em t=0 a estação ocupa {inicio[1] / 2:.0%} da largura, esperava ≥ 60%")
         check(inicio[2], "cena veks: em t=0 parte da estação está dentro da névoa")
         checar_enquadramento(pg, "cena veks")
-        checar_proporcao_alvo(pg, "veks-orcamento", "cena veks")
+        checar_proporcao_alvo(pg, "veks-proposta-modelo", "cena veks")
         check(not erros, f"cena veks: erros de JS: {erros}")
 
 
@@ -369,27 +377,57 @@ def checar_pagina_estatica():
     p = PAGINA.read_text(encoding="utf-8")
     vis = texto_visivel(p)
     check("Orço obras, acompanho a execução e construí os sistemas que uso para isso." in vis, "página: frase da abertura ausente")
-    manchetes = [texto_visivel(m) for m in re.findall(r'<h2 class="manchete"[^>]*>(.*?)</h2>', p, re.S)]
-    apoios = [texto_visivel(m) for m in re.findall(r'<p class="apoio"[^>]*>(.*?)</p>', p, re.S)]
-    check(manchetes == ["Implantei a gestão de obra em dois galpões com 22 baias."], f"página: manchetes {manchetes}")
-    check(apoios == ["Depois de 11/08 o diário ficou 23 dias só no WhatsApp. Recuperado, o avanço passou de 27,6% para 44,7%, lido numa cópia do sistema."],
-          f"página: apoios {apoios}")
-    for m in manchetes:
-        check(len(m.split()) <= 12 and re.search(r"\d", m), f"página: manchete fora da regra (≤ 12 palavras, com número): {m!r}")
-    for a in apoios:
-        check(len(a.split()) <= 30, f"página: apoio com {len(a.split())} palavras (máx. 30)")
+    TEXTOS = {
+        "veks": ("Orcei 13 obras, de R$ 29 mil a R$ 24,5 milhões.",
+                 "11 com proposta. Conferência com a SINAPI: desvio máximo de 0,25% nos 19 serviços conferidos. A gestão de obra deste sistema ainda não rodou numa obra real."),
+        "sige": ("Implantei a gestão de obra em dois galpões com 22 baias.",
+                 "Depois de 11/08 o diário ficou 23 dias só no WhatsApp. Recuperado, o avanço passou de 27,6% para 44,7%, lido numa cópia do sistema."),
+        "modulares": ("O celeiro B-36 não cabia no caminhão: dividi em duas caixas.",
+                      "Três viagens, telhado em kit, 37 decisões registradas. Pré-dimensionado, sujeito à revisão do engenheiro responsável."),
+    }
+    secoes = re.findall(r'<section class="caso cena" id="([a-z]+)" data-caso="\1">(.*?)</section>', p, re.S)
+    check([s[0] for s in secoes] == list(CASOS), f"página: casos {[s[0] for s in secoes]}, esperava {list(CASOS)} nessa ordem")
+    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))
+    for caso, corpo in secoes:
+        m = re.findall(r'<h2 class="manchete"[^>]*>(.*?)</h2>', corpo, re.S)
+        a = re.findall(r'<p class="apoio"[^>]*>(.*?)</p>', corpo, re.S)
+        check(len(m) == 1 and texto_visivel(m[0]) == TEXTOS[caso][0], f"página {caso}: manchete {m and texto_visivel(m[0])!r}")
+        check(len(a) == 1 and texto_visivel(a[0]) == TEXTOS[caso][1], f"página {caso}: apoio {a and texto_visivel(a[0])!r}")
+        for t in m:
+            t = texto_visivel(t)
+            check(len(t.split()) <= 12 and re.search(r"\d", t), f"página {caso}: manchete fora da regra (≤ 12 palavras, com número): {t!r}")
+        for t in a:
+            check(len(texto_visivel(t).split()) <= 30, f"página {caso}: apoio com {len(texto_visivel(t).split())} palavras (máx. 30)")
+        doc = CASOS[caso]["doc"]
+        d = dest[doc]
+        x, y, w, h = d["destaque"]
+        esperado = f"left:{x / d['largura']:.4%};top:{y / d['altura']:.4%};width:{w / d['largura']:.4%};height:{h / d['altura']:.4%}"
+        check(f'class="doc" style="{RETANGULO_CSS}"' in corpo, f"página {caso}: .doc fora de RETANGULO")
+        check(f'<img src="docs/{doc}.webp" width="{d["largura"]}" height="{d["altura"]}"' in corpo, f"página {caso}: img do documento {doc} com src/width/height errados")
+        check(f'class="destaque" style="{esperado}"' in corpo, f"página {caso}: destaque ≠ destaques.json (esperava style=\"{esperado}\")")
+        rx, ry, rw, rh = d["recorte"]
+        check(f'<img src="docs/{doc}-recorte.webp" width="{rw}" height="{rh}"' in corpo, f"página {caso}: recorte de {doc} com src/width/height errados")
+        check(f'<figure class="clipe" data-clipe="video/v2-{caso}.mp4" data-dur="{CASOS[caso]["dur"]:g}" aria-hidden="true">' in corpo, f"página {caso}: figure.clipe")
+        alvo = re.search(r'<p class="caso-link"><a href="portfolio\.html#([a-z-]+)">', corpo)
+        check(alvo and f'id="{alvo.group(1)}"' in (SITE / "portfolio.html").read_text(encoding="utf-8"), f"página {caso}: link do caso completo sem âncora existente em portfolio.html")
     for proibido in PROIBIDOS:
         check(proibido not in vis, f"página: texto proibido {proibido!r}")
     check(re.search(r"\bItu\b", vis) is None, "página: nome do município do cliente (Itu)")
     for src, w, h in re.findall(r'<img src="(docs/[^"]+)" width="(\d+)" height="(\d+)"', p):
         check(dims(SITE / src) == (int(w), int(h)), f"página: {src} com width/height {w}×{h} ≠ arquivo {dims(SITE / src)}")
-    check(f'class="doc" style="{RETANGULO_CSS}"' in p, "página: .doc fora de RETANGULO (left:20%;top:16.6667%;width:60%;height:66.6667%)")
-    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))["sige-portal"]
-    x, y, w, h = dest["destaque"]
-    esperado = f"left:{x / dest['largura']:.4%};top:{y / dest['altura']:.4%};width:{w / dest['largura']:.4%};height:{h / dest['altura']:.4%}"
-    check(f'class="destaque" style="{esperado}"' in p, f"página: destaque ≠ destaques.json (esperava style=\"{esperado}\")")
-    dur = render.CENAS["sige"][1]
-    check(f'<figure class="clipe" data-clipe="video/v2-sige.mp4" data-dur="{dur:g}" aria-hidden="true">' in p, "página: figure.clipe do caso SIGE")
+    check('<section class="caso cena so-cena" id="mesa" data-caso="mesa">' in p and '<figure class="clipe" data-clipe="video/v2-abertura.mp4" data-dur="8" aria-hidden="true">' in p, "página: a cena da abertura (#mesa, só cena, 8 s)")
+    check('<img src="video/v2-abertura.webp" alt="" width="1920" height="1080" fetchpriority="high">' in p, "página: o pôster da abertura é o LCP (width/height/fetchpriority)")
+    trilho = re.search(r'<nav class="trilho" aria-label="Seções">(.*?)</nav>', p, re.S)
+    hrefs = re.findall(r'href="#([a-z]+)"', trilho.group(1)) if trilho else []
+    check(hrefs == ["inicio", "veks", "sige", "modulares", "trajetoria", "contato"], f"página: trilho {hrefs}")
+    for h in hrefs:
+        check(f'id="{h}"' in p, f"página: âncora do trilho sem alvo: #{h}")
+    faixa = re.search(r'<ol class="faixa">(.*?)</ol>', p, re.S)
+    itens = [texto_visivel(li) for li in re.findall(r"<li>(.*?)</li>", faixa.group(1), re.S)] if faixa else []
+    check(len(itens) == 4 and [it.split(" ")[0] for it in itens] == ["2017", "2020", "fev/2025", "mar"], f"página: trajetória {itens}")
+    for nome in ("AZ Contabilidade", "UNIFEI", "InLoco Jr.", "V Alves", "Estruturas do Vale", "VEKS"):
+        check(nome in " ".join(itens), f"página: trajetória sem {nome!r}")
+    check("calculadora de parede" in vis and "classificador de fluxo de caixa" in vis, "página: trajetória sem a linha das ferramentas")
     check('<script src="clipes.js" defer></script>' in p and '<script src="v2.js" defer></script>' in p, "página: scripts clipes.js e v2.js")
 
 
@@ -433,81 +471,90 @@ def checar_texto_fora_do_quadro(b, nome):
 
 
 def checar_pagina():
-    """1920×1080 com Range: sem erros nem 404; em p=0,25 o vídeo busca 5 s e mostra quadro (.viva); em p=0,25 o documento
-    está invisível; em p=1 o documento, o destaque e o texto estão visíveis, o documento em RETANGULO, o destaque
-    dentro do documento, a imagem real nunca ampliada, e o texto não cobre o documento."""
+    """1920×1080 com Range, em cada caso: sem erros nem 404; em p=0,25 o vídeo busca o quadro do meio e mostra quadro
+    (.viva); em p=0,25 o documento está invisível; em p=1 o documento, o destaque e o texto estão visíveis, o documento em
+    RETANGULO, o destaque dentro do documento, a imagem real nunca ampliada, e o texto não cobre o documento."""
     from render import navegador, servidor
+    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))
     with servidor() as base, navegador() as nav:
         ctx, pg, erros = abrir_pagina(nav, base, 1920, 1080)
         check(pg.evaluate("document.documentElement.classList.contains('js-v2')"), "página: v2.js não ligou .js-v2")
-        rolar(pg, "sige", .25)
-        pg.wait_for_function("document.querySelector('#sige figure.clipe').classList.contains('viva')", timeout=20000)
-        t = pg.evaluate("document.querySelector('#sige video').currentTime")
-        check(abs(t - 5.0208) < .05, f"página: em p=0,25 o vídeo está em {t:.3f} s, esperava 5,021 s")
-        b = caixas(pg, "sige")
-        check(float(b["doc"][4]) == 0, f"página: em p=0,25 o documento já aparece (opacidade {b['doc'][4]})")
-        vis = pg.evaluate("getComputedStyle(document.querySelector('#sige .texto')).visibility")
-        check(vis == "hidden", f"página: em p=0,25 o texto invisível ainda recebe foco (visibility {vis}, esperava hidden)")
-        rolar(pg, "sige", 1)
-        b = caixas(pg, "sige")
-        check(float(b["doc"][4]) == 1 and float(b["dest"][4]) == 1 and float(b["texto"][4]) == 1, f"página: em p=1 opacidades {b['doc'][4]}, {b['dest'][4]}, {b['texto'][4]}")
-        vis = pg.evaluate("getComputedStyle(document.querySelector('#sige .texto')).visibility")
-        check(vis == "visible", f"página: em p=1 o texto está com visibility {vis}")
-        checar_alinhado(b, "página 1920×1080")
-        d, s = b["doc"], b["dest"]
-        check(d[0] <= s[0] and d[1] <= s[1] and s[0] + s[2] <= d[0] + d[2] and s[1] + s[3] <= d[1] + d[3], "página: destaque fora do documento")
-        check(b["img"][2] <= 1600, f"página: documento exibido com {b['img'][2]:.0f} px, acima dos 1600 px do arquivo (ampliado)")
-        check(b["texto"][0] >= d[0] + d[2] + 16, "página: o texto cobre o documento em 1920×1080")
-        checar_texto_fora_do_quadro(b, "página 1920×1080")
+        for caso in CASOS:
+            rolar(pg, caso, .25)
+            pg.wait_for_function(f"document.querySelector('#{caso} figure.clipe').classList.contains('viva')", timeout=20000)
+            t = pg.evaluate(f"document.querySelector('#{caso} video').currentTime")
+            meio = CASOS[caso]["dur"] / 2 + 1 / 48
+            check(abs(t - meio) < .05, f"página {caso}: em p=0,25 o vídeo está em {t:.3f} s, esperava {meio:.3f} s")
+            b = caixas(pg, caso)
+            check(float(b["doc"][4]) == 0, f"página {caso}: em p=0,25 o documento já aparece (opacidade {b['doc'][4]})")
+            vis = pg.evaluate(f"getComputedStyle(document.querySelector('#{caso} .texto')).visibility")
+            check(vis == "hidden", f"página {caso}: em p=0,25 o texto invisível ainda recebe foco (visibility {vis}, esperava hidden)")
+            rolar(pg, caso, 1)
+            b = caixas(pg, caso)
+            check(float(b["doc"][4]) == 1 and float(b["dest"][4]) == 1 and float(b["texto"][4]) == 1, f"página {caso}: em p=1 opacidades {b['doc'][4]}, {b['dest'][4]}, {b['texto'][4]}")
+            vis = pg.evaluate(f"getComputedStyle(document.querySelector('#{caso} .texto')).visibility")
+            check(vis == "visible", f"página {caso}: em p=1 o texto está com visibility {vis}")
+            checar_alinhado(b, f"página {caso} 1920×1080")
+            d, s = b["doc"], b["dest"]
+            check(d[0] <= s[0] and d[1] <= s[1] and s[0] + s[2] <= d[0] + d[2] and s[1] + s[3] <= d[1] + d[3], f"página {caso}: destaque fora do documento")
+            larg = dest[CASOS[caso]["doc"]]["largura"]
+            check(b["img"][2] <= larg, f"página {caso}: documento exibido com {b['img'][2]:.0f} px, acima dos {larg} px do arquivo (ampliado)")
+            check(b["texto"][0] >= d[0] + d[2] + 16, f"página {caso}: o texto cobre o documento em 1920×1080")
+            checar_texto_fora_do_quadro(b, f"página {caso} 1920×1080")
         check(not erros, f"página: erros/404: {erros}")
         ctx.close()
 
 
 def checar_viewports():
-    """Viewports fora de 16:9: documento em RETANGULO, inteiro na tela, texto sem cobrir o documento, em p=1."""
+    """Viewports fora de 16:9, em cada caso: documento em RETANGULO, inteiro na tela, texto sem cobrir o documento, em p=1."""
     from render import navegador, servidor
+    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))
     with servidor() as base, navegador() as nav:
         for w, h in ((1366, 768), (2560, 1080), (1280, 1024)):
             ctx, pg, erros = abrir_pagina(nav, base, w, h)
-            rolar(pg, "sige", 1)
-            b = caixas(pg, "sige")
-            checar_alinhado(b, f"página {w}×{h}")
-            d = b["doc"]
-            check(d[0] >= 0 and d[1] >= 0 and d[0] + d[2] <= w and d[1] + d[3] <= h, f"página {w}×{h}: documento sai da tela {d[:4]}")
-            check(b["texto"][0] >= d[0] + d[2] + 16, f"página {w}×{h}: o texto cobre o documento")
-            checar_texto_fora_do_quadro(b, f"página {w}×{h}")
-            check(b["img"][2] <= 1600, f"página {w}×{h}: documento ampliado")
+            for caso in CASOS:
+                rolar(pg, caso, 1)
+                b = caixas(pg, caso)
+                checar_alinhado(b, f"página {caso} {w}×{h}")
+                d = b["doc"]
+                check(d[0] >= 0 and d[1] >= 0 and d[0] + d[2] <= w and d[1] + d[3] <= h, f"página {caso} {w}×{h}: documento sai da tela {d[:4]}")
+                check(b["texto"][0] >= d[0] + d[2] + 16, f"página {caso} {w}×{h}: o texto cobre o documento")
+                checar_texto_fora_do_quadro(b, f"página {caso} {w}×{h}")
+                check(b["img"][2] <= dest[CASOS[caso]["doc"]]["largura"], f"página {caso} {w}×{h}: documento ampliado")
             check(not erros, f"página {w}×{h}: erros/404: {erros}")
             ctx.close()
 
 
 def checar_sem_range():
-    """Servidor sem Range: o clipe congela no pôster (sem .viva); documento, destaque e texto aparecem alinhados em p=1."""
+    """Servidor sem Range: o clipe congela no pôster (sem .viva); documento, destaque e texto aparecem alinhados em p=1 de cada caso."""
     from render import navegador, servidor
     with servidor(com_range=False) as base, navegador() as nav:
         ctx, pg, erros = abrir_pagina(nav, base, 1920, 1080)
         rolar(pg, "sige", .25)
         pg.wait_for_timeout(3000)
         check(not pg.evaluate("document.querySelector('#sige figure.clipe').classList.contains('viva')"), "sem Range: o clipe não congelou no pôster")
-        rolar(pg, "sige", 1)
-        b = caixas(pg, "sige")
-        check(float(b["doc"][4]) == 1 and float(b["dest"][4]) == 1, "sem Range: documento/destaque invisíveis em p=1")
-        checar_alinhado(b, "sem Range")
+        for caso in CASOS:
+            rolar(pg, caso, 1)
+            b = caixas(pg, caso)
+            check(float(b["doc"][4]) == 1 and float(b["dest"][4]) == 1, f"sem Range: documento/destaque de {caso} invisíveis em p=1")
+            checar_alinhado(b, f"sem Range {caso}")
         ctx.close()
 
 
 def checar_celular():
-    """390×844: sem o documento inteiro (display none); o recorte visível, inteiro na tela em p=1 e nunca ampliado;
-    movimento reduzido: sem .js-v2, pôster, documento e destaque visíveis; sem JS: manchete e documento visíveis."""
+    """390×844, em cada caso: sem o documento inteiro (display none); o recorte visível, inteiro na tela em p=1 e nunca
+    ampliado; movimento reduzido: sem .js-v2, pôster, documento e destaque visíveis; sem JS: manchete e documento visíveis."""
     from render import navegador, servidor
+    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))
     with servidor() as base, navegador() as nav:
         ctx, pg, erros = abrir_pagina(nav, base, 390, 844, device_scale_factor=2, is_mobile=True, has_touch=True)
-        rolar(pg, "sige", 1)
-        b = caixas(pg, "sige")
-        check(b["doc"][5] == "none", "celular: o documento inteiro aparece (ilegível em 390 px)")
-        r = b["recorte"]
-        check(r and r[5] != "none" and r[0] >= 0 and r[1] >= 0 and r[0] + r[2] <= 390 and r[1] + r[3] <= 844, f"celular: recorte fora da tela {r}")
-        check(r and r[2] <= 800, "celular: recorte ampliado")
+        for caso in CASOS:
+            rolar(pg, caso, 1)
+            b = caixas(pg, caso)
+            check(b["doc"][5] == "none", f"celular {caso}: o documento inteiro aparece (ilegível em 390 px)")
+            r = b["recorte"]
+            check(r and r[5] != "none" and r[0] >= 0 and r[1] >= 0 and r[0] + r[2] <= 390 and r[1] + r[3] <= 844, f"celular {caso}: recorte fora da tela {r}")
+            check(r and r[2] <= dest[CASOS[caso]["doc"]]["recorte"][2], f"celular {caso}: recorte ampliado")
         check(not erros, f"celular: erros/404: {erros}")
         ctx.close()
         ctx, pg, erros = abrir_pagina(nav, base, 1920, 1080, reduced_motion="reduce")
@@ -523,23 +570,80 @@ def checar_celular():
 
 
 def checar_recorte_viewports():
-    """Telas em que o documento inteiro sairia ilegível (celular deitado 844×390, tablet em pé 768×1024): sem o documento,
-    com o recorte inteiro na tela e nunca ampliado, e o texto (manchete e apoio) inteiro na tela em p=1."""
+    """Telas em que o documento inteiro sairia ilegível (celular deitado 844×390, tablet em pé 768×1024), em cada caso: sem o
+    documento, com o recorte inteiro na tela e nunca ampliado, e o texto (manchete e apoio) inteiro na tela em p=1."""
     from render import navegador, servidor
+    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))
     with servidor() as base, navegador() as nav:
         for w, h in ((844, 390), (768, 1024)):
             ctx, pg, erros = abrir_pagina(nav, base, w, h, device_scale_factor=2, is_mobile=True, has_touch=True)
-            rolar(pg, "sige", 1)
-            b = caixas(pg, "sige")
-            check(b["doc"][5] == "none", f"recorte {w}×{h}: o documento inteiro aparece (sairia com {b['doc'][2]:.0f} px)")
-            r = b["recorte"]
-            check(r and r[5] != "none" and r[0] >= 0 and r[1] >= 0 and r[0] + r[2] <= w and r[1] + r[3] <= h, f"recorte {w}×{h}: recorte fora da tela {r and r[:4]}")
-            check(r and r[2] <= 800, f"recorte {w}×{h}: recorte ampliado")
-            m = pg.evaluate("""(function(){var e=document.querySelector('#sige .apoio').getBoundingClientRect(),
-              t=document.querySelector('#sige .manchete').getBoundingClientRect();return [t.top,e.bottom];})()""")
-            check(m[0] >= 0 and m[1] <= h, f"recorte {w}×{h}: manchete/apoio fora da tela (topo {m[0]:.0f}, base {m[1]:.0f})")
+            for caso in CASOS:
+                rolar(pg, caso, 1)
+                b = caixas(pg, caso)
+                check(b["doc"][5] == "none", f"recorte {caso} {w}×{h}: o documento inteiro aparece (sairia com {b['doc'][2]:.0f} px)")
+                r = b["recorte"]
+                check(r and r[5] != "none" and r[0] >= 0 and r[1] >= 0 and r[0] + r[2] <= w and r[1] + r[3] <= h, f"recorte {caso} {w}×{h}: recorte fora da tela {r and r[:4]}")
+                check(r and r[2] <= dest[CASOS[caso]["doc"]]["recorte"][2], f"recorte {caso} {w}×{h}: recorte ampliado")
+                m = pg.evaluate(f"""(function(){{var e=document.querySelector('#{caso} .apoio').getBoundingClientRect(),
+                  t=document.querySelector('#{caso} .manchete').getBoundingClientRect();return [t.top,e.bottom];}})()""")
+                check(m[0] >= 0 and m[1] <= h, f"recorte {caso} {w}×{h}: manchete/apoio fora da tela (topo {m[0]:.0f}, base {m[1]:.0f})")
             check(not erros, f"recorte {w}×{h}: erros/404: {erros}")
             ctx.close()
+
+
+def checar_abertura():
+    """Critério 1 do spec: em 1366×768 a ficha inteira (nome, vaga, posicionamento, contato) cabe sem rolar; a cena da
+    abertura anda com a rolagem (só cena: p=0,5 → 4 s de 8) e não tem documento nem texto."""
+    from render import navegador, servidor
+    with servidor() as base, navegador() as nav:
+        ctx, pg, erros = abrir_pagina(nav, base, 1366, 768)
+        fundo = pg.evaluate("document.querySelector('#inicio .contato').getBoundingClientRect().bottom")
+        check(fundo <= 768, f"abertura 1366×768: o contato termina em {fundo:.0f} px, abaixo da primeira tela")
+        check(pg.evaluate("document.querySelector('#mesa .doc, #mesa .texto') === null"), "abertura: #mesa tem .doc ou .texto")
+        rolar(pg, "mesa", .5)
+        pg.wait_for_function("document.querySelector('#mesa figure.clipe').classList.contains('viva')", timeout=20000)
+        t = pg.evaluate("document.querySelector('#mesa video').currentTime")
+        check(abs(t - 4.0208) < .05, f"abertura: em p=0,5 o vídeo está em {t:.3f} s, esperava 4,021 s (só cena)")
+        check(not erros, f"abertura: erros/404: {erros}")
+        ctx.close()
+
+
+def checar_trilho():
+    """Trilho lateral em 1366×768 e 1920×1080: não cobre o documento nem o texto em p=1 de nenhum caso; a âncora da
+    seção visível recebe aria-current; abaixo de 1200 px o trilho some."""
+    from render import navegador, servidor
+    def cruza(a, b):
+        return a[0] < b[0] + b[2] and b[0] < a[0] + a[2] and a[1] < b[1] + b[3] and b[1] < a[1] + a[3]
+    with servidor() as base, navegador() as nav:
+        for w, h in ((1366, 768), (1920, 1080)):
+            ctx, pg, erros = abrir_pagina(nav, base, w, h)
+            for caso in CASOS:
+                rolar(pg, caso, 1)
+                b = caixas(pg, caso)
+                trilho = pg.evaluate("(function(){var r=document.querySelector('nav.trilho').getBoundingClientRect();return [r.left,r.top,r.width,r.height];})()")
+                check(not cruza(trilho, b["doc"][:4]) and not cruza(trilho, b["texto"][:4]), f"trilho {w}×{h}: cobre o documento ou o texto em {caso}")
+                atual = pg.evaluate("(function(){var a=document.querySelector('nav.trilho a[aria-current=\"true\"]');return a&&a.getAttribute('href');})()")
+                check(atual == f"#{caso}", f"trilho {w}×{h}: em {caso} o aria-current está em {atual}")
+            ctx.close()
+        ctx, pg, erros = abrir_pagina(nav, base, 1100, 800)
+        check(pg.evaluate("getComputedStyle(document.querySelector('nav.trilho')).display") == "none", "trilho: aparece em 1100 px")
+        ctx.close()
+
+
+def checar_troca_de_clipes():
+    """clipes.js mantém no máximo 2 vídeos com dados: ir da abertura ao caso 4 e voltar ao caso 2 traz o caso 2 de volta a .viva."""
+    from render import navegador, servidor
+    with servidor() as base, navegador() as nav:
+        ctx, pg, erros = abrir_pagina(nav, base, 1920, 1080)
+        for caso in ("mesa", "veks", "sige", "modulares"):
+            rolar(pg, caso, .3)
+            pg.wait_for_function(f"document.querySelector('#{caso} figure.clipe').classList.contains('viva')", timeout=20000)
+        com_dados = pg.evaluate("[].filter.call(document.querySelectorAll('figure.clipe video'),function(v){return v.readyState>0;}).length")
+        check(com_dados <= 2, f"clipes: {com_dados} vídeos com dados ao mesmo tempo (máx. 2)")
+        rolar(pg, "veks", .3)
+        pg.wait_for_function("document.querySelector('#veks figure.clipe').classList.contains('viva')", timeout=20000)
+        check(not erros, f"clipes: erros/404: {erros}")
+        ctx.close()
 
 
 def checar_readme():
@@ -568,6 +672,9 @@ def main():
         checar_sem_range()
         checar_celular()
         checar_recorte_viewports()
+        checar_abertura()
+        checar_trilho()
+        checar_troca_de_clipes()
     if "--video" in sys.argv:
         checar_video()
     if FALHAS:

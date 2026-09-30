@@ -30,6 +30,9 @@ LIBERADOS = {
     "zip:casas pre moldadas (1).zip!prancha-transporte-tiltup-gambrel.png",
     "pdf:casas pre moldadas (1).zip!b36-atas-decisoes-plano-de-acoes.pdf#1",
     "site/img/o-proposta.webp",
+    # 30/09: a planta do cliente da unidade de saúde (já no site, só o tipo do cliente) e a página da proposta no modelo
+    # VEKS re-diagramada em alta por cenas/proposta/proposta.py (mesmos textos e números públicos, sem a prancha nem a prefeitura)
+    "site/img/upa-plan-grey.webp", "site/img/o-proposta-modelo.webp",
 }
 TEMP = Path(tempfile.mkdtemp(prefix="documentos-"))
 

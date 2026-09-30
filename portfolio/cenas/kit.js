@@ -93,6 +93,7 @@ const TIPOS = {
   tronco: {cor: 0x7A6048, variacao: .2, G: 6, rug: 1},
   asfalto: {cor: 0x4A4D50, variacao: .08, G: 12, rug: 1},
   acento: {cor: LARANJA, variacao: .05, G: 4, rug: .6},
+  vermelho: {cor: 0xC0392B, variacao: .05, G: 4, rug: .65},  // as paredes a construir, na cor da planta
 };
 const cache = {};
 export function material(tipo, {repetir = 1} = {}) {
