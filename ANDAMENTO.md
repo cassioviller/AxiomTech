@@ -95,3 +95,16 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Pôster dos modulares: a prancha "como cada caixa viaja" entra inteira (2308×1443, margem branca); changelog rodada 15.
 - Render em qualidade alta no PC do Cássio (Windows, RTX 3060) por outra sessão do Claude Code: `portfolio/cenas/RENDER-LOCAL.md`. O branch `site-v2-fase-2` vai para o GitHub (`origin`); os vídeos voltam por push e aqui se faz `git pull`.
 - Pendente: decisão do Cássio sobre o teto de 2,5 MB por vídeo (subir ou AV1 com H.264 de reserva); depois deploy, `--origem`, iPhone real.
+
+## PARA A SESSÃO NO PC DO CÁSSIO (Windows, RTX 3060) — ler primeiro, 01/10/2026
+- Branch de trabalho: `site-v2-fase-2` (commit da rodada 15 em diante). O site é `portfolio/site/index.html`; servir com `python portfolio/servir.py 5000 --directory portfolio/site`.
+- **O que fazer aí, na ordem:**
+  1. Seguir `portfolio/cenas/RENDER-LOCAL.md` (instalar git/python/ffmpeg/playwright; `python portfolio/cenas/render.py --gpu --qualidade alta --so modulares`). O modo `--gpu` e a qualidade alta **nunca foram executados** (no Replit não há placa): se der erro, corrigir no `render.py`/`kit.js` e anotar aqui.
+  2. O vídeo `v2-modulares.mp4` publicado ainda tem a prancha cortada (a correção da rodada 15 mudou o documento e a cena, mas o vídeo não foi regravado): o render do passo 1 resolve. Conferir no pôster `v2-modulares.webp` que a prancha aparece inteira, com "= UNIDAS NA OBRA · 6,00 × 6,00 m".
+  3. Depois os outros três casos (`abertura`, `veks`, `sige`) em qualidade alta.
+  4. Commit só dos `portfolio/site/video/v2-*.mp4|webp` e push.
+- **Plano do render realista ("tipo Lumion")**: `docs/superpowers/specs/2026-10-01-render-realista.md` (pesquisa, ferramentas verificadas, plano revisto). Resumo: Blender 5.2.2 LTS + Cycles OptiX por linha de comando, assets CC0 do Poly Haven e do ambientCG por API, piloto no caso 4. Ainda não começou; depende de duas decisões do Cássio: (a) teto do vídeo — AV1 + H.264 de reserva (recomendado) ou subir de 2,5 MB para 4–5 MB; (b) começar pelos assets reais nas cenas three.js ou direto pelo piloto no Blender.
+- **Fora do git (não existem aí):** `BRIEF.md`, os zips com os originais (`casas pre moldadas (1).zip`, `saida.zip`…), `portfolio/cenas/saida/`. Por isso **não rodar `cenas/documentos.py`** no PC; os documentos já recortados estão em `portfolio/site/docs/`.
+- **Sigilo:** nada de nome de cliente nem endereço legível; os prints do portal do SIGE usam tarjas opacas. Só assets CC0, com a origem anotada.
+- Testes: no PC basta `python portfolio/tests/check_v2.py --video`; os de cena (`--navegador`) foram calibrados no SwiftShader do Replit. `check_filme.py` falha desde a fase 2 (testa o filme antigo) — conhecido.
+- Histórico e decisões: este arquivo (de cima para baixo), `portfolio/revisao/CHANGELOG.md` (rodadas 8–15), specs e planos em `docs/superpowers/`.
