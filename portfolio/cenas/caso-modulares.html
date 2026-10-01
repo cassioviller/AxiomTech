@@ -175,7 +175,7 @@ const cavalete = new THREE.Group(); cavalete.position.set(9.5, 0, 9); cavalete.r
 [-.5, .5].forEach(x => { const p = bloco(.05, 1.8, .05, x, .9, 0, cavalete, material('madeira')); p.rotation.x = -.21; p.position.z = -.19; });
 const quadro = bloco(1.1, .74, .02, 0, 1.15, 0, cavalete, material('madeira'));
 quadro.rotation.x = -.21;
-S.prancha = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.0 * 901 / 1442), new THREE.MeshBasicMaterial({color: 0xffffff}));
+S.prancha = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.0 * 1443 / 2308), new THREE.MeshBasicMaterial({color: 0xffffff}));
 S.prancha.position.set(0, 1.15, .012); S.prancha.rotation.x = -.21; cavalete.add(S.prancha);
 S.alvo = real(documento('../site/docs/b36-caixas.webp'), S.prancha, 'b36-caixas.webp');
 const lateral = new THREE.Group(); lateral.position.set(1.9, 0, 9.4); lateral.rotation.y = -.6; cena.add(lateral);

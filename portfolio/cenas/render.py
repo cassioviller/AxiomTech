@@ -4,6 +4,7 @@ Cada cena é um módulo que expõe window.renderCena(t) (t = tempo local 0..10) 
 As cenas importam módulos ES: file:// não serve, então portfolio/ é servido com Range numa porta local.
 
 Uso: python3 portfolio/cenas/render.py --so sige
+     python portfolio/cenas/render.py --gpu --qualidade alta --so modulares   (render local numa GPU; ver RENDER-LOCAL.md)
 Saídas: portfolio/cenas/saida/<caso>-mestre.mp4  mestre 1920×1080 crf 16 (ignorado pelo git)
         portfolio/site/video/v2-<caso>.mp4       1920×1080, 24 fps, H.264 High 4.0, GOP 4, sem áudio
         portfolio/site/video/v2-<caso>.webp      pôster = último quadro
@@ -27,6 +28,9 @@ sys.path.insert(0, str(RAIZ))
 from servir import ComRange  # noqa: E402
 
 LARGURA, ALTURA = 1920, 1080
+ARGS_GPU = ["--ignore-gpu-blocklist", "--enable-gpu", "--enable-webgl", "--disable-gpu-watchdog"]  # Chromium com janela usa a placa (ANGLE/D3D11 no Windows)
+GPU_NOME = """(function(){var gl=window.__palco.renderer.getContext(),e=gl.getExtension('WEBGL_debug_renderer_info');
+return e?gl.getParameter(e.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);})()"""
 ARGS = ["--use-gl=swiftshader", "--enable-unsafe-swiftshader", "--enable-webgl", "--ignore-gpu-blocklist",
         "--disable-gpu-watchdog"]  # um quadro 3840×2160 com GTAO leva 15-60 s no SwiftShader: sem a flag o vigia mata a GPU (contexto perdido)
 CONTEXTO_OK = "(function(){var gl=window.__palco.renderer.getContext();return !gl.isContextLost()&&gl.drawingBufferWidth>0;})()"
@@ -54,11 +58,14 @@ def servidor(com_range=True):
 
 
 @contextmanager
-def navegador():
+def navegador(gpu=False):
+    """Chromium headless com SwiftShader (CPU, determinístico: o do Replit e dos testes) ou, com gpu=True, Chromium com
+    janela na placa de vídeo do computador (o headless pode cair no SwiftShader mesmo com a placa presente)."""
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         exe = shutil.which("chromium")  # no Replit o Chromium do Playwright não roda: usa o do sistema
-        nav = p.chromium.launch(executable_path=exe, args=ARGS) if exe else p.chromium.launch(args=ARGS)
+        opcoes = {"args": ARGS_GPU, "headless": False} if gpu else {"args": ARGS}
+        nav = p.chromium.launch(executable_path=exe, **opcoes) if exe else p.chromium.launch(**opcoes)
         try:
             yield nav
         finally:
@@ -86,16 +93,20 @@ def abrir_cena(nav, url, tentativas=3):
     sys.exit(f"{url}: contexto WebGL perdido {tentativas} vezes seguidas")
 
 
-# PNG 1920×1080 lido do framebuffer do WebGL com gl.readPixels (espera o SwiftShader terminar) e reduzido 2×2 em JS.
+# PNG 1920×1080 lido do framebuffer do WebGL com gl.readPixels (espera o SwiftShader terminar) e reduzido F×F em JS
+# (F = largura do buffer / 1920: 2 na qualidade normal, 4 na alta).
 # Não usa pg.screenshot nem drawImage do canvas: os dois passam pelo compositor, e sob carga a primeira captura depois
 # de carregar saía com o quadro velho (o canvas vazio), o que quebrava o determinismo e as pontas paradas.
 CAPTURA = """(function(){var p=window.__palco,r=p.renderer,gl=r.getContext();r.setRenderTarget(null);
-var W=gl.drawingBufferWidth,H=gl.drawingBufferHeight,buf=new Uint8Array(W*H*4);gl.readPixels(0,0,W,H,gl.RGBA,gl.UNSIGNED_BYTE,buf);
-var w=W>>1,h=H>>1,g=document.createElement('canvas');g.width=w;g.height=h;var x=g.getContext('2d'),img=x.createImageData(w,h),d=img.data;
-for(var y=0;y<h;y++){var sy=H-2-2*y,r0=sy*W*4,r1=r0+W*4,o=y*w*4;
-  for(var i=0;i<w;i++){var a=r0+8*i,b=r1+8*i,q=o+4*i;
-    d[q]=(buf[a]+buf[a+4]+buf[b]+buf[b+4]+2)>>2;d[q+1]=(buf[a+1]+buf[a+5]+buf[b+1]+buf[b+5]+2)>>2;
-    d[q+2]=(buf[a+2]+buf[a+6]+buf[b+2]+buf[b+6]+2)>>2;d[q+3]=255;}}
+var W=gl.drawingBufferWidth,H=gl.drawingBufferHeight,F=W/1920;
+if(F!==Math.round(F)||H!==1080*F)throw new Error('buffer '+W+'x'+H+' não é múltiplo inteiro de 1920x1080 (a GPU limitou o tamanho?)');
+var buf=new Uint8Array(W*H*4);gl.readPixels(0,0,W,H,gl.RGBA,gl.UNSIGNED_BYTE,buf);
+var w=W/F,h=H/F,n=F*F,m=n>>1,g=document.createElement('canvas');g.width=w;g.height=h;var x=g.getContext('2d'),img=x.createImageData(w,h),d=img.data;
+for(var y=0;y<h;y++){var o=y*w*4;
+  for(var i=0;i<w;i++){var r=m,gg=m,b=m;
+    for(var dy=0;dy<F;dy++){var a=((H-1-(F*y+dy))*W+F*i)*4;
+      for(var dx=0;dx<F;dx++,a+=4){r+=buf[a];gg+=buf[a+1];b+=buf[a+2];}}
+    var q=o+4*i;d[q]=(r/n)|0;d[q+1]=(gg/n)|0;d[q+2]=(b/n)|0;d[q+3]=255;}}
 x.putImageData(img,0,0);return g.toDataURL('image/png');})()"""
 
 
@@ -207,13 +218,23 @@ def main():
     if i and (i >= len(sys.argv) or sys.argv[i] not in CENAS):
         sys.exit(f"--so pede um caso de CENAS: {', '.join(CENAS)}")
     casos = [sys.argv[i]] if i else list(CENAS)
-    with servidor() as base, navegador() as nav:
+    j = sys.argv.index("--qualidade") + 1 if "--qualidade" in sys.argv else 0
+    qualidade = sys.argv[j] if j and j < len(sys.argv) else "normal"
+    if qualidade not in ("normal", "alta"):
+        sys.exit("--qualidade pede normal ou alta")
+    gpu = "--gpu" in sys.argv
+    sufixo = "" if qualidade == "normal" else f"-{qualidade}"  # quadros de qualidades diferentes nunca se misturam na retomada
+    with servidor() as base, navegador(gpu) as nav:
         for caso in casos:
             arquivo, dur = CENAS[caso]
-            pg, erros = abrir_cena(nav, f"{base}/cenas/{arquivo}")
+            pg, erros = abrir_cena(nav, f"{base}/cenas/{arquivo}?q={qualidade}")
             if erros:
                 sys.exit(f"{caso}: erro de JavaScript ao carregar: {'; '.join(erros)}")
-            mestre = SAIDA / f"{caso}-mestre.mp4"
+            placa = pg.evaluate(GPU_NOME)
+            print(f"{caso}: qualidade {qualidade}, WebGL em {placa}", flush=True)
+            if gpu and re.search(r"swiftshader|llvmpipe|software|basic render", placa, re.I):
+                sys.exit(f"--gpu: o Chromium não usou a placa de vídeo ({placa}); atualizar o driver ou rodar sem --gpu")
+            mestre = SAIDA / f"{caso}{sufixo}-mestre.mp4"
             renderizar(pg, dur, mestre)
             if erros:
                 sys.exit(f"{caso}: erro de JavaScript no render: {'; '.join(erros)}")

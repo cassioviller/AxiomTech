@@ -62,7 +62,9 @@ def carregar(fonte):
 
 def cortar(fonte, caixa, destino):
     x, y, w, h = caixa
-    subprocess.run(["magick", str(fonte), "-crop", f"{w}x{h}+{x}+{y}", "+repage", "-quality", "90", str(destino)], check=True)
+    # -extent em vez de -crop: uma caixa que passa da borda da fonte (x ou y negativo) ganha margem branca; assim uma prancha
+    # mais larga que 1,6 entra inteira na proporção do RETANGULO, sem cortar o conteúdo
+    subprocess.run(["magick", str(fonte), "-background", "white", "-extent", f"{w}x{h}{x:+d}{y:+d}", "+repage", "-quality", "90", str(destino)], check=True)
 
 
 def gerar():

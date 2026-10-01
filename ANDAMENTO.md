@@ -90,3 +90,8 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Materiais do kit refeitos (mapeamento em metros, um desenho por revestimento, relevo em metros; ver CHANGELOG rodada 14); fase 3 do texto feita (portfolio.html, currículo 1 página, folha dos 36 min). Suítes OK (check_filme falha como desde a fase 2: testa o filme antigo). Quadros de conferência em `portfolio/cenas/saida/prints-r14b` e `-r14c`. Vídeos: regravar em cadeia abertura, veks, sige, modulares.
 - 01/10: abertura (`0ad1d5a`), veks e sige (`03edd2b`) regravados. Modulares parou no quadro 103 (limite de 2 h da tarefa em segundo plano) e foi retomado às 13h: 288 quadros, 2,46 MB em crf 35 (teto do script: 36). `check_v2.py` (normal, `--navegador`, `--video`) OK. Rodada 14 dos vídeos concluída.
 - Para o Cássio olhar: no pôster dos modulares a prancha "como cada caixa viaja" sai cortada à direita (o "=" fica sem o resultado e a legenda é cortada em "selagem"); já era assim antes desta regravação.
+
+## Estado em 01/10/2026 (tarde) — rodada 15 (prancha inteira, render local na GPU)
+- Pôster dos modulares: a prancha "como cada caixa viaja" entra inteira (2308×1443, margem branca); changelog rodada 15.
+- Render em qualidade alta no PC do Cássio (Windows, RTX 3060) por outra sessão do Claude Code: `portfolio/cenas/RENDER-LOCAL.md`. O branch `site-v2-fase-2` vai para o GitHub (`origin`); os vídeos voltam por push e aqui se faz `git pull`.
+- Pendente: decisão do Cássio sobre o teto de 2,5 MB por vídeo (subir ou AV1 com H.264 de reserva); depois deploy, `--origem`, iPhone real.

@@ -176,7 +176,7 @@ S.mesa = new THREE.Group(); cena.add(S.mesa); S.assunto = [S.mesa];
 bloco(1.6, .04, .8, 0, .73, 0, S.mesa, material('madeira', {repetir: 2}));
 [[-.75, -.35], [.75, -.35], [-.75, .35], [.75, .35]].forEach(p => bloco(.05, .71, .05, p[0], .355, p[1], S.mesa, material('acoPintado')));
 
-// os documentos: a prancha do B-36 (A3 deitada, 1442×901), a tela do orçamento impressa (A4 deitada, 1280×800),
+// os documentos: a prancha do B-36 (inteira, com margem branca em cima e embaixo até 1,6: 2308×1443), a tela do orçamento impressa (A4 deitada, 1280×800),
 // o portal do SIGE num tablet (tela 0,24 × 0,15, 1600×1000) e a proposta (A4 em pé, 885×1060), que desliza para o lugar
 folha(documento('../site/docs/b36-caixas.webp'), .42, .2624, -.42, .752, .18, .04, S.mesa);
 folha(documento('../site/docs/veks-orcamento.webp'), .297, .1856, .05, .752, -.15, -.03, S.mesa);

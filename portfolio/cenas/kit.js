@@ -13,6 +13,10 @@ export {THREE};
 export const LARGURA = 1920, ALTURA = 1080;
 export const RETANGULO = {x: .2, y: 1 / 6, w: .6, h: 2 / 3}; // onde o documento termina no último quadro (frações do quadro); a página usa os mesmos números
 const LARANJA = 0xE0622A;
+// qualidade do render, pela URL (?q=alta): a normal é a do Replit (SwiftShader, CPU); a alta é para o render local
+// numa GPU (RTX 3060): buffer 4× (7680×4320, reduzido 4×4 na captura), sombra 8192 e GTAO com o dobro de amostras
+const QUALIDADES = {normal: {escala: 2, sombra: 4096, ao: 16}, alta: {escala: 4, sombra: 8192, ao: 32}};
+export const QUALIDADE = QUALIDADES[new URLSearchParams(location.search).get('q')] || QUALIDADES.normal;
 
 export const limitar = x => Math.max(0, Math.min(1, x));
 export const suave = x => { x = limitar(x); return x * x * (3 - 2 * x); };
@@ -75,8 +79,8 @@ function pintarCeu(sol, {zenite = 0x3D6EB4, horizonte = 0xC9D8E6, chao = 0xA79F9
 
 export function criarPalco({ceu = 0xD9E2EA, nevoa = null, solPos = [-40, 60, 30], nuvens = .5} = {}) {
   const renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true});
-  renderer.setPixelRatio(2);
-  renderer.setSize(LARGURA, ALTURA); // estilo 1920×1080 CSS, buffer 3840×2160: o print reduz e suaviza as bordas
+  renderer.setPixelRatio(QUALIDADE.escala);
+  renderer.setSize(LARGURA, ALTURA); // estilo 1920×1080 CSS, buffer 3840×2160 (alta: 7680×4320): o print reduz e suaviza as bordas
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NoToneMapping;
   renderer.shadowMap.enabled = true;
@@ -96,19 +100,19 @@ export function criarPalco({ceu = 0xD9E2EA, nevoa = null, solPos = [-40, 60, 30]
   const hemi = new THREE.HemisphereLight(0xCFDCEC, 0x8E7A62, .35);
   cena.add(hemi);
   sol.castShadow = true;
-  sol.shadow.mapSize.set(4096, 4096);
+  sol.shadow.mapSize.set(QUALIDADE.sombra, QUALIDADE.sombra);
   sol.shadow.bias = -.0002;
   sol.shadow.normalBias = .02;
   sol.shadow.radius = 4;
   Object.assign(sol.shadow.camera, {left: -60, right: 60, top: 60, bottom: -60, near: 1, far: 200});
   cena.add(sol, sol.target);
   const composer = new EffectComposer(renderer);
-  composer.setPixelRatio(2);
+  composer.setPixelRatio(QUALIDADE.escala);
   composer.setSize(LARGURA, ALTURA);
   composer.addPass(new RenderPass(cena, camera));
   const ao = new GTAOPass(cena, camera, LARGURA, ALTURA);
-  ao.updateGtaoMaterial({radius: .5, distanceExponent: 1.5, thickness: 1, scale: 1.2, samples: 16});
-  ao.updatePdMaterial({lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 4, rings: 2, samples: 16});
+  ao.updateGtaoMaterial({radius: .5, distanceExponent: 1.5, thickness: 1, scale: 1.2, samples: QUALIDADE.ao});
+  ao.updatePdMaterial({lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 4, rings: 2, samples: QUALIDADE.ao});
   composer.addPass(ao);
   composer.addPass(new OutputPass());
   return {THREE, renderer, cena, camera, sol, hemi, composer, ao};
