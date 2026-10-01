@@ -324,7 +324,7 @@ function boxMapping(m, L, macro, macroMap) {
 }
 
 // para materiais das cenas que emprestam um mapa do kit (a areia e a brita usam as normais do solo): o mesmo box mapping
-export function emMetros(m, tipo) { boxMapping(m, TIPOS[tipo].L, false, null); return m; }
+export function emMetros(m, tipo) { boxMapping(m, TIPOS[tipo].L, false, null); m.userData.emMetros = tipo; m.userData.ladrilho = TIPOS[tipo].L; return m; }
 
 const cache = {};
 // `repetir` fica na assinatura por compatibilidade, sem efeito: o tamanho do ladrilho é o real de cada tipo (TIPOS.L)
@@ -351,6 +351,7 @@ export function material(tipo, {repetir = 1} = {}) {
   // variação em grande escala (manchas de dezenas de metros) por cima do ladrilho: esconde a repetição do pasto e do solo
   const macro = d.macro ? textura(macroCanvas(d.macro, semente * 3 + 1), false) : null;
   boxMapping(m, d.L, !!d.macro, macro);
+  m.name = tipo; m.userData.tipo = tipo; m.userData.ladrilho = d.L;  // o exportador (cenas/exportar.py) leva o tipo para o Blender
   return (cache[tipo] = m);
 }
 function macroCanvas(variacao, semente) {
@@ -366,7 +367,7 @@ function macroCanvas(variacao, semente) {
 
 // uma árvore: tronco cônico e copa de sete esferas irregulares (icosaedros com vértices deslocados); `s` é a escala
 export function arvore(s = 1) {
-  const g = new THREE.Group();
+  const g = new THREE.Group(); g.userData.asset = 'arvore'; g.userData.escala = s;
   const tronco = new THREE.Mesh(new THREE.CylinderGeometry(.12 * s, .18 * s, 3 * s, 10), material('tronco'));
   tronco.position.y = 1.5 * s; tronco.castShadow = true; g.add(tronco);
   [[0, 3.6, 0, 1.5], [.6, 3.1, .3, 1.1], [-.5, 3.3, -.4, 1.2], [.2, 4.3, .5, 1.0], [-.7, 4.0, .4, .9], [.8, 3.8, -.6, .95], [-.2, 2.7, .8, .85]].forEach((f, i) => {
@@ -382,7 +383,7 @@ export function arvore(s = 1) {
 // vidro: reflete o céu (envMap) e deixa ver um interior escuro; sem transmissão física (cara no SwiftShader)
 export function vidro() {
   if (cache.vidro) return cache.vidro;
-  return (cache.vidro = new THREE.MeshPhysicalMaterial({color: 0x3A4A56, roughness: .06, metalness: 0, envMapIntensity: 1.6, clearcoat: 1, clearcoatRoughness: .04}));
+  return (cache.vidro = new THREE.MeshPhysicalMaterial({color: 0x3A4A56, roughness: .06, metalness: 0, envMapIntensity: 1.6, clearcoat: 1, clearcoatRoughness: .04, name: 'vidro'}));
 }
 
 const PRONTOS = [];
@@ -429,4 +430,6 @@ export function publicar(palco, cam, run) {
   window.__palco = palco;
   window.PRONTO = Promise.all(PRONTOS);
   window.renderCena = function (t) { run(t); cam(palco.camera, t); palco.composer.render(); };
+  // a pose sem desenhar (barata): o exportador para o Blender amostra os 24 quadros por segundo com ela
+  window.poseCena = function (t) { run(t); cam(palco.camera, t); palco.cena.updateMatrixWorld(true); };
 }

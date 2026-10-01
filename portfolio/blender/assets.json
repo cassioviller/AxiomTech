@@ -1,0 +1,18 @@
+{
+  "_": "Assets CC0 do Poly Haven (polyhaven.com) usados no render do Blender. Baixados por baixar_assets.py para assets/ (fora do git). Trocar um id aqui e rodar de novo.",
+  "resolucao": "2k",
+  "hdri": {"id": "kloofendal_48d_partly_cloudy_puresky", "resolucao": "4k"},
+  "texturas": {
+    "pasto": {"id": "aerial_grass_rock", "tom": "#5E7F3C", "_": "as gramas do Poly Haven são secas; o tom (matiz e saturação) é o verde do pasto do kit"},
+    "solo": "red_laterite_soil_stones",
+    "concreto": "concrete_floor_02",
+    "aco": "metal_plate",
+    "madeira": "weathered_brown_planks",
+    "telha": "corrugated_iron_02",
+    "tronco": "bark_brown_02",
+    "asfalto": "asphalt_04",
+    "assoalho": "wood_floor",
+    "porcelanato": "large_floor_tiles_02",
+    "tinta": "beige_wall_001"
+  }
+}

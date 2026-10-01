@@ -5,6 +5,8 @@ As cenas importam módulos ES: file:// não serve, então portfolio/ é servido 
 
 Uso: python3 portfolio/cenas/render.py --so sige
      python portfolio/cenas/render.py --gpu --qualidade alta --so modulares   (render local numa GPU; ver RENDER-LOCAL.md)
+     python portfolio/cenas/render.py --quadros <pasta> --so modulares         (só encoda: quadros q0000.png… já prontos,
+                                                                                p. ex. os do Blender; ver blender/LEIA-ME.md)
 Saídas: portfolio/cenas/saida/<caso>-mestre.mp4  mestre 1920×1080 crf 16 (ignorado pelo git)
         portfolio/site/video/v2-<caso>.mp4       1920×1080, 24 fps, H.264 High 4.0, GOP 4, sem áudio
         portfolio/site/video/v2-<caso>.webp      pôster = último quadro
@@ -177,6 +179,18 @@ def renderizar(pg, dur, mestre):
     print(f"{mestre.name}: {n} quadros", flush=True)
 
 
+def mestre_de_quadros(pasta, dur, mestre):
+    """Mestre a partir de quadros já renderizados (q0000.png… 1920×1080, um por quadro do vídeo); a pasta não é apagada."""
+    n = quadros(dur)
+    faltam = [k for k in range(n) if not (pasta / f"q{k:04d}.png").exists()]
+    if faltam:
+        sys.exit(f"{pasta}: faltam {len(faltam)} de {n} quadros (o primeiro: q{faltam[0]:04d}.png)")
+    mestre.parent.mkdir(parents=True, exist_ok=True)
+    ffmpeg("-framerate", str(FPS), "-i", str(pasta / "q%04d.png"), "-frames:v", str(n), "-vf", f"scale={LARGURA}:{ALTURA}:flags=lanczos",
+           "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-pix_fmt", "yuv420p", str(mestre))
+    print(f"{mestre.name}: {n} quadros de {pasta}", flush=True)
+
+
 def encode_web(mestre, destino, crf):
     ffmpeg("-i", str(mestre), "-c:v", "libx264", "-preset", "slow", "-crf", str(crf), "-g", "4", "-keyint_min", "4",
            "-sc_threshold", "0", "-bf", "0", "-pix_fmt", "yuv420p", "-profile:v", "high", "-level", "4.0",
@@ -223,6 +237,16 @@ def main():
     if qualidade not in ("normal", "alta"):
         sys.exit("--qualidade pede normal ou alta")
     gpu = "--gpu" in sys.argv
+    if "--quadros" in sys.argv:  # só encoda quadros já prontos; não abre o navegador
+        k = sys.argv.index("--quadros") + 1
+        if not i or k >= len(sys.argv):
+            sys.exit("--quadros <pasta> pede também --so <caso>")
+        caso, dur = casos[0], CENAS[casos[0]][1]
+        mestre = SAIDA / f"{caso}-quadros-mestre.mp4"
+        mestre_de_quadros(Path(sys.argv[k]).resolve(), dur, mestre)
+        publicar(caso, mestre, dur)
+        print("pronto:", WEB)
+        return
     sufixo = "" if qualidade == "normal" else f"-{qualidade}"  # quadros de qualidades diferentes nunca se misturam na retomada
     with servidor() as base, navegador(gpu) as nav:
         for caso in casos:

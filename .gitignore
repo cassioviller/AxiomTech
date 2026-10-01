@@ -17,3 +17,6 @@ portfolio/filme/saida/
 
 # mestres 1920×1080 das cenas do site v2 (a versão web fica em portfolio/site/video/)
 portfolio/cenas/saida/
+
+# assets CC0 do render no Blender (baixados por portfolio/blender/baixar_assets.py)
+portfolio/blender/assets/

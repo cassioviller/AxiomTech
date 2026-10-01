@@ -108,3 +108,9 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - **Sigilo:** nada de nome de cliente nem endereço legível; os prints do portal do SIGE usam tarjas opacas. Só assets CC0, com a origem anotada.
 - Testes: no PC basta `python portfolio/tests/check_v2.py --video`; os de cena (`--navegador`) foram calibrados no SwiftShader do Replit. `check_filme.py` falha desde a fase 2 (testa o filme antigo) — conhecido.
 - Histórico e decisões: este arquivo (de cima para baixo), `portfolio/revisao/CHANGELOG.md` (rodadas 8–15), specs e planos em `docs/superpowers/`.
+
+## 01/10/2026 (fim da tarde) — render realista, primeira etapa: código pronto para o piloto no PC
+- Decisões do Cássio: seguir o recomendado (Blender + Cycles na RTX 3060, operado pelo Claude Code; AV1 com H.264 de reserva).
+- Pronto e testado no Replit em CPU: `cenas/exportar.py`, `blender/baixar_assets.py`, `blender/montar.py`, `render.py --quadros`. **Roteiro do piloto: `portfolio/blender/LEIA-ME.md`** (fazer depois do passo 1 do bloco "PARA A SESSÃO NO PC", ou no lugar dele: o render do Blender substitui o do three.js).
+- Resultado do teste (caso 4, 960×540, 48 amostras, CPU): luz, sombras e chão convincentes; **os modelos continuam caixas** (caminhão, guindaste, árvores de esferas) — é o que falta para sair do ar de maquete. Próximos passos, na ordem: (1) piloto na GPU e tempo por quadro; (2) árvores e capim do Poly Haven no lugar das marcadas em `cena.json`; (3) luzes dos interiores; (4) chanfros e sujeira nos procedurais; (5) AV1 + H.264 em `<source>` (não feito: mexe no `clipes.js`/`v2.js`, que buscam o vídeo por `currentTime`, e precisa ser medido com os quadros novos).
+- No Replit o Blender só roda com `LD_LIBRARY_PATH` montado à mão (libX11, libSM, libICE… do nix); não está instalado de forma permanente. No PC é instalação normal.
