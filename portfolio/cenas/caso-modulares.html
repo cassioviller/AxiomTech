@@ -100,13 +100,14 @@ function caixa(frente) {
   }
   bloco(.06, 1.0, 1.1, -W / 2 - .04, .27 + 1.4, 0, g, vidro());
   bloco(.06, 1.0, 1.1, W / 2 + .04, .27 + 1.4, 0, g, vidro());
+  g.userData.asset = frente ? 'caixa-frente' : 'caixa-fundo';  // o render do Blender troca por modelo (objetos.py)
   cena.add(g); S.caixas.push(g); return g;
 }
 const caixa1 = caixa(true), caixa2 = caixa(false);
 caixa2.position.set(0, PIL, -1.5);
 S.repouso.caixa1 = [0, PIL, 1.5];
 
-// o telhado gambrel em kit (águas ao longo de z, frontões em x = ±2,95): o grupo fica parado sobre as duas caixas e cada
+// o telhado gambrel em kit (desenhado com os frontões em x = ±2,95 e montado girado 90°: frontões na frente e no fundo): o grupo fica parado sobre as duas caixas e cada
 // peça guarda dois poses locais, `ini` (deitada na pilha do kit, no chão ao lado da fundação) e `fim` (montada)
 const XQ = 1.68, HQ = (3 - XQ) * Math.tan(Math.PI / 3), HH = HQ + XQ * Math.tan(Math.PI / 6);
 S.telhado = new THREE.Group(); cena.add(S.telhado);
@@ -114,27 +115,33 @@ S.repouso.telhado = PIL + .27 + 2.85;
 S.telhado.position.y = S.repouso.telhado;
 function agua(z0, y0, z1, y1) {
   const L = Math.hypot(z1 - z0, y1 - y0), m = bloco(6.6, .16, L, 0, (y0 + y1) / 2, (z0 + z1) / 2, S.telhado, material('telha'));
+  m.userData.asset = 'agua';
   m.rotation.x = -Math.atan2(y1 - y0, z1 - z0); return m;
 }
 const frontao = new THREE.Shape();
 frontao.moveTo(-3, 0); frontao.lineTo(-XQ, HQ); frontao.lineTo(0, HH); frontao.lineTo(XQ, HQ); frontao.lineTo(3, 0); frontao.closePath();
 function pecaFrontao(s) {
   const f = new THREE.Mesh(new THREE.ExtrudeGeometry(frontao, {depth: .1, bevelEnabled: false}), material('papel'));
-  f.rotation.y = Math.PI / 2; f.position.set(s * 2.95, 0, 0); f.castShadow = f.receiveShadow = true; S.telhado.add(f); return f;
+  f.rotation.y = Math.PI / 2; f.position.set(s * 2.95, 0, 0); f.castShadow = f.receiveShadow = true; S.telhado.add(f);
+  f.userData.asset = 'frontao'; return f;
 }
 // ordem de montagem: os dois frontões, as duas águas de baixo, as duas de cima; a pilha tem a primeira peça em cima
 S.pecas = [pecaFrontao(-1), pecaFrontao(1), agua(-3.3, 0, -XQ, HQ), agua(3.3, 0, XQ, HQ), agua(-XQ, HQ, 0, HH), agua(XQ, HQ, 0, HH)];
 const PILHA = new THREE.Vector3(5.5, .02 - S.repouso.telhado, 4.6);  // local ao grupo: no chão, entre a fundação e a estrada, ao alcance da lança
 S.pecas.forEach((p, k) => {
-  const fim = {p: p.position.clone(), q: p.quaternion.clone()};
+  // montado, o telhado gira 90° em y: a cumeeira corre ao longo de z (frente → fundo), os frontões ficam sobre a fachada
+  // dos portões e sobre a de trás, e as águas caem para as laterais (x = ±3,3)
+  const GIRO = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+  const fim = {p: p.position.clone().applyQuaternion(GIRO), q: p.quaternion.clone().premultiply(GIRO)};
   const deitada = k < 2 ? new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)) : new THREE.Quaternion();
   const ini = {p: new THREE.Vector3(PILHA.x, PILHA.y + .08 + (5 - k) * .18, PILHA.z + (k < 2 ? HH / 2 : 0)), q: deitada};
-  p.userData = {ini, fim, montada: false};
+  p.userData = {ini, fim, montada: false, asset: p.userData.asset};
   p.position.copy(ini.p); p.quaternion.copy(ini.q);
 });
 
 // o caminhão (carreta comum): chassi, cabine, rodas; anda no eixo z sobre a estrada, cabine para +z
 S.caminhao = new THREE.Group(); S.caminhao.position.set(12, 0, -40); cena.add(S.caminhao);
+S.caminhao.userData.asset = 'caminhao';  // o render do Blender (--visual cinema) troca as caixas marcadas por modelos
 bloco(2.6, .5, 7.4, 0, 1.05, -.6, S.caminhao, material('acoPintado'));
 bloco(2.5, 2.2, 2.0, 0, 1.9, 3.9, S.caminhao, material('acoPintado'));
 bloco(2.3, .9, 1.9, 0, 2.7, 3.95, S.caminhao, vidro());
@@ -142,20 +149,20 @@ bloco(2.3, .9, 1.9, 0, 2.7, 3.95, S.caminhao, vidro());
 
 // o guindaste: base sobre rodas com patolas, torre que gira, lança que inclina, cabo, gancho e balancim (o acento)
 const G = S.guindaste;
-G.base = new THREE.Group(); G.base.position.set(5.5, 0, -6.5); cena.add(G.base);
+G.base = new THREE.Group(); G.base.position.set(5.5, 0, -6.5); cena.add(G.base); G.base.userData.asset = 'guindaste-base';
 bloco(4.6, .9, 2.4, 0, .95, 0, G.base, material('acoPintado'));
 [[-1.5, -1.3], [-1.5, 1.3], [1.5, -1.3], [1.5, 1.3]].forEach(w => { const r = cilindro(.6, .6, w[0], .6, w[1], G.base, material('plastico')); r.rotation.set(0, 0, Math.PI / 2); });
 [[-2.2, -1.5], [-2.2, 1.5], [2.2, -1.5], [2.2, 1.5]].forEach(o => { bloco(.3, .3, 1.3, o[0], .55, o[1] * .8, G.base, material('aco')); cilindro(.12, .7, o[0], .35, o[1] * 1.2, G.base, material('aco')); });
-G.torre = new THREE.Group(); G.torre.position.set(-.6, 1.4, 0); G.base.add(G.torre);
+G.torre = new THREE.Group(); G.torre.position.set(-.6, 1.4, 0); G.base.add(G.torre); G.torre.userData.asset = 'guindaste-torre';
 bloco(2.4, .9, 1.9, 0, .45, 0, G.torre, material('acoPintado'));
 bloco(1.2, 1.1, 1.4, -1.2, .55, .9, G.torre, vidro());
-G.lanca = new THREE.Group(); G.lanca.position.set(.6, .8, 0); G.torre.add(G.lanca);
+G.lanca = new THREE.Group(); G.lanca.position.set(.6, .8, 0); G.torre.add(G.lanca); G.lanca.userData.asset = 'guindaste-lanca';
 const L = 11.5;
 bloco(L, .5, .5, L / 2, 0, 0, G.lanca, material('aco'));
 bloco(L * .5, .36, .36, L * .9, 0, 0, G.lanca, material('aco'));
 G.ponta = new THREE.Object3D(); G.ponta.position.set(L, 0, 0); G.lanca.add(G.ponta);
 G.cabo = cilindro(.02, 1, 0, 0, 0, cena, material('aco'));
-G.gancho = new THREE.Group(); cena.add(G.gancho);
+G.gancho = new THREE.Group(); cena.add(G.gancho); G.gancho.userData.asset = 'gancho';
 bloco(.5, .35, .5, 0, 0, 0, G.gancho, material('acento'));
 bloco(6.2, .14, .14, 0, -.5, 0, G.gancho, material('aco'));
 const alvoLanca = new THREE.Vector3();
@@ -224,7 +231,7 @@ instancias(new THREE.BoxGeometry(.08, 2.3, .08), material('acoPintado'), postes)
 
 // contêiner de canteiro (escritório/almoxarifado) sobre blocos, com porta, janela, frisos, ar-condicionado e degrau
 {
-  const g = grupo(-14.5, -10, .12);
+  const g = grupo(-14.5, -10, .12); g.userData.asset = 'conteiner';
   [[-2.6, -1], [2.6, -1], [-2.6, 1], [2.6, 1]].forEach(b => bloco(.4, .3, .4, b[0], .15, b[1], g, material('concreto')));
   bloco(6, 2.6, 2.6, 0, .3 + 1.3, 0, g, material('acoPintado'));
   bloco(6.1, .06, 2.7, 0, 2.93, 0, g, MAT.zinco);
@@ -237,25 +244,25 @@ instancias(new THREE.BoxGeometry(.08, 2.3, .08), material('acoPintado'), postes)
 }
 // caixa d'água (tanque azul) sobre torre de madeira, e o banheiro químico junto ao tapume
 {
-  const g = grupo(-17.2, -5.8, .3);
+  const g = grupo(-17.2, -5.8, .3); g.userData.asset = 'caixa-dagua';
   [[-.6, -.6], [.6, -.6], [-.6, .6], [.6, .6]].forEach(p => bloco(.12, 3.2, .12, p[0], 1.6, p[1], g, material('madeira')));
   [[0, -.6, 0], [0, .6, 0], [-.6, 0, Math.PI / 2], [.6, 0, Math.PI / 2]].forEach(p => { const b = bloco(1.32, .08, .08, p[0], 1.5, p[1], g, material('madeira')); b.rotation.y = p[2]; });
   bloco(1.7, .08, 1.7, 0, 3.24, 0, g, material('madeira'));
   cilindro(.8, 1.3, 0, 3.28 + .65, 0, g, MAT.azul);
   const tampa = new THREE.Mesh(new THREE.ConeGeometry(.86, .18, 20), MAT.azul); tampa.position.y = 3.28 + 1.3 + .09; tampa.castShadow = true; g.add(tampa);
   cilindro(.03, 3.2, .7, 1.6, .5, g, material('plastico'));  // o tubo de descida
-  const b = grupo(-17, -1.5, .1);
+  const b = grupo(-17, -1.5, .1); b.userData.asset = 'banheiro';
   bloco(1.1, 2.3, 1.1, 0, 1.15, 0, b, MAT.azul); bloco(1.2, .08, 1.2, 0, 2.34, 0, b, material('papel'));
   bloco(.7, 1.9, .03, 0, 1.0, .56, b, material('plastico'));
 }
 // caçamba de entulho (perfil trapezoidal), dois tambores e a pilha de terra (no relevo) ao lado
 {
-  const g = grupo(-11.5, -5.8, .3);
+  const g = grupo(-11.5, -5.8, .3); g.userData.asset = 'cacamba';
   const perfil = new THREE.Shape(); perfil.moveTo(-.9, 0); perfil.lineTo(.9, 0); perfil.lineTo(1.25, 1.3); perfil.lineTo(-1.25, 1.3); perfil.closePath();
   const c = new THREE.Mesh(new THREE.ExtrudeGeometry(perfil, {depth: 1.5, bevelEnabled: false}), MAT.amarelo);
   c.position.set(0, .05, -.75); c.castShadow = c.receiveShadow = true; g.add(c);
   [[-.5, 1.2, -.2, .2], [.3, 1.15, .3, -.4], [0, 1.28, -.4, .9], [.6, 1.1, -.5, .1]].forEach(e => { const m = bloco(.5, .3, .4, e[0], e[1], e[2], g, material('concreto')); m.rotation.y = e[3]; });
-  [[-10.8, -8.4, MAT.azul], [-10.15, -8.0, material('acoPintado')]].forEach(t => cilindro(.29, .88, t[0], chao(t[0], t[1]) + .44, t[1], cena, t[2]));
+  [[-10.8, -8.4, MAT.azul, 'tambor-azul'], [-10.15, -8.0, material('acoPintado'), 'tambor-cinza']].forEach(t => { cilindro(.29, .88, t[0], chao(t[0], t[1]) + .44, t[1], cena, t[2]).userData.asset = t[3]; });
 }
 // paletes com material: um feixe de montantes de LSF, sacos de cimento e um volume sob lona azul, tudo amarrado
 function palete(x, z, ry) {
@@ -265,22 +272,22 @@ function palete(x, z, ry) {
   return g;
 }
 {
-  const g = palete(-7.5, -6.5, .2);  // montantes de LSF (perfis C de 3,00 m), duas camadas, cintados
+  const g = palete(-7.5, -6.5, .2); g.userData.asset = 'palete-lsf';  // montantes de LSF (perfis C de 3,00 m), duas camadas, cintados
   for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) bloco(.09, .09, 3.0, -.3 + i * .2, .175 + j * .1, 0, g, material('aco'));
   [-1, 1].forEach(s => bloco(.86, .26, .03, 0, .22, s * 1.05, g, material('plastico')));
-  const s = palete(-10.2, -3.6, -.15);  // sacos, três camadas cruzadas
+  const s = palete(-10.2, -3.6, -.15); s.userData.asset = 'palete-sacos';  // sacos, três camadas cruzadas
   for (let k = 0; k < 3; k++) for (let i = 0; i < 3; i++) { const m = bloco(.5, .13, .32, k % 2 ? -.32 + i * .32 : 0, .19 + k * .13, k % 2 ? 0 : -.32 + i * .32, s, MAT.saco); m.rotation.y = (k % 2 ? 0 : Math.PI / 2) + entre(-.08, .08); }
-  for (let k = 0; k < 5; k++) { const e = palete(-2.2, 10.2, .25 + entre(-.05, .05)); e.position.y += k * .13; e.position.x += entre(-.03, .03); }  // paletes vazios empilhados
+  for (let k = 0; k < 5; k++) { const e = palete(-2.2, 10.2, .25 + entre(-.05, .05)); e.userData.asset = 'palete'; e.position.y += k * .13; e.position.x += entre(-.03, .03); }  // paletes vazios empilhados
   const bl = [];  // blocos de concreto empilhados (3 × 2 × 3), levemente desalinhados
   for (let k = 0; k < 3; k++) for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) bl.push([-4.5 + i * .4 + entre(-.01, .01), chao(-4.5, 8.5) + .1 + k * .2, 8.5 + j * .2 + entre(-.01, .01), .3 + entre(-.02, .02), 1, 1, 1]);
-  instancias(new THREE.BoxGeometry(.39, .19, .19), material('concreto'), bl);
-  const l = palete(-5.2, -8.6, .5);  // volume sob a lona
+  instancias(new THREE.BoxGeometry(.39, .19, .19), material('concreto'), bl).userData.asset = 'bloco-concreto';
+  const l = palete(-5.2, -8.6, .5); l.userData.asset = 'palete-lona';  // volume sob a lona
   bloco(1.1, .8, .95, 0, .53, 0, l, MAT.lona);
   [-.35, .35].forEach(xx => bloco(.03, .82, .97, xx, .53, 0, l, material('plastico')));
 }
 // betoneira pequena (tambor amarelo inclinado sobre chassi com rodas), montes de areia e brita, baldes, pá e carrinho de mão
 {
-  const g = grupo(-5.6, -4.2, -.6);
+  const g = grupo(-5.6, -4.2, -.6); g.userData.asset = 'betoneira';
   [[-.45, .3], [.45, .3]].forEach(w => { const r = cilindro(.25, .1, w[0], .25, w[1], g, MAT.borracha); r.rotation.set(0, 0, Math.PI / 2); });
   cilindro(.03, 1.0, 0, .25, .3, g, material('aco'), true).rotation.set(0, 0, Math.PI / 2);
   [[-.35, .35], [.35, .35]].forEach(p => { const b = bloco(.06, .95, .06, p[0], .55, -.05, g, material('aco')); b.rotation.x = .35; });
@@ -289,12 +296,12 @@ function palete(x, z, ry) {
   const tambor = new THREE.Mesh(new THREE.LatheGeometry(pts, 20), MAT.amarelo); tambor.material.side = THREE.DoubleSide;
   tambor.position.set(0, .8, -.05); tambor.rotation.x = -.7; tambor.castShadow = tambor.receiveShadow = true; g.add(tambor);
   bloco(.3, .25, .3, 0, .5, -.45, g, material('plastico'));
-  const areia = new THREE.Mesh(new THREE.ConeGeometry(1.25, .78, 20), MAT.areia); areia.position.set(-7.2, chao(-7.2, -2.6) + .38, -2.6); areia.castShadow = areia.receiveShadow = true; cena.add(areia);
-  const brita = new THREE.Mesh(new THREE.ConeGeometry(1.1, .55, 20), MAT.brita); brita.position.set(-9.6, chao(-9.6, -1.4) + .27, -1.4); brita.castShadow = brita.receiveShadow = true; cena.add(brita);
-  const pa = grupo(-6.3, -3.2, .4); const cabo = cilindro(.016, 1.3, 0, .65, 0, pa, material('madeira')); cabo.rotation.x = -.55; bloco(.22, .28, .015, 0, .05, .0, pa, material('aco'));
+  const areia = new THREE.Mesh(new THREE.ConeGeometry(1.25, .78, 20), MAT.areia); areia.position.set(-7.2, chao(-7.2, -2.6) + .38, -2.6); areia.castShadow = areia.receiveShadow = true; cena.add(areia); areia.userData.asset = 'monte-areia';
+  const brita = new THREE.Mesh(new THREE.ConeGeometry(1.1, .55, 20), MAT.brita); brita.position.set(-9.6, chao(-9.6, -1.4) + .27, -1.4); brita.castShadow = brita.receiveShadow = true; cena.add(brita); brita.userData.asset = 'monte-brita';
+  const pa = grupo(-6.3, -3.2, .4); pa.userData.asset = 'pa'; const cabo = cilindro(.016, 1.3, 0, .65, 0, pa, material('madeira')); cabo.rotation.x = -.55; bloco(.22, .28, .015, 0, .05, .0, pa, material('aco'));
   pa.rotation.z = .15;
-  [[-4.6, -3.3, material('plastico')], [-4.25, -2.75, MAT.azul], [-4.4, -.2, material('plastico')]].forEach(b => { const m = new THREE.Mesh(new THREE.CylinderGeometry(.16, .13, .3, 16), b[2]); m.position.set(b[0], chao(b[0], b[1]) + .15, b[1]); m.castShadow = m.receiveShadow = true; cena.add(m); });
-  const cm = grupo(-4.9, -6.4, -.4);  // carrinho de mão: caçamba inclinada, roda, dois braços
+  [[-4.6, -3.3, material('plastico')], [-4.25, -2.75, MAT.azul], [-4.4, -.2, material('plastico')]].forEach(b => { const m = new THREE.Mesh(new THREE.CylinderGeometry(.16, .13, .3, 16), b[2]); m.position.set(b[0], chao(b[0], b[1]) + .15, b[1]); m.castShadow = m.receiveShadow = true; cena.add(m); m.userData.asset = b[2] === MAT.azul ? 'balde-azul' : 'balde-preto'; });
+  const cm = grupo(-4.9, -6.4, -.4); cm.userData.asset = 'carrinho';  // carrinho de mão: caçamba inclinada, roda, dois braços
   const cuba = bloco(.6, .32, .8, 0, .45, 0, cm, material('acoPintado')); cuba.rotation.x = .12;
   const roda = cilindro(.18, .08, 0, .18, .5, cm, MAT.borracha); roda.rotation.set(0, 0, Math.PI / 2);
   [-.25, .25].forEach(xx => { const b = bloco(.04, .04, 1.4, xx, .35, -.2, cm, material('aco')); b.rotation.x = .18; });
@@ -302,7 +309,7 @@ function palete(x, z, ry) {
 // andaime tubular pequeno com plataforma na ponta oeste da fundação, caixa de ferramentas ao lado e escada encostada na
 // face leste da caixa 2 (a escala humana da obra)
 {
-  const g = grupo(-4.9, 1.5, .1), tubo = new THREE.CylinderGeometry(.025, .025, 1, 8);
+  const g = grupo(-4.9, 1.5, .1); g.userData.asset = 'andaime'; const tubo = new THREE.CylinderGeometry(.025, .025, 1, 8);
   [[-.6, -.4], [.6, -.4], [-.6, .4], [.6, .4]].forEach(p => { const m = new THREE.Mesh(tubo, material('aco')); m.scale.y = 2.0; m.position.set(p[0], 1.0, p[1]); m.castShadow = true; g.add(m); });
   [.45, .95, 1.45, 1.95].forEach(y => {
     [-.4, .4].forEach(zz => { const m = new THREE.Mesh(tubo, material('aco')); m.scale.y = 1.2; m.rotation.z = Math.PI / 2; m.position.set(0, y, zz); m.castShadow = true; g.add(m); });
@@ -310,7 +317,7 @@ function palete(x, z, ry) {
   });
   bloco(1.25, .04, .85, 0, 1.5, 0, g, material('madeira', {repetir: 3}));
   bloco(.62, .3, .28, -.2, .15, -1.0, g, material('vermelho')); bloco(.3, .03, .03, -.2, .32, -1.0, g, material('aco'));  // a caixa de ferramentas
-  const e = grupo(4.1, -2.3, 0); e.rotation.z = .32;  // a escada: pé a 1,1 m da parede, topo a 3,2 m
+  const e = grupo(4.1, -2.3, 0); e.rotation.z = .32; e.userData.asset = 'escada';  // a escada: pé a 1,1 m da parede, topo a 3,2 m
   [-.19, .19].forEach(xx => bloco(.04, 3.4, .04, xx, 1.7, 0, e, material('aco')));
   for (let i = 0; i < 10; i++) bloco(.38, .03, .03, 0, .3 + i * .32, 0, e, material('aco'));
 }
@@ -321,11 +328,12 @@ function palete(x, z, ry) {
   const cones = [], faixas = [], bases = [];
   lista.forEach(c => { const y = chao(c[0], c[1]), r = entre(0, Math.PI), s = entre(.95, 1.05);
     bases.push([c[0], y + .015, c[1], r, 1, 1, 1]); cones.push([c[0], y + .03 + .31 * s, c[1], r, s, s, s]); faixas.push([c[0], y + .03 + .38 * s, c[1], r, s, s, s]); });
-  instancias(cone, material('vermelho'), cones); instancias(faixa, material('papel'), faixas); instancias(base, material('plastico'), bases);
+  instancias(cone, material('vermelho'), cones).userData.asset = 'cone'; instancias(faixa, material('papel'), faixas).userData.asset = 'cone-faixa';
+  instancias(base, material('plastico'), bases).userData.asset = 'cone-base';
 }
 // a picape branca do engenheiro estacionada no acostamento da estrada, e uma placa de obra lisa (faixa azul) na entrada
 {
-  const g = grupo(17.8, -9, Math.PI + .06);
+  const g = grupo(17.8, -9, Math.PI + .06); g.userData.asset = 'picape';
   bloco(1.85, .55, 5.0, 0, .78, 0, g, material('papel'));
   bloco(1.8, .35, 1.3, 0, 1.2, 1.85, g, material('papel'));               // o capô
   bloco(1.78, .72, 1.7, 0, 1.4, .55, g, material('papel'));               // a cabine
@@ -335,7 +343,7 @@ function palete(x, z, ry) {
   bloco(1.85, .5, .05, 0, 1.3, -2.5, g, material('papel'));               // a tampa traseira
   bloco(1.9, .2, .25, 0, .5, 2.55, g, material('plastico')); bloco(1.9, .2, .25, 0, .5, -2.55, g, material('plastico'));
   [[-.85, 1.6], [.85, 1.6], [-.85, -1.6], [.85, -1.6]].forEach(w => { const r = cilindro(.36, .26, w[0], .36, w[1], g, MAT.borracha); r.rotation.set(0, 0, Math.PI / 2); });
-  const p = grupo(6.3, 15.4, Math.PI / 2);
+  const p = grupo(6.3, 15.4, Math.PI / 2); p.userData.asset = 'placa-obra';
   [-1.05, 1.05].forEach(xx => bloco(.08, 2.7, .08, xx, 1.35, 0, p, material('madeira')));
   bloco(2.3, 1.35, .03, 0, 2.0, .05, p, material('papel')); bloco(2.3, .26, .012, 0, 2.5, .07, p, MAT.azul);
 }
@@ -344,8 +352,9 @@ function palete(x, z, ry) {
   const POSTES = [[22.5, -38], [22.5, -22], [22.5, -6], [22.5, 10], [22.5, 26]];
   POSTES.forEach(p => {
     const m = new THREE.Mesh(new THREE.CylinderGeometry(.12, .2, 9, 12), material('concreto')); m.position.set(p[0], 4.5, p[1]); m.castShadow = m.receiveShadow = true; cena.add(m);
-    const cz = bloco(1.7, .1, .12, p[0], 8.55, p[1], cena, material('madeira'));
-    [-.6, .6].forEach(dx => cilindro(.05, .14, p[0] + dx, 8.67, p[1], cena, material('papel')));
+    m.userData.asset = 'poste';
+    bloco(1.7, .1, .12, p[0], 8.55, p[1], cena, material('madeira')).userData.asset = 'poste-cruzeta';
+    [-.6, .6].forEach(dx => { cilindro(.05, .14, p[0] + dx, 8.67, p[1], cena, material('papel')).userData.asset = 'poste-isolador'; });
   });
   for (let i = 0; i + 1 < POSTES.length; i++) [-.6, .6].forEach(dx => {
     const a = new THREE.Vector3(POSTES[i][0] + dx, 8.74, POSTES[i][1]), b = new THREE.Vector3(POSTES[i + 1][0] + dx, 8.74, POSTES[i + 1][1]);
@@ -363,7 +372,7 @@ function palete(x, z, ry) {
     [.42, .78, 1.12].forEach(y => fios.push([(x0 + x1) / 2, y, (z0 + z1) / 2, ang, L, 1, 1]));
   }
   cerca(-27, -26, 8, -26); cerca(16, -26, 58, -26); cerca(-27, -26, -27, 34);
-  instancias(new THREE.BoxGeometry(.11, 1.3, .11), material('madeira'), mouroes);
+  instancias(new THREE.BoxGeometry(.11, 1.3, .11), material('madeira'), mouroes).userData.asset = 'mourao';
   instancias(new THREE.BoxGeometry(1, .012, .012), material('aco'), fios);
 }
 // pedras e moitas espalhadas pelo pasto (fora da praça, da estrada e das árvores), com tamanho e rotação variados
@@ -376,7 +385,7 @@ function palete(x, z, ry) {
   const irregular = (det, f) => { const g = new THREE.IcosahedronGeometry(1, det), pos = g.attributes.position;
     for (let k = 0; k < pos.count; k++) { const r = 1 + f * Math.sin(9.1 * k) * Math.cos(5.3 * k); pos.setXYZ(k, pos.getX(k) * r, pos.getY(k) * r, pos.getZ(k) * r); }
     g.computeVertexNormals(); return g; };
-  instancias(irregular(1, .15), MAT.brita, pedras);
+  instancias(irregular(1, .15), MAT.brita, pedras).userData.asset = 'pedra';
   instancias(irregular(2, .28), material('folha', {repetir: 2}), moitas);
 }
 
@@ -428,6 +437,8 @@ publicar(palco, cam, t => {
   const x = lerp(noCaminhao.x, lugar1.x, anda), z = lerp(noCaminhao.z + S.caminhao.position.z, lugar1.z, anda);
   const y = t < 2.4 ? noCaminhao.y : lerp(lerp(noCaminhao.y, 7.2, sobe), lugar1.y, desce);
   caixa1.position.set(t < 2.4 ? noCaminhao.x : x, y, t < 2.4 ? noCaminhao.z + S.caminhao.position.z : z);
+  // no caminhão a caixa viaja no comprido (6,00 m ao longo da carreta, portão para a câmera); o guindaste a gira 90° enquanto atravessa
+  caixa1.rotation.y = Math.PI / 2 * (1 - suave(anda));
   // o telhado: as peças saem da pilha e assentam uma a uma (6,6 → 9,0); `carga` é o ponto que o gancho segura
   const carga = montarTelhado(t);
   // o guindaste aponta para o caminhão, depois para a caixa enquanto a iça (2,4 → 5,0), depois para cada peça do

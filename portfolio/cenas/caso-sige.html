@@ -68,6 +68,7 @@ function pecasLSF(compr, alt) {
 }
 function painelLSF(compr, alt, pai) {
   const g = new THREE.Group(); pai.add(g);
+  g.userData.asset = `painel-lsf:${compr}:${alt}`;  // o render do Blender troca por perfis C e U de verdade
   pecasLSF(compr, alt).forEach(p => perfil(...p, g));
   return g;
 }
@@ -163,7 +164,7 @@ function galpao(x0, comPilares) {
     d.position.set(-COMPR / 2 + (k + .5) * passo, .18, -LARG / 2 + .15); S.divisorias.push(d);
   }
   if (comPilares) for (let k = 0; k <= N_BAIAS; k += 2)
-    [-LARG / 2 + .3, LARG / 2 - .3].forEach(z => perfil(.25, H_PILAR, .25, -COMPR / 2 + k * passo, .18 + H_PILAR / 2, z, G, material('acoPintado')));
+    [-LARG / 2 + .3, LARG / 2 - .3].forEach(z => { perfil(.25, H_PILAR, .25, -COMPR / 2 + k * passo, .18 + H_PILAR / 2, z, G, material('acoPintado')).userData.asset = 'pilar'; });
   S.galpoes.push(G);
   return fundo;
 }
@@ -178,8 +179,8 @@ for (let i = 0; i < 6; i++) perfil(6, .09, .09, 0, .05 + i * .1, 9 + (i % 2) * .
 for (let i = 0; i < 8; i++) { const f = perfil(6, .09, .09, 41 + (i % 2) * .12, .05 + Math.floor(i / 2) * .1, 6 + (i % 2) * .5, cena); f.rotation.y = Math.PI / 2 + .15; }
 const cone = material('acento');
 [[2, 10.5], [3.2, 12.5], [4.4, 14.5], [5.6, 16.5], [-2.2, 14.8], [8.2, 22.5], [-6.2, 27.5]].forEach(p => {
-  const c = new THREE.Mesh(new THREE.ConeGeometry(.22, .7, 16), cone); c.position.set(p[0], .37, p[1]); c.rotation.y = rnd(); c.castShadow = true; cena.add(c);
-  const base = perfil(.5, .03, .5, p[0], .015, p[1], cena, LOCAL.borracha); base.rotation.y = c.rotation.y;
+  const c = new THREE.Mesh(new THREE.ConeGeometry(.22, .7, 16), cone); c.position.set(p[0], .37, p[1]); c.rotation.y = rnd(); c.castShadow = true; cena.add(c); c.userData.asset = 'cone-sige';  // o render do Blender troca por modelo
+  const base = perfil(.5, .03, .5, p[0], .015, p[1], cena, LOCAL.borracha); base.rotation.y = c.rotation.y; base.userData.asset = 'cone-sige-base';
 });
 
 // painéis em kit deitados sobre calços de madeira (pilhas perto de cada galpão), os do caminhão, e os montantes soltos:
@@ -236,11 +237,12 @@ function monte(x, z, r, h, mat) {
     pos.setXYZ(k, x * f, Math.max(-.05, y) * f, z * f);
   }
   geo.computeVertexNormals();
-  const m = new THREE.Mesh(geo, mat); m.scale.set(r, h, r * .85); m.position.set(x, .02, z); m.rotation.y = rnd() * 6; m.castShadow = m.receiveShadow = true; cena.add(m); return m;
+  const m = new THREE.Mesh(geo, mat); m.scale.set(r, h, r * .85); m.position.set(x, .02, z); m.rotation.y = rnd() * 6; m.castShadow = m.receiveShadow = true; cena.add(m);
+  m.userData.asset = mat === LOCAL.areia ? 'monte-areia-sige' : 'monte-brita-sige'; return m;
 }
 monte(-6.6, 9.8, 1.7, 1.0, LOCAL.areia); monte(-9.6, 8.6, 1.4, .8, LOCAL.brita); monte(35, 20, 2.2, 1.1, LOCAL.brita);
 { // betoneira: tambor inclinado sobre o chassi de duas rodas, motor ao lado
-  const b = new THREE.Group(); b.position.set(-4.2, 0, 12.6); b.rotation.y = -.5; cena.add(b);
+  const b = new THREE.Group(); b.position.set(-4.2, 0, 12.6); b.rotation.y = -.5; cena.add(b); b.userData.asset = 'betoneira-sige';
   perfil(1.1, .08, .08, 0, .45, 0, b, material('acoPintado')); perfil(.08, .08, 1.0, 0, .45, 0, b, material('acoPintado'));
   [[-.55, .35], [.55, .35]].forEach(w => { const r = cilindro(.22, .1, w[0], .22, -.25, b, LOCAL.borracha); r.rotation.z = Math.PI / 2; });
   [[-.5, 0], [.5, 0]].forEach(p => perfil(.06, .9, .06, p[0], .9, .2, b, material('acoPintado')));
@@ -250,18 +252,18 @@ monte(-6.6, 9.8, 1.7, 1.0, LOCAL.areia); monte(-9.6, 8.6, 1.4, .8, LOCAL.brita);
   perfil(.4, .3, .35, .4, .3, .35, b, material('acoPintado'));
 }
 { // carrinho de mão: caçamba de chapa, roda dianteira, duas pernas e os cabos
-  const c = new THREE.Group(); c.position.set(-3.2, 0, 15); c.rotation.y = 2.2; cena.add(c);
+  const c = new THREE.Group(); c.position.set(-3.2, 0, 15); c.rotation.y = 2.2; cena.add(c); c.userData.asset = 'carrinho-sige';
   const cac = perfil(.6, .3, .8, 0, .45, 0, c, material('acoPintado')); cac.rotation.x = .1;
   const r = cilindro(.18, .06, 0, .18, .55, c, LOCAL.borracha); r.rotation.z = Math.PI / 2;
   [-.25, .25].forEach(x => { perfil(.03, .03, 1.5, x, .35, -.1, c, material('acoPintado')); perfil(.03, .3, .03, x, .15, -.5, c, material('acoPintado')); });
 }
 for (let i = 0; i < 6; i++) { // baldes de plástico
   const b = cilindro(.14, .3, entre(-6.2, -4.6), .15, entre(14, 15.4), cena, i < 4 ? material('plastico') : LOCAL.pvc, .11);
-  b.rotation.y = rnd() * 3;
+  b.rotation.y = rnd() * 3; b.userData.asset = i < 4 ? 'balde-sige-preto' : 'balde-sige-pvc';
 }
 [[-10.5, 16, LOCAL.azul], [-11.2, 16.4, LOCAL.azul], [-10.2, 16.8, material('acoPintado')], [-11.4, 17.2, LOCAL.azul]].forEach(t => {
-  cilindro(.29, .88, t[0], .44, t[1], cena, t[2]);
-  cilindro(.3, .03, t[0], .87, t[1], cena, material('aco')); cilindro(.3, .03, t[0], .3, t[1], cena, material('aco'));
+  cilindro(.29, .88, t[0], .44, t[1], cena, t[2]).userData.asset = t[2] === LOCAL.azul ? 'tambor-sige-azul' : 'tambor-sige-cinza';
+  cilindro(.3, .03, t[0], .87, t[1], cena, material('aco')).userData.asset = 'tambor-aro'; cilindro(.3, .03, t[0], .3, t[1], cena, material('aco')).userData.asset = 'tambor-aro';
 });
 
 // vala cercada: estacas de madeira com fita zebrada em volta da escavação (com a terra retirada ao lado)
@@ -281,7 +283,7 @@ for (let i = 0; i < 6; i++) { // baldes de plástico
 
 // caixa d'água elevada (torre de aço, reservatório azul) com a descida de PVC; gerador a diesel com cabo até o escritório
 {
-  const t = new THREE.Group(); t.position.set(-6.5, 0, 17.5); cena.add(t);
+  const t = new THREE.Group(); t.position.set(-6.5, 0, 17.5); cena.add(t); t.userData.asset = 'caixa-dagua-sige';
   [[-.6, -.6], [.6, -.6], [-.6, .6], [.6, .6]].forEach(p => perfil(.1, 3.2, .1, p[0], 1.6, p[1], t, material('acoPintado')));
   [[0, 1.2], [0, 2.3]].forEach(h => { perfil(1.3, .06, .06, 0, h[1], -.6, t, material('acoPintado')); perfil(1.3, .06, .06, 0, h[1], .6, t, material('acoPintado')); perfil(.06, .06, 1.3, -.6, h[1], 0, t, material('acoPintado')); perfil(.06, .06, 1.3, .6, h[1], 0, t, material('acoPintado')); });
   perfil(1.5, .08, 1.5, 0, 3.24, 0, t, material('madeira'));
@@ -291,7 +293,7 @@ for (let i = 0; i < 6; i++) { // baldes de plástico
   desce.castShadow = vai.castShadow = true;
 }
 {
-  const g = new THREE.Group(); g.position.set(5.6, 0, 16.4); g.rotation.y = .3; cena.add(g);
+  const g = new THREE.Group(); g.position.set(5.6, 0, 16.4); g.rotation.y = .3; cena.add(g); g.userData.asset = 'gerador';
   perfil(1.4, .12, .8, 0, .06, 0, g, material('acoPintado'));
   perfil(1.2, .8, .7, 0, .52, 0, g, LOCAL.verdeMaquina);
   cilindro(.04, .5, .4, 1.1, 0, g, material('aco'));
@@ -304,18 +306,18 @@ for (let i = 0; i < 6; i++) { // baldes de plástico
 
 // banheiro químico, contêiner-almoxarifado e caçamba de entulho
 {
-  const b = new THREE.Group(); b.position.set(-7.5, 0, 24.5); b.rotation.y = .25; cena.add(b);
+  const b = new THREE.Group(); b.position.set(-7.5, 0, 24.5); b.rotation.y = .25; cena.add(b); b.userData.asset = 'banheiro-sige';
   perfil(1.1, 2.3, 1.1, 0, 1.15, 0, b, LOCAL.azul); perfil(1.16, .1, 1.16, 0, 2.32, 0, b, LOCAL.pvc);
   perfil(.7, 1.9, .03, 0, 1.05, .56, b, LOCAL.azulEscuro); cilindro(.04, .5, .4, 2.5, -.35, b, LOCAL.pvc);
 }
 {
-  const c = perfil(6, 2.55, 2.4, -41, 1.35, 21, cena, LOCAL.azulEscuro); c.rotation.y = .1;
+  const c = perfil(6, 2.55, 2.4, -41, 1.35, 21, cena, LOCAL.azulEscuro); c.rotation.y = .1; c.userData.asset = 'conteiner-sige';
   [[-3.01, 0], [3.01, 0]].forEach(p => { const porta = perfil(.04, 2.2, 2.1, p[0], 0, 0, c, material('acoPintado')); porta.castShadow = false; });
   [[-1.5, -1.2], [1.5, -1.2], [-1.5, 1.2], [1.5, 1.2]].forEach(p => perfil(.6, .45, .12, p[0], .2, p[1], c, material('acoPintado')));  // vigas do chão
   perfil(6.1, .1, 2.5, 0, -1.3, 0, c, material('acoPintado'));
 }
 {
-  const c = new THREE.Group(); c.position.set(38, 0, 25.5); c.rotation.y = -.2; cena.add(c);
+  const c = new THREE.Group(); c.position.set(38, 0, 25.5); c.rotation.y = -.2; cena.add(c); c.userData.asset = 'cacamba-sige';
   perfil(3.4, .12, 1.9, 0, .3, 0, c, LOCAL.azulEscuro);
   [[-1.7, 0, .1, 1.5, 1.9], [1.7, 0, .1, 1.5, 1.9]].forEach(w => perfil(w[2], w[3], w[4], w[0], .3 + w[3] / 2, w[1], c, LOCAL.azulEscuro));
   [[0, -.95], [0, .95]].forEach(w => perfil(3.4, 1.5, .1, w[0], 1.05, w[1], c, LOCAL.azulEscuro));
@@ -329,7 +331,7 @@ function roda(r, w, x, y, z, pai) {
   const c = cilindro(r * .55, w + .02, 0, 0, 0, p, material('aco'), r * .55, 12); c.castShadow = false;
 }
 {
-  const v = new THREE.Group(); v.position.set(12.5, 0, 27); v.rotation.y = 1.15; cena.add(v);
+  const v = new THREE.Group(); v.position.set(12.5, 0, 27); v.rotation.y = 1.15; cena.add(v); v.userData.asset = 'caminhonete';
   perfil(1.9, .62, 5.2, 0, .7, 0, v, LOCAL.pinturaBranca);            // carroceria: da soleira ao capô
   perfil(1.9, .3, 1.85, 0, 1.16, .05, v, LOCAL.pinturaBranca);        // as portas
   perfil(1.76, .46, 1.7, 0, 1.52, .05, v, vidro());                     // os vidros da cabine
@@ -341,7 +343,7 @@ function roda(r, w, x, y, z, pai) {
   [[-.9, 1.7], [.9, 1.7], [-.9, -1.6], [.9, -1.6]].forEach(w => roda(.38, .24, w[0], .38, w[1], v));
 }
 {
-  const c = new THREE.Group(); c.position.set(29.5, 0, 28); c.rotation.y = Math.PI + .12; cena.add(c);
+  const c = new THREE.Group(); c.position.set(29.5, 0, 28); c.rotation.y = Math.PI + .12; cena.add(c); c.userData.asset = 'caminhao-sige';
   perfil(1.0, .3, 8.2, 0, .72, -.6, c, material('acoPintado'));
   perfil(2.45, 2.2, 2.1, 0, 1.95, 3.6, c, LOCAL.pinturaBranca);
   perfil(2.3, .85, .06, 0, 2.55, 4.68, c, vidro()); perfil(1.3, .55, .06, 0, 2.55, 2.53, c, vidro());
@@ -365,7 +367,7 @@ function roda(r, w, x, y, z, pai) {
   const mouroes = [];
   for (let x = -120; x <= 120; x += 3) if (Math.abs(x - 30) > 2.5) mouroes.push({p: [x, .8, 36], s: [1, 1, 1], r: [entre(-.03, .03), 0, entre(-.03, .03)]});
   for (let z = 33; z >= -120; z -= 3) mouroes.push({p: [60, .8, z], s: [1, 1, 1], r: [entre(-.03, .03), 0, entre(-.03, .03)]});
-  instancias(new THREE.CylinderGeometry(.06, .075, 1.7, 8), material('madeira'), mouroes);
+  instancias(new THREE.CylinderGeometry(.06, .075, 1.7, 8), material('madeira'), mouroes).userData.asset = 'mourao-sige';
   const fios = [];
   [.4, .75, 1.1, 1.45].forEach(y => { fios.push({p: [0, y, 36], s: [240, .012, .012]}); fios.push({p: [60, y, -42], s: [.012, .012, 156]}); });
   instancias(new THREE.BoxGeometry(1, 1, 1), material('aco'), fios).castShadow = false;
@@ -409,7 +411,7 @@ instancias(new THREE.BoxGeometry(1, 1, 1), material('madeira'), madeira);
 {
   const corpo = new THREE.IcosahedronGeometry(1, 1);
   [[-66, -66, .3], [-58, -70, 2.4], [-50, -62, 1.1], [-74, -58, 3.6], [-44, -74, .8], [-80, -70, 1.9]].forEach(v => {
-    const b = new THREE.Group(); b.position.set(v[0], 0, v[1]); b.rotation.y = v[2]; cena.add(b);
+    const b = new THREE.Group(); b.position.set(v[0], 0, v[1]); b.rotation.y = v[2]; cena.add(b); b.userData.asset = 'boi';
     const c = new THREE.Mesh(corpo, LOCAL.couro); c.scale.set(.6, .55, 1.1); c.position.y = 1.15; c.castShadow = true; b.add(c);
     const cupim = new THREE.Mesh(corpo, LOCAL.couro); cupim.scale.set(.3, .25, .35); cupim.position.set(0, 1.55, .65); b.add(cupim);
     const cab = new THREE.Mesh(corpo, LOCAL.couro); cab.scale.set(.24, .3, .4); cab.position.set(0, .95, 1.3); cab.castShadow = true; b.add(cab);
@@ -425,10 +427,10 @@ perfil(5.4, .06, 4.4, 0, 2.73, 0, E, material('telha'));
 [-1.9, 0, 1.9].forEach(z => perfil(5.4, .08, .08, 0, 2.66, z, E, material('acoPintado')));  // terças da cobertura
 const paredeE = perfil(5, 2.6, .08, 0, 1.36, -1.95, E, material('papel'));
 paredeE.castShadow = false;
-perfil(1.6, .05, .8, 0, .75, -.9, E, material('madeira'));
-[[-.72, -1.22], [.72, -1.22], [-.72, -.58], [.72, -.58]].forEach(p => perfil(.05, .72, .05, p[0], .37, p[1], E, material('acoPintado')));
+perfil(1.6, .05, .8, 0, .75, -.9, E, material('madeira')).userData.asset = 'mesa-tampo';
+[[-.72, -1.22], [.72, -1.22], [-.72, -.58], [.72, -.58]].forEach(p => { perfil(.05, .72, .05, p[0], .37, p[1], E, material('acoPintado')).userData.asset = 'mesa-perna'; });
 // notebook: base e tampa aberta 15° para trás; a tela (0,32 × 0,20) na face da frente da tampa
-const note = new THREE.Group(); note.position.set(0, .775, -.85); E.add(note);
+const note = new THREE.Group(); note.position.set(0, .775, -.85); E.add(note); note.userData.asset = 'notebook-aberto';
 perfil(.34, .018, .24, 0, .009, 0, note, material('plastico'));
 const tampa = new THREE.Group(); tampa.position.set(0, .018, -.12); tampa.rotation.x = -THREE.MathUtils.degToRad(15); note.add(tampa);
 perfil(.34, .23, .008, 0, .115, 0, tampa, material('plastico'));
@@ -445,32 +447,32 @@ documento('../site/docs/sige-portal.webp').then(tx => { S.tela.material.map = tx
 // o quadro de cortiça entre as folhas, com folhas lisas presas por percevejos; o cabo do notebook até a tomada; a cadeira,
 // o capacete, a garrafa térmica, a caneca, o rolo de plantas na mesa; o galão de água e a caixa térmica no chão
 {
-  perfil(.9, .66, .02, 0, 1.36, -1.9, E, LOCAL.cortica);
-  perfil(.9, .03, .03, 0, 1.7, -1.895, E, material('madeira')); perfil(.9, .03, .03, 0, 1.02, -1.895, E, material('madeira'));
-  perfil(.03, .66, .03, -.45, 1.36, -1.895, E, material('madeira')); perfil(.03, .66, .03, .45, 1.36, -1.895, E, material('madeira'));
+  perfil(.9, .66, .02, 0, 1.36, -1.9, E, LOCAL.cortica).userData.asset = 'cortica-sige';
+  perfil(.9, .03, .03, 0, 1.7, -1.895, E, material('madeira')).userData.asset = 'cortica-extra'; perfil(.9, .03, .03, 0, 1.02, -1.895, E, material('madeira')).userData.asset = 'cortica-extra';
+  perfil(.03, .66, .03, -.45, 1.36, -1.895, E, material('madeira')).userData.asset = 'cortica-extra'; perfil(.03, .66, .03, .45, 1.36, -1.895, E, material('madeira')).userData.asset = 'cortica-extra';
   [[-.28, 1.45, 0], [.0, 1.4, 1], [.27, 1.47, 0], [-.12, 1.15, 2], [.22, 1.14, 0]].forEach(f => {
-    const folha = perfil(f[2] === 1 ? .29 : .21, f[2] === 1 ? .21 : .28, .004, f[0], f[1], -1.885, E, material('papel')); folha.rotation.z = entre(-.06, .06); folha.castShadow = false;
-    cilindro(.006, .006, f[0], f[1] + .1, -1.88, E, f[2] === 2 ? LOCAL.azul : LOCAL.amarelo, .006, 8);
+    const folha = perfil(f[2] === 1 ? .29 : .21, f[2] === 1 ? .21 : .28, .004, f[0], f[1], -1.885, E, material('papel')); folha.rotation.z = entre(-.06, .06); folha.castShadow = false; folha.userData.asset = 'cortica-extra';
+    cilindro(.006, .006, f[0], f[1] + .1, -1.88, E, f[2] === 2 ? LOCAL.azul : LOCAL.amarelo, .006, 8).userData.asset = 'cortica-extra';
   });
   const trilho = new THREE.CatmullRomCurve3([[.16, .79, -.96], [.2, .78, -1.2], [.3, .7, -1.3], [.5, .2, -1.55], [-.3, .08, -1.7], [-1.45, .1, -1.85], [-1.5, .3, -1.9]].map(p => new THREE.Vector3(...p)));
   const cabo = new THREE.Mesh(new THREE.TubeGeometry(trilho, 40, .006, 5), LOCAL.borracha); cabo.castShadow = true; E.add(cabo);
   perfil(.1, .08, .03, -1.5, .34, -1.9, E, LOCAL.pvc);  // a tomada na parede
   perfil(.3, .04, .07, -.3, .14, -1.7, E, LOCAL.pvc);   // a régua de tomadas no chão
   perfil(.2, .028, .06, .55, .8, -.7, E, material('plastico'));  // o carregador
-  const cad = new THREE.Group(); cad.position.set(.95, 0, -.35); cad.rotation.y = -.7; E.add(cad);
+  const cad = new THREE.Group(); cad.position.set(.95, 0, -.35); cad.rotation.y = -.7; E.add(cad); cad.userData.asset = 'cadeira-plastica';
   perfil(.44, .04, .44, 0, .47, 0, cad, material('plastico')); perfil(.44, .38, .03, 0, .78, -.2, cad, material('plastico'));
   [[-.19, -.19], [.19, -.19], [-.19, .19], [.19, .19]].forEach(p => perfil(.03, .46, .03, p[0], .23, p[1], cad, material('acoPintado')));
   [-.2, .2].forEach(x => perfil(.03, .45, .03, x, .72, -.2, cad, material('acoPintado')));
   const cap = new THREE.Mesh(new THREE.SphereGeometry(.14, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), LOCAL.pinturaBranca);
-  cap.position.set(-.55, .78, -1.0); cap.rotation.y = .6; cap.castShadow = true; E.add(cap);
-  const aba = cilindro(.17, .012, -.55, .785, -1.0, E, LOCAL.pinturaBranca, .17, 20); aba.scale.z = 1.15;
-  cilindro(.05, .3, .5, .93, -1.15, E, material('aco'), .045, 16); cilindro(.045, .05, .5, 1.1, -1.15, E, material('plastico'), .05, 16);  // garrafa térmica
-  cilindro(.04, .09, .3, .825, -.72, E, LOCAL.pvc, .035, 14);  // caneca
+  cap.position.set(-.55, .78, -1.0); cap.rotation.y = .6; cap.castShadow = true; E.add(cap); cap.userData.asset = 'capacete-sige';
+  const aba = cilindro(.17, .012, -.55, .785, -1.0, E, LOCAL.pinturaBranca, .17, 20); aba.scale.z = 1.15; aba.userData.asset = 'capacete-extra';
+  cilindro(.05, .3, .5, .93, -1.15, E, material('aco'), .045, 16).userData.asset = 'garrafa'; cilindro(.045, .05, .5, 1.1, -1.15, E, material('plastico'), .05, 16).userData.asset = 'garrafa-extra';  // garrafa térmica
+  cilindro(.04, .09, .3, .825, -.72, E, LOCAL.pvc, .035, 14).userData.asset = 'caneca-sige';  // caneca
   const rolo = cilindro(.035, .55, -.5, .81, -.62, E, material('papel'), .035, 12); rolo.rotation.z = Math.PI / 2; rolo.rotation.y = .25;
-  perfil(.24, .012, .33, .55, .78, -1.0, E, material('plastico'));  // a prancheta
-  cilindro(.14, .45, -1.9, .35, -1.4, E, LOCAL.azul, .12, 16); cilindro(.05, .1, -1.9, .62, -1.4, E, LOCAL.azul, .05, 12);  // galão de água
-  perfil(.5, .38, .36, -1.4, .31, -1.45, E, LOCAL.azul); perfil(.52, .05, .38, -1.4, .52, -1.45, E, LOCAL.pvc);  // caixa térmica
-  [[-2.15, -.3], [-1.95, -.25]].forEach(p => { perfil(.11, .1, .3, p[0], .17, p[1], E, LOCAL.borracha); cilindro(.055, .25, p[0], .3, p[1] - .08, E, LOCAL.borracha, .05, 10); });  // as botas
+  perfil(.24, .012, .33, .55, .78, -1.0, E, material('plastico')).userData.asset = 'prancheta';  // a prancheta
+  cilindro(.14, .45, -1.9, .35, -1.4, E, LOCAL.azul, .12, 16).userData.asset = 'galao'; cilindro(.05, .1, -1.9, .62, -1.4, E, LOCAL.azul, .05, 12).userData.asset = 'galao-extra';  // galão de água
+  perfil(.5, .38, .36, -1.4, .31, -1.45, E, LOCAL.azul).userData.asset = 'caixa-termica'; perfil(.52, .05, .38, -1.4, .52, -1.45, E, LOCAL.pvc).userData.asset = 'caixa-termica-extra';  // caixa térmica
+  [[-2.15, -.3], [-1.95, -.25]].forEach(p => { perfil(.11, .1, .3, p[0], .17, p[1], E, LOCAL.borracha).userData.asset = 'bota'; cilindro(.055, .25, p[0], .3, p[1] - .08, E, LOCAL.borracha, .05, 10).userData.asset = 'bota-cano'; });  // as botas
 }
 
 // câmera: vista aérea dos dois galpões → escritório → de frente para a tela (última chave calculada: tela exatamente em RETANGULO)

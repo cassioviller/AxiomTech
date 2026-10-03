@@ -64,6 +64,28 @@ def main():
         dim = info.get("dimensions") or [2000, 2000]  # mm
         indice["texturas"][tipo] = {"id": i, "mapas": mapas, "metros": [dim[0] / 1000, dim[1] / 1000], "tom": tom}
         creditos.append((i, f"textura do tipo `{tipo}`", info))
+    h = man.get("hdri_cinema")
+    if h:  # o céu do --visual cinema (montar.py)
+        info = api(f"info/{h['id']}")
+        baixar(api(f"files/{h['id']}")["hdri"][h["resolucao"]]["hdr"], ASSETS / "hdri" / f"{h['id']}.hdr")
+        indice["hdri_cinema"] = h["id"]
+        creditos.append((h["id"], "céu de fim de tarde (HDRI, --visual cinema)", info))
+    indice["modelos"] = {}
+    for papel, ids in man.get("modelos", {}).items():  # .blend + as texturas que ele referencia (caminhos relativos)
+        if papel == "_":
+            continue
+        indice["modelos"][papel] = []
+        for i in ids:
+            i, objetos = (i["id"], i.get("objetos")) if isinstance(i, dict) else (i, None)
+            print(f"{papel}: {i}", flush=True)
+            info, arquivos = api(f"info/{i}"), api(f"files/{i}")
+            b = arquivos["blend"][man.get("resolucao_modelos", "1k")]["blend"]
+            pasta = ASSETS / "modelos" / i
+            baixar(b, pasta / Path(b["url"]).name)
+            for rel, arq in b.get("include", {}).items():
+                baixar(arq, pasta / rel)
+            indice["modelos"][papel].append({"arquivo": f"modelos/{i}/{Path(b['url']).name}", "objetos": objetos})
+            creditos.append((i, f"modelo 3D ({papel}, --visual cinema)", info))
     (ASSETS / "indice.json").write_text(json.dumps(indice, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     linhas = ["# Assets do render no Blender", "",
               "Todos do [Poly Haven](https://polyhaven.com), licença CC0 (domínio público; uso livre, inclusive comercial).",

@@ -58,10 +58,11 @@ window.exportarCena = function (tempos) {
   }
 
   // --- itens: cada malha visível da cena; InstancedMesh vira um item com `instancias` ---
-  const itens = [], arvores = [];
+  const itens = [], arvores = [], grupos = [];
   const dentroDeAsset = o => { for (let x = o; x; x = x.parent) if (x.userData && x.userData.asset) return x; return null; };
   cena.traverse(o => {
     if (o.userData && o.userData.asset === 'arvore') arvores.push(o);
+    else if (o.userData && o.userData.asset) grupos.push(o);  // veículos etc.: o render realista troca as caixas por modelos
     if (!o.isMesh || !o.geometry || !o.geometry.attributes.position) return;
     const asset = dentroDeAsset(o);
     itens.push({o, d: {nome: o.name || o.type + '-' + o.id, geometria: geo(o.geometry), material: mat(o.material),
@@ -79,8 +80,11 @@ window.exportarCena = function (tempos) {
   }
   const cam = new Float32Array(N * 16), fov = new Float32Array(N);
   const arv = arvores.map(() => new Float32Array(16));
+  const grp = grupos.map(() => new Float32Array(N * 16));
   for (let q = 0; q < N; q++) {
-    window.poseCena(tempos[q]);
+    // algumas cenas miram a partir da pose anterior (o guindaste do modulares aponta a lança a partir de onde ela está):
+    // repetir a pose até estabilizar, para o quadro não depender de qual quadro veio antes (o 0 saía diferente do 1)
+    for (let k = 0; k < 6; k++) window.poseCena(tempos[q]);
     for (const it of itens) {
       const o = it.o;
       it.v[q] = visivel(o) ? 1 : 0;
@@ -94,6 +98,7 @@ window.exportarCena = function (tempos) {
     }
     cam.set(camera.matrixWorld.elements, q * 16); fov[q] = camera.fov;
     if (q === 0) arvores.forEach((a, i) => arv[i].set(a.matrixWorld.elements));
+    grupos.forEach((g, i) => grp[i].set(g.matrixWorld.elements, q * 16));
   }
   // o que não muda vai uma vez só
   for (const it of itens) {
@@ -114,6 +119,7 @@ window.exportarCena = function (tempos) {
       fundo: cena.fog ? cena.fog.color.toArray() : null, nevoa: cena.fog ? [cena.fog.near, cena.fog.far] : null},
     materiais, geometrias, itens: itens.map(it => it.d), canvases,
     arvores: arvores.map((a, i) => ({id: 'arvore-' + a.id, escala: a.userData.escala, matriz: Array.from(arv[i])})),
+    grupos: grupos.map((g, i) => ({id: g.userData.asset + '-' + g.id, asset: g.userData.asset, matrizes: b64(grp[i])})),
     camera: {matrizes: b64(cam), fov: Array.from(fov), aspecto: camera.aspect, perto: camera.near, longe: camera.far},
     sol: {posicao: sol.position.toArray(), alvo: sol.target.position.toArray(), cor: sol.color.toArray(), intensidade: sol.intensity},
   };

@@ -101,7 +101,7 @@ const arv = arvore(1.3); arv.position.set(-5.5, 0, -2.6); cena.add(arv);  // for
 
 // ---- o armário baixo ao fundo, com pastas e rolos de projeto em cima; o cesto de rolos; a planta ----
 {
-  const a = new THREE.Group(); a.position.set(-.7, PISO, -2.2); cena.add(a);
+  const a = new THREE.Group(); a.position.set(-.7, PISO, -2.2); cena.add(a); a.userData.asset = 'armario';  // o render do Blender troca por modelo
   bloco(1.56, .08, .4, 0, .04, -.02, a, mat.preto);
   bloco(1.6, .7, .45, 0, .43, 0, a, material('madeira'));
   bloco(1.64, .03, .48, 0, .795, .015, a, material('madeira'));
@@ -127,7 +127,7 @@ const arv = arvore(1.3); arv.position.set(-5.5, 0, -2.6); cena.add(arv);  // for
 }
 {
   // cesto com rolos de projeto em pé
-  const c = new THREE.Group(); c.position.set(-1.85, PISO, -2.2); cena.add(c);
+  const c = new THREE.Group(); c.position.set(-1.85, PISO, -2.2); cena.add(c); c.userData.asset = 'cesto-rolos';
   cilindro(.16, .14, .42, 0, .21, 0, c, material('acoPintado'), 24);
   [[0, 0, .08], [.07, .05, -.05], [-.06, .06, .0], [.03, -.07, .12], [-.05, -.04, -.1], [.08, -.02, .04]].forEach((p, i) => {
     const L = .7 + .1 * (i % 3), r = cilindro(.03, .03, L, p[0], .05 + L / 2, p[1], c, material('papel'), 12);
@@ -136,7 +136,7 @@ const arv = arvore(1.3); arv.position.set(-5.5, 0, -2.6); cena.add(arv);  // for
 }
 {
   // planta de chão ao lado direito do armário
-  const p = new THREE.Group(); p.position.set(.75, PISO, -2.15); cena.add(p);
+  const p = new THREE.Group(); p.position.set(.75, PISO, -2.15); cena.add(p); p.userData.asset = 'planta-chao';
   cilindro(.15, .12, .32, 0, .16, 0, p, mat.ceramica, 24);
   cilindro(.14, .14, .02, 0, .31, 0, p, material('solo'), 24);
   for (let i = 0; i < 11; i++) {
@@ -153,7 +153,7 @@ const arv = arvore(1.3); arv.position.set(-5.5, 0, -2.6); cena.add(arv);  // for
 
 // ---- a cadeira, à frente e à esquerda da mesa, virada como se o orçamentista tivesse acabado de se levantar ----
 {
-  const c = new THREE.Group(); c.position.set(-.35, PISO + .012, 1.2); c.rotation.y = -.5; cena.add(c);
+  const c = new THREE.Group(); c.position.set(-.35, PISO + .012, 1.2); c.rotation.y = -.5; cena.add(c); c.userData.asset = 'cadeira-ab';
   cilindro(.04, .05, .06, 0, .06, 0, c, material('plastico'), 12);
   for (let i = 0; i < 5; i++) {
     const ang = i * 2 * Math.PI / 5, g = new THREE.Group(); g.rotation.y = ang; c.add(g);
@@ -169,49 +169,49 @@ const arv = arvore(1.3); arv.position.set(-5.5, 0, -2.6); cena.add(arv);  // for
   [-.25, .25].forEach(x => { bloco(.03, .2, .05, x, .6, .04, c, material('plastico')); bloco(.05, .02, .26, x, .705, .0, c, material('plastico')); });
 }
 // lixeira ao lado da mesa
-cilindro(.13, .11, .28, -1.05, PISO + .14, .15, cena, material('plastico'), 24);
+cilindro(.13, .11, .28, -1.05, PISO + .14, .15, cena, material('plastico'), 24).userData.asset = 'lixeira-ab';
 
 // ---- a mesa: tampo 1,6 × 0,8 m a 0,75 m, pernas de aço pintado ----
 S.mesa = new THREE.Group(); cena.add(S.mesa); S.assunto = [S.mesa];
-bloco(1.6, .04, .8, 0, .73, 0, S.mesa, material('madeira', {repetir: 2}));
-[[-.75, -.35], [.75, -.35], [-.75, .35], [.75, .35]].forEach(p => bloco(.05, .71, .05, p[0], .355, p[1], S.mesa, material('acoPintado')));
+bloco(1.6, .04, .8, 0, .73, 0, S.mesa, material('madeira', {repetir: 2})).userData.asset = 'mesa-tampo';
+[[-.75, -.35], [.75, -.35], [-.75, .35], [.75, .35]].forEach(p => { bloco(.05, .71, .05, p[0], .355, p[1], S.mesa, material('acoPintado')).userData.asset = 'mesa-perna'; });
 
 // os documentos: a prancha do B-36 (inteira, com margem branca em cima e embaixo até 1,6: 2308×1443), a tela do orçamento impressa (A4 deitada, 1280×800),
 // o portal do SIGE num tablet (tela 0,24 × 0,15, 1600×1000) e a proposta (A4 em pé, 885×1060), que desliza para o lugar
 folha(documento('../site/docs/b36-caixas.webp'), .42, .2624, -.42, .752, .18, .04, S.mesa);
 folha(documento('../site/docs/veks-orcamento.webp'), .297, .1856, .05, .752, -.15, -.03, S.mesa);
-const tablet = new THREE.Group(); tablet.position.set(.45, .75, .12); tablet.rotation.y = .1; S.mesa.add(tablet);
+const tablet = new THREE.Group(); tablet.position.set(.45, .75, .12); tablet.rotation.y = .1; S.mesa.add(tablet); tablet.userData.asset = 'tablet';
 bloco(.26, .008, .17, 0, .004, 0, tablet, material('plastico'));
 folha(documento('../site/docs/sige-portal.webp'), .24, .15, 0, .0085, 0, 0, tablet);
 S.proposta = folha(documento('../site/docs/veks-proposta.webp'), .21, .2515, -.62, .754, -.34, .4, S.mesa); // começa na beira da mesa
 
 // o resto da mesa: uma caneca (com café e asa), um lápis laranja (o acento da cena)
 const caneca = new THREE.Mesh(new THREE.CylinderGeometry(.04, .036, .095, 24), material('papel'));
-caneca.position.set(.66, .7975, -.25); caneca.castShadow = true; S.mesa.add(caneca);
+caneca.position.set(.66, .7975, -.25); caneca.castShadow = true; S.mesa.add(caneca); caneca.userData.asset = 'caneca-ab';
 const lapis = new THREE.Mesh(new THREE.CylinderGeometry(.004, .004, .18, 8), material('acento'));
-lapis.rotation.set(0, 0, Math.PI / 2); lapis.rotation.y = .5; lapis.position.set(.2, .754, .3); lapis.castShadow = true; S.mesa.add(lapis);
+lapis.rotation.set(0, 0, Math.PI / 2); lapis.rotation.y = .5; lapis.position.set(.2, .754, .3); lapis.castShadow = true; S.mesa.add(lapis); lapis.userData.asset = 'lapis';
 
 // ---- os outros objetos da mesa (grupo próprio: não entram na caixa do assunto), nos cantos livres ----
 const T = .754, itens = new THREE.Group(); cena.add(itens);
 {
-  const cafe = cilindro(.035, .035, .003, .66, .836, -.25, itens, mat.cafe, 24);
+  const cafe = cilindro(.035, .035, .003, .66, .836, -.25, itens, mat.cafe, 24); cafe.userData.asset = 'caneca-extra';
   const asa = new THREE.Mesh(new THREE.TorusGeometry(.024, .005, 8, 20), material('papel'));
-  asa.position.set(.705, .80, -.25); asa.castShadow = true; itens.add(asa);
+  asa.position.set(.705, .80, -.25); asa.castShadow = true; itens.add(asa); asa.userData.asset = 'caneca-extra';
   // regra dos objetos da mesa: a câmera chega pela frente e pela direita, então nada fica à frente/à direita de um
   // documento (cobriria um canto dele visto de três quartos); os objetos baixos ficam entre os documentos, os altos nos cantos
   // trena amarela com cinta de borracha, atrás da caneca
-  const tr = new THREE.Group(); tr.position.set(.72, T, -.14); tr.rotation.y = -.3; itens.add(tr);
+  const tr = new THREE.Group(); tr.position.set(.72, T, -.14); tr.rotation.y = -.3; itens.add(tr); tr.userData.asset = 'trena-ab';
   bloco(.062, .032, .068, 0, .016, 0, tr, mat.amarelo); bloco(.066, .012, .072, 0, .016, 0, tr, mat.borracha);
   bloco(.02, .006, .01, 0, .003, .039, tr, mat.aluminio);
   // celular (moldura de alumínio, tela apagada), entre o tablet e a beira direita
-  const cel = new THREE.Group(); cel.position.set(.72, T, .06); cel.rotation.y = .2; itens.add(cel);
+  const cel = new THREE.Group(); cel.position.set(.72, T, .06); cel.rotation.y = .2; itens.add(cel); cel.userData.asset = 'celular-ab';
   bloco(.073, .008, .15, 0, .004, 0, cel, mat.aluminio); bloco(.068, .001, .145, 0, .0085, 0, cel, mat.vidroPreto);
   // notebook fechado atrás do orçamento
-  const nb = new THREE.Group(); nb.position.set(.405, T, -.26); nb.rotation.y = .06; itens.add(nb);
+  const nb = new THREE.Group(); nb.position.set(.405, T, -.26); nb.rotation.y = .06; itens.add(nb); nb.userData.asset = 'notebook';
   bloco(.30, .01, .21, 0, .005, 0, nb, mat.aluminio); bloco(.30, .008, .21, 0, .014, .004, nb, mat.grafite);
   const dob = cilindro(.006, .006, .26, 0, .011, -.103, nb, mat.preto, 10); dob.rotation.z = Math.PI / 2;
   // calculadora lisa (visor e teclas sem dígitos) à frente do orçamento
-  const calc = new THREE.Group(); calc.position.set(-.03, T, .24); calc.rotation.y = .12; itens.add(calc);
+  const calc = new THREE.Group(); calc.position.set(-.03, T, .24); calc.rotation.y = .12; itens.add(calc); calc.userData.asset = 'calculadora';
   bloco(.085, .012, .16, 0, .006, 0, calc, mat.cinza); bloco(.07, .002, .028, 0, .012, -.058, calc, mat.vidroPreto);
   const teclas = new THREE.InstancedMesh(new THREE.BoxGeometry(.015, .005, .011), mat.branco, 20), m4 = new THREE.Matrix4(), cor = new THREE.Color();
   for (let k = 0; k < 20; k++) { m4.makeTranslation(-.03 + (k % 4) * .02, .0135, -.03 + Math.floor(k / 4) * .017); teclas.setMatrixAt(k, m4); teclas.setColorAt(k, cor.set(k % 4 === 3 ? 0x8A9098 : 0xF1F1EE)); }
@@ -231,17 +231,17 @@ const T = .754, itens = new THREE.Group(); cena.add(itens);
   const tri = new THREE.Shape(); const R = .0095;
   [90, 210, 330].forEach((g, i) => { const a = g * Math.PI / 180; i ? tri.lineTo(R * Math.cos(a), R * Math.sin(a)) : tri.moveTo(R * Math.cos(a), R * Math.sin(a)); });
   tri.closePath();
-  const esc = new THREE.Group(); esc.position.set(-.72, T + R / 2, .25); esc.rotation.y = .04; itens.add(esc);
+  const esc = new THREE.Group(); esc.position.set(-.72, T + R / 2, .25); esc.rotation.y = .04; itens.add(esc); esc.userData.asset = 'escalimetro-ab';
   const prisma = new THREE.Mesh(new THREE.ExtrudeGeometry(tri, {depth: .3, bevelEnabled: false}), mat.branco);
   prisma.position.z = -.15; prisma.castShadow = prisma.receiveShadow = true; esc.add(prisma);
   [[30, mat.verde], [150, mat.azul]].forEach(([g, c]) => { const a = g * Math.PI / 180, f = bloco(.0025, .0008, .28, R / 2 * Math.cos(a), R / 2 * Math.sin(a), 0, esc, c); f.rotation.z = a - Math.PI / 2; });
   // uma caneta esferográfica azul, à frente da calculadora
-  const can = new THREE.Group(); can.position.set(-.03, T + .0045, .365); can.rotation.y = .1; itens.add(can);
+  const can = new THREE.Group(); can.position.set(-.03, T + .0045, .365); can.rotation.y = .1; itens.add(can); can.userData.asset = 'caneta';
   const corpo = cilindro(.0045, .0045, .13, 0, 0, 0, can, mat.azul, 10); corpo.rotation.z = Math.PI / 2;
   const ponta = cilindro(.0045, .0015, .012, .071, 0, 0, can, mat.aluminio, 10); ponta.rotation.z = -Math.PI / 2;
   bloco(.04, .002, .004, -.045, .005, 0, can, mat.aluminio);
   // vaso pequeno (suculenta) no canto do fundo à esquerda
-  const vs = new THREE.Group(); vs.position.set(-.73, T, -.04); itens.add(vs);
+  const vs = new THREE.Group(); vs.position.set(-.73, T, -.04); itens.add(vs); vs.userData.asset = 'suculenta';
   cilindro(.042, .042, .005, 0, .0025, 0, vs, mat.ceramica, 24);
   cilindro(.035, .028, .075, 0, .0425, 0, vs, mat.ceramica, 24);
   cilindro(.032, .032, .008, 0, .078, 0, vs, material('solo'), 24);

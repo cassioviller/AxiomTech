@@ -2,6 +2,19 @@
   "_": "Assets CC0 do Poly Haven (polyhaven.com) usados no render do Blender. Baixados por baixar_assets.py para assets/ (fora do git). Trocar um id aqui e rodar de novo.",
   "resolucao": "2k",
   "hdri": {"id": "kloofendal_48d_partly_cloudy_puresky", "resolucao": "4k"},
+  "hdri_cinema": {"id": "qwantani_late_afternoon_puresky", "resolucao": "4k"},
+  "resolucao_modelos": "1k",
+  "modelos": {
+    "_": "--visual cinema: modelos que substituem as árvores e os arbustos do kit (as posições vêm do cena.json); objetos = os do .blend que entram (cada .blend traz várias versões: LOD0, LOD1, peças soltas)",
+    "arvore": [{"id": "tree_small_02", "objetos": ["tree_small_02_LOD1"]}],
+    "mata": [{"id": "tree_small_02", "objetos": ["tree_small_02_LOD1"], "_": "a jacarandá (1,5 mi de polígonos) estourava a RAM de 8 GB no render"}],
+    "arbusto": [{"id": "grass_medium_02", "objetos": ["grass_medium_02_geometry_nodes"]}],
+    "planta": [{"id": "potted_plant_02"}],
+    "suculenta": [{"id": "potted_plant_04"}],
+    "cadeira-plastica": [{"id": "plastic_monobloc_chair_01"}],
+    "relogio": [{"id": "wall_clock"}],
+    "pedra": [{"id": "boulder_01", "objetos": ["boulder_01_LOD0"]}, {"id": "namaqualand_boulder_02", "objetos": ["namaqualand_boulder_02_LOD0"]}]
+  },
   "texturas": {
     "pasto": {"id": "aerial_grass_rock", "tom": "#5E7F3C", "_": "as gramas do Poly Haven são secas; o tom (matiz e saturação) é o verde do pasto do kit"},
     "solo": "red_laterite_soil_stones",
@@ -13,6 +26,10 @@
     "asfalto": "asphalt_04",
     "assoalho": "wood_floor",
     "porcelanato": "large_floor_tiles_02",
-    "tinta": "beige_wall_001"
+    "tinta": "beige_wall_001",
+    "conteiner": {"id": "container_side", "tom": "#3D5568", "_": "--visual cinema: chapa do contêiner de canteiro"},
+    "zinco": "corrugated_iron_03",
+    "areia": {"id": "sand_01", "tom": "#C4A97C", "_": "a foto é cinza-esverdeada; o tom é o bege da areia de obra"},
+    "brita": {"id": "gravel", "tom": "#8E8C88", "_": "brita de pedra britada: cinza"}
   }
 }
