@@ -41,7 +41,7 @@ CAPITULOS = [
      "PJ, 6 meses, cumprido até o fim, com a V Alves até julho. Calculadora de parede e classificador de caixa.", "", 8),
     ("mai → set/2026", "O SIGE ganhou versão nova.",
      "Cerca de 50 módulos em 6 áreas; entregas de 22/07 a 14/09/2026. Portal e diário em uso nos galpões.", "", 8),
-    ("jul → set/2026", "13 obras no sistema, 11 com proposta.",
+    ("jul → set/2026", "Diversas obras no sistema.",
      "Lê o desenho, mede e orça. Nos 19 serviços SINAPI conferidos, desvio máximo de 0,25%. Código com assistentes de IA.",
      "A gestão de obra deste sistema ainda não rodou em obra real.", 8.5),
     ("ago/2026", "O celeiro não cabe no caminhão.",

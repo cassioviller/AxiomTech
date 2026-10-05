@@ -4,7 +4,7 @@ Analista de orçamento, planejamento e custos · CLT ou PJ · São José dos Cam
 RESUMO
 
 Estudante de Engenharia Civil (7º semestre) com um ano e meio dentro de construtoras (orçamento, compras, cronograma,
-diário de obra, medição, fluxo de caixa) e oito anos de rotina contábil. Orcei 13 obras, de R$ 29 mil a R$ 24,5 milhões,
+diário de obra, medição, fluxo de caixa) e oito anos de rotina contábil. Orcei diversas obras, de R$ 29 mil a R$ 24,5 milhões,
 reproduzindo as composições SINAPI com desvio máximo de 0,25%. Levei uma proposta de mão de obra do pacote de
 projeto ao PDF assinável em 36 minutos, com a origem de cada número registrada. Concebi e construí o SIGE, sistema de
 gestão para construtoras com cerca de 50 módulos, hoje em uso numa empresa de Light Steel Frame.
@@ -12,7 +12,7 @@ EXPERIÊNCIA
 
 Processos, Orçamentos e Gestão de Obras (PJ) | VEKS Engenharia                                                03/2026 – 09/2026
 Construtora de Light Steel Frame · São José dos Campos/SP · contrato de 6 meses, cumprido até o fim
-  Elaborei orçamentos e propostas comerciais de 13 obras (R$ 29 mil a R$ 24,5 milhões), com quantitativos medidos no
+  Elaborei orçamentos e propostas comerciais de diversas obras (R$ 29 mil a R$ 24,5 milhões), com quantitativos medidos no
   projeto e composição de custos que reproduz as composições SINAPI com desvio máximo de 0,25%, conferida serviço a
   serviço.
   Idealizei e dirigi o sistema de orçamento da empresa: lê o desenho do cliente, mede, orça, gera cronograma e proposta; a
