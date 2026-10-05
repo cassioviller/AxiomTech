@@ -3,7 +3,7 @@
 // um seek em voo por vez, o último pedido vence. Carga em três portas: depois do 'load' da janela, quando a cena chega a
 // 600 px da tela (2 alturas de tela no site v2), e nunca com economia de dados, rede 2g, sem H.264 ou com ?clipes=nao (fica o pôster). Movimento
 // reduzido, inclusive ligado no meio, descarrega tudo. A imagem só some (.viva) quando há um quadro pronto. Carregados
-// ficam no máximo MAXIMO (2; o site v2 pede 3 em tela larga) clipes, os mais perto do meio da tela dentro da faixa;
+// ficam no máximo MAXIMO (2; o site v2 pede 3) clipes, os mais perto do meio da tela dentro da faixa;
 // no site v2 um clipe que saiu da faixa continua com os dados até um mais perto precisar da vaga, para a volta (rolar
 // para cima) não baixar tudo de novo. arrumar() reavalia isso a cada seek, entrada/saída da faixa ou troca de movimento reduzido — nunca
 // descarte por ordem de chegada.
@@ -16,12 +16,11 @@ var v0=document.createElement('video'),con=navigator.connection||{};
 var PODE=!/[?&]clipes=nao\b/.test(location.search)&&v0.canPlayType('video/mp4; codecs="avc1.64001F"')!==''
   &&!con.saveData&&!/^(slow-)?2g$/.test(con.effectiveType||'');
 var reduzir=matchMedia('(prefers-reduced-motion: reduce)'),todas=[];
-// <html data-clipes-max="N"> (opcional): a página aceita N clipes carregados em tela larga (o site v2 usa 3: a volta não recarrega)
+// <html data-clipes-max="N"> (opcional): a página aceita N clipes carregados (o site v2 usa 3: a volta não recarrega)
 // e quem saiu da faixa guarda os dados até um mais perto precisar da vaga (GUARDA); sem o atributo, sai ao deixar a faixa
 var GUARDA='clipesMax' in document.documentElement.dataset;
-if(+document.documentElement.dataset.clipesMax>MAXIMO&&matchMedia('(min-width: 901px)').matches)MAXIMO=+document.documentElement.dataset.clipesMax;
-// data-clipe-hd (opcional): a versão em alta, só em tela larga e sem economia de dados; no resto fica data-clipe (leve)
-var HD=matchMedia('(min-width: 901px)').matches&&!con.saveData;
+if(+document.documentElement.dataset.clipesMax>MAXIMO)MAXIMO=+document.documentElement.dataset.clipesMax;
+// data-clipe-hd (opcional): a versão em alta, em qualquer tela; sem ele fica data-clipe
 function depoisDoLoad(fn){if(document.readyState==='complete')fn();else addEventListener('load',fn);}
 function chave(a){return a.dist()-(a.pronto?FOLGA:0);}
 function arrumar(){
@@ -32,7 +31,7 @@ function arrumar(){
 }
 
 figs.forEach(function(fig){
-  var v=fig.querySelector('video'),cena=fig.closest('.cena')||fig,src=HD&&fig.dataset.clipeHd||fig.dataset.clipe,dur=parseFloat(fig.dataset.dur)||0;
+  var v=fig.querySelector('video'),cena=fig.closest('.cena')||fig,src=fig.dataset.clipeHd||fig.dataset.clipe,dur=parseFloat(fig.dataset.dur)||0;
   var alvo=-1,pedido=-1,emVoo=0,vivo=false,lentos=0,tinha=false,ligado=false,esperados=0,desde=0; // esperados: 'emptied' que os nossos load() ainda vão disparar; desde: hora dos metadados da carga atual (0: nenhuma)
   var ultimo=Math.round(dur*FPS)-1;                                         // índice do último quadro: o fim da cena pede este quadro, nunca além
   function quadro(t){return (Math.min(Math.round(t*FPS),ultimo)+0.5)/FPS;}

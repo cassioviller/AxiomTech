@@ -33,8 +33,8 @@ img{display:block;max-width:100%;height:auto}
 .barra .nome{font-family:var(--display);font-weight:700;font-size:1.15rem;text-transform:uppercase;color:var(--ink);text-decoration:none}
 .barra nav{display:flex;flex-wrap:wrap;gap:6px 16px;flex:1 1 auto}
 .barra a{color:var(--ink)}
-/* celular: a barra numa linha só (os links rolam de lado) e sem o PDF, que está no contato; não cobre o palco */
-@media (max-width:600px){
+/* até 900 px (celular, tablet, o preview do Replit): a barra numa linha só (os links rolam de lado) e sem o PDF, que está no contato */
+@media (max-width:900px){
   .barra{flex-wrap:nowrap;gap:0 14px;padding:8px 16px}
   .barra .nome{white-space:nowrap;flex:none}
   .barra nav{flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none;min-width:0}
@@ -94,9 +94,23 @@ img{display:block;max-width:100%;height:auto}
 .js-v2 .palco{position:sticky;top:0;height:100vh}
 .js-v2 .quadro{position:absolute;left:50%;top:50%;width:max(100vw,177.78vh);transform:translate(-50%,-50%) translateX(calc(var(--lado,0)*-17%)) scale(calc(1 - .28*var(--lado,0)))}
 .js-v2 .texto{position:absolute;right:3vw;top:50%;width:min(30rem,26vw);transform:translateY(-50%);opacity:var(--lado,0);visibility:var(--vis,hidden);padding:0;margin:0}
-@media (max-aspect-ratio:3/2) and (min-width:901px){.js-v2 .quadro{width:100vw}}
-/* documento inteiro ilegível (tela estreita ou baixa): entra o recorte; em tela baixa o v2.js deixa a página empilhada */
-@media (max-width:900px), (max-height:520px){
+@media (max-aspect-ratio:3/2) and (min-width:601px){.js-v2 .quadro{width:100vw}}
+/* tela média (601–1100 px): a coluna de texto ao lado fica mais larga e a letra menor, para caber na altura da tela */
+@media (min-width:601px) and (max-width:1100px){
+  .js-v2 .quadro{transform:translate(-50%,-50%) translateX(calc(var(--lado,0)*-24%)) scale(calc(1 - .4*var(--lado,0)))} /* em p=1 o quadro termina antes de 57 vw */
+  .js-v2 .texto{width:38vw;right:2.5vw;font-size:14px;line-height:1.5}
+  .js-v2 .manchete{font-size:clamp(1.35rem,3.4vw,1.9rem)}
+  .js-v2 .rotulo{font-size:.7rem}
+}
+/* celular em pé (até 600 px): o documento inteiro fica ilegível, entra o recorte e o texto desce para baixo do quadro */
+/* tela baixa (celular deitado, janela baixa): letra menor e o texto centrado abaixo da barra, para caber inteiro */
+@media (max-height:520px) and (min-width:601px){
+  .js-v2 .texto{font-size:12px;line-height:1.4;top:calc(50% + 22px)}
+  .js-v2 .manchete{font-size:1.15rem;margin-bottom:.35em}
+  .js-v2 .rotulo{font-size:.62rem}
+  .js-v2 .apoio,.js-v2 .medida{margin-bottom:.55em}
+}
+@media (max-width:600px){
   .doc{display:none}
   .recorte{display:block}
   .js-v2 .quadro{transform:translate(-50%,-50%)}
@@ -234,7 +248,7 @@ img{display:block;max-width:100%;height:auto}
     <p class="contato"><a class="zap" href="https://wa.me/5512982071116">WhatsApp (12) 98207-1116</a><a href="mailto:cassiovillers@gmail.com">cassiovillers@gmail.com</a><a href="curriculo-cassio-viller.pdf">Currículo (PDF)</a><a href="portfolio.html">Portfólio completo</a></p>
   </section>
 </main>
-<script src="clipes.js?v=2026-10-05" defer></script>
-<script src="v2.js?v=2026-10-05" defer></script>
+<script src="clipes.js?v=2026-10-05b" defer></script>
+<script src="v2.js?v=2026-10-05b" defer></script>
 </body>
 </html>

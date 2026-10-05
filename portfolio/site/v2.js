@@ -9,10 +9,8 @@ if(!('IntersectionObserver' in window))return;
 if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 var casos=[].slice.call(document.querySelectorAll('.caso'));
 if(!casos.length)return;
-// tela baixa (celular deitado): o palco preso não cabe com o texto; fica empilhada, como sem JS, e acompanha a rotação
-var CURTA=matchMedia('(max-height: 520px)');
-function modo(){document.documentElement.classList.toggle('js-v2',!CURTA.matches);}
-modo();
+// todas as telas têm a mesma versão (vídeo preso que anda com a rolagem), inclusive as baixas (celular deitado)
+document.documentElement.classList.add('js-v2');
 var DOC=[.5,.6],DESTAQUE=[.6,.7],LADO=[.62,.72],pendente=false;
 var trilho=[].slice.call(document.querySelectorAll('nav.trilho a[href^="#"]'));
 var secoes=trilho.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));});
@@ -30,7 +28,6 @@ function atualizar(agora){
   var dt=ultimoT?Math.min(100,agora-ultimoT):16.7,k=1-Math.pow(1-SEGUE,dt/16.7),anda=false;
   ultimoT=agora;
   marcar();
-  if(CURTA.matches)return;
   casos.forEach(function(c){
     var r=c.getBoundingClientRect(),curso=c.offsetHeight-innerHeight;
     if(r.bottom<-innerHeight||r.top>2*innerHeight){c.__p=undefined;return;}
@@ -52,6 +49,5 @@ function atualizar(agora){
 function pedir(){if(!pendente){pendente=true;requestAnimationFrame(atualizar);}}
 addEventListener('scroll',pedir,{passive:true});
 addEventListener('resize',pedir);
-if(CURTA.addEventListener)CURTA.addEventListener('change',function(){modo();pedir();});
 pedir();
 })();

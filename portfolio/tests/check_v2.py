@@ -598,28 +598,24 @@ def checar_celular():
 
 
 def checar_recorte_viewports():
-    """Telas em que o documento inteiro sairia ilegível (celular deitado 844×390, tablet em pé 768×1024), em cada caso: sem o
-    documento, com o recorte inteiro na tela e nunca ampliado, e o texto (manchete e apoio) inteiro na tela em p=1."""
+    """Telas médias e baixas (celular deitado 844×390, tablet em pé 768×1024) têm a versão completa, como o computador:
+    em cada caso, em p=1, o documento à vista, o texto inteiro entre a barra e o fim da tela e ao lado do quadro, sem cobri-lo."""
     from render import navegador, servidor
-    dest = json.loads((DOCS / "destaques.json").read_text(encoding="utf-8"))
     with servidor() as base, navegador() as nav:
         for w, h in ((844, 390), (768, 1024)):
             ctx, pg, erros = abrir_pagina(nav, base, w, h, device_scale_factor=2, is_mobile=True, has_touch=True)
+            check(pg.evaluate("document.documentElement.classList.contains('js-v2')"), f"{w}×{h}: sem .js-v2 (vídeo preso)")
             for caso in CASOS:
                 rolar(pg, caso, 1)
                 b = caixas(pg, caso)
-                check(b["doc"][5] == "none", f"recorte {caso} {w}×{h}: o documento inteiro aparece (sairia com {b['doc'][2]:.0f} px)")
-                r = b["recorte"]
-                check(r and r[5] != "none" and r[0] >= 0 and r[1] >= 0 and r[0] + r[2] <= w and r[1] + r[3] <= h, f"recorte {caso} {w}×{h}: recorte fora da tela {r and r[:4]}")
-                check(r and r[2] <= dest[CASOS[caso]["doc"]]["recorte"][2], f"recorte {caso} {w}×{h}: recorte ampliado")
-                m = pg.evaluate(f"""(function(){{var e=(document.querySelector('#{caso} .medida')||document.querySelector('#{caso} .apoio')).getBoundingClientRect(),
-                  t=document.querySelector('#{caso} .manchete').getBoundingClientRect();return [t.top,e.bottom];}})()""")
-                if h <= 520:  # tela baixa: a página fica empilhada (sem palco preso) e p=1 mostra o fim da seção (recorte e
-                    # links); o leitor rola à vontade, então o que importa é manchete → medida caber inteiro numa tela
-                    check(m[1] - m[0] <= h, f"recorte {caso} {w}×{h}: manchete/apoio/medida mais altos que a tela ({m[1] - m[0]:.0f} px)")
-                else:
-                    check(m[0] >= 0 and m[1] <= h, f"recorte {caso} {w}×{h}: manchete/apoio/medida fora da tela (topo {m[0]:.0f}, base {m[1]:.0f})")
-            check(not erros, f"recorte {w}×{h}: erros/404: {erros}")
+                check(b["doc"][5] != "none" and float(b["doc"][4]) == 1, f"{caso} {w}×{h}: o documento não aparece em p=1")
+                m = pg.evaluate(f"""(function(){{var t=document.querySelector('#{caso} .rotulo').getBoundingClientRect(),
+                  e=document.querySelector('#{caso} .caso-link').getBoundingClientRect(),
+                  q=document.querySelector('#{caso} .quadro').getBoundingClientRect(),
+                  barra=document.querySelector('.barra').getBoundingClientRect();return [t.top,barra.bottom,e.bottom,t.left,q.right];}})()""")
+                check(m[0] >= m[1] and m[2] <= h, f"{caso} {w}×{h}: o texto não cabe entre a barra e o fim da tela (topo {m[0]:.0f}, barra {m[1]:.0f}, base {m[2]:.0f})")
+                check(m[3] >= m[4], f"{caso} {w}×{h}: o texto cobre o quadro (texto em {m[3]:.0f} px, quadro até {m[4]:.0f} px)")
+            check(not erros, f"{w}×{h}: erros/404: {erros}")
             ctx.close()
 
 
@@ -671,7 +667,7 @@ def checar_troca_de_clipes():
             rolar(pg, caso, .3)
             pg.wait_for_function(f"document.querySelector('#{caso} figure.clipe').classList.contains('viva')", timeout=20000)
         com_dados = pg.evaluate("[].filter.call(document.querySelectorAll('figure.clipe video'),function(v){return v.readyState>0;}).length")
-        check(com_dados <= 3, f"clipes: {com_dados} vídeos com dados ao mesmo tempo (máx. 3 em tela larga)")
+        check(com_dados <= 3, f"clipes: {com_dados} vídeos com dados ao mesmo tempo (máx. 3)")
         rolar(pg, "veks", .3)
         pg.wait_for_function("document.querySelector('#veks figure.clipe').classList.contains('viva')", timeout=20000)
         check(not erros, f"clipes: erros/404: {erros}")
