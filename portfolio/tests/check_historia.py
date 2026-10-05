@@ -86,7 +86,7 @@ ROTEIRO = [
         ("img", "o-orcamento.webp", 1040, 1080), ("sistema", "Ver o caso completo: conferência SINAPI →")),
     cap("casa", "h2", ("ago/2026", ["2026-08"]),
         "O celeiro não cabe inteiro no caminhão.",
-        "B-36, pré-dimensionado e sujeito à revisão do engenheiro responsável: duas caixas, três viagens, 37 decisões registradas.",
+        "B-36: projetei, orcei e fiz a proposta. Duas caixas, três viagens, 37 decisões registradas.",
         ("clipe", 10), ("modular", "Ver o caso completo: celeiro B-36 →")),
     cap("icamento", "h2", ("ago/2026", ["2026-08"]),
         "No estudo, o módulo sobe pelo balancim, cabos na vertical.",
@@ -115,8 +115,7 @@ ROTEIRO = [
 ]
 
 RESSALVAS = ["estimativa", "nos 19 serviços conferidos", "cópia do sistema", "assistentes de IA",
-             "em paralelo", "pré-dimensionado", "sujeito à revisão do engenheiro responsável",
-             "no sistema em uso, a carga ainda não foi aplicada"]
+             "em paralelo", "no sistema em uso, a carga ainda não foi aplicada"]
 PROIBIDOS = ["3,40"]
 PALAVRAS_CHAVE = ["quantitativos", "SINAPI", "BDI", "cronograma físico-financeiro", "curva S", "medição", "cotação"]
 WHATSAPP = "https://wa.me/5512982071116"

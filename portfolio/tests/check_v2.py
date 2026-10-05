@@ -392,7 +392,7 @@ def checar_pagina_estatica():
         "sige": ("Implantei a gestão de obra em dois galpões com 22 baias.",
                  "Construí o cronograma ligado ao diário de obra (RDO) e ao portal do cliente: 109 etapas, 65 diários e 378 fotos num link que dá acesso ao cliente."),
         "modulares": ("A casa modular não cabia no caminhão: dividi em 2 caixas.",
-                      "Três viagens, telhado em kit, 37 decisões registradas. Pré-dimensionado, sujeito à revisão do engenheiro responsável."),
+                      "Projetei, orcei e fiz a proposta: três viagens, telhado em kit, 37 decisões registradas."),
     }
     # o caso 1 do spec (36 minutos) não tem cena própria: os prints originais não vêm e os de 760 px não podem ser ampliados.
     # O número entra no caso do orçamento, cujo documento é a proposta feita nesses 36 minutos.

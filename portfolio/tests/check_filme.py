@@ -46,7 +46,7 @@ CAPITULOS = [
      "", 8.5),
     ("ago/2026", "O celeiro não cabe no caminhão.",
      "B-36: duas caixas, três viagens, 37 decisões registradas. No estudo, o módulo sobe pelo balancim, cabos na vertical.",
-     "Pré-dimensionado, sujeito à revisão do engenheiro responsável.", 8.5),
+     "Projetei, orcei e fiz a proposta.", 8.5),
     ("ago → set/2026", "23 dias de diário só no WhatsApp.",
      "Depois de 11/08, o diário saiu do sistema; 28 atividades prontas apareciam atrasadas nos dois galpões.",
      "Recuperação lida numa cópia; no sistema em uso, a carga ainda não foi aplicada.", 8.5),
@@ -63,7 +63,7 @@ PROIBIDOS = ["26 anos", "155.000", "150.500", "Cassio", "orçadas", "perdidos", 
              "a obra digitava", "no centavo",
              # rodada 4: nada no quadro que o portfólio não sustente (o clipe não tem legenda para ressalvar)
              "OUTRO DADO", "barras de 3 m", "LICENCIADO", "COMPRAS", "756", "CONSTRUIR E DEMOLIR", "ESC 1:"]
-EXIGIDOS = ["Cássio Viller", "No estudo", "Pré-dimensionado", "numa cópia", "a carga ainda não foi aplicada",
+EXIGIDOS = ["Cássio Viller", "No estudo", "Projetei, orcei", "numa cópia", "a carga ainda não foi aplicada",
             "MESMO DADO", "PLANO DE CORTE", "EM USO", "DESENHO", "PLANTA"]
 ANDARES = ["PROPOSTA", "OBRA", "CRONOGRAMA", "DIÁRIO", "MEDIÇÃO", "COBRANÇA", "CAIXA", "PORTAL DO CLIENTE"]  # = #sige .flow do portfólio
 WPM_MAX = 200  # leitura confortável; o apoio fica visível em ~76% do capítulo

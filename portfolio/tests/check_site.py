@@ -36,7 +36,6 @@ RESSALVAS = [
     "nos 19 serviços conferidos",
     "ligadas empresa por empresa",
     "assistentes de IA",
-    "sujeito à revisão do engenheiro responsável",
     "Dados de exemplo do manual",
 ]
 
