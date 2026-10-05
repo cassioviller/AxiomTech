@@ -390,7 +390,7 @@ def checar_pagina_estatica():
         "veks": ("Orcei diversas obras, de R$ 29 mil a R$ 24,5 milhões.",
                  "Conferência com a SINAPI: desvio máximo de 0,25% nos 19 serviços conferidos."),
         "sige": ("Implantei a gestão de obra em dois galpões com 22 baias.",
-                 "Construí o cronograma ligado ao diário de obra (RDO) e ao portal do cliente: 109 etapas, 65 diários e 378 fotos num link (cópia do sistema)."),
+                 "Construí o cronograma ligado ao diário de obra (RDO) e ao portal do cliente: 109 etapas, 65 diários e 378 fotos num link que dá acesso ao cliente."),
         "modulares": ("A casa modular não cabia no caminhão: dividi em 2 caixas.",
                       "Três viagens, telhado em kit, 37 decisões registradas. Pré-dimensionado, sujeito à revisão do engenheiro responsável."),
     }
