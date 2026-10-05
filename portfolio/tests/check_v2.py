@@ -390,7 +390,7 @@ def checar_pagina_estatica():
         "veks": ("Orcei 13 obras, de R$ 29 mil a R$ 24,5 milhões.",
                  "11 com proposta. Conferência com a SINAPI: desvio máximo de 0,25% nos 19 serviços conferidos. A gestão de obra deste sistema ainda não rodou numa obra real."),
         "sige": ("Implantei a gestão de obra em dois galpões com 22 baias.",
-                 "Depois de 11/08 o diário ficou 23 dias só no WhatsApp. Recuperado, o avanço passou de 27,6% para 44,7%, lido numa cópia do sistema."),
+                 "Construí o cronograma ligado ao diário de obra (RDO) e ao portal do cliente: 109 etapas, 65 diários e 378 fotos num link (cópia do sistema)."),
         "modulares": ("O celeiro B-36 não cabia no caminhão: dividi em duas caixas.",
                       "Três viagens, telhado em kit, 37 decisões registradas. Pré-dimensionado, sujeito à revisão do engenheiro responsável."),
     }
