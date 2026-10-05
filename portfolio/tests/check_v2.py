@@ -449,7 +449,7 @@ def checar_pagina_estatica():
     for nome in ("AZ Contabilidade", "UNIFEI", "InLoco Jr.", "V Alves", "Estruturas do Vale", "VEKS"):
         check(nome in " ".join(itens), f"página: trajetória sem {nome!r}")
     check("calculadora de parede" in vis and "classificador de fluxo de caixa" in vis, "página: trajetória sem a linha das ferramentas")
-    check('<script src="clipes.js" defer></script>' in p and '<script src="v2.js" defer></script>' in p, "página: scripts clipes.js e v2.js")
+    check('<script src="clipes.js?v=' in p and '<script src="v2.js?v=' in p, "página: scripts clipes.js e v2.js")
 
 
 def abrir_pagina(nav, base, largura, altura, **kw):
