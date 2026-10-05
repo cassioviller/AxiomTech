@@ -3,35 +3,33 @@ Analista de orçamento, planejamento e custos · CLT ou PJ · São José dos Cam
 (12) 98207-1116 (WhatsApp) · cassiovillers@gmail.com · github.com/cassioviller · linkedin.com/in/cassioviller
 RESUMO
 
-Estudante de Engenharia Civil (7º semestre) com um ano e meio dentro de construtoras (orçamento, compras, cronograma,
-diário de obra, medição, fluxo de caixa) e oito anos de rotina contábil. Orcei diversas obras, de R$ 29 mil a R$ 24,5 milhões,
-reproduzindo as composições SINAPI com desvio máximo de 0,25%. Levei uma proposta de mão de obra do pacote de
-projeto ao PDF assinável em 36 minutos, com a origem de cada número registrada. Concebi e construí o SIGE, sistema de
-gestão para construtoras com cerca de 50 módulos, hoje em uso numa empresa de Light Steel Frame.
+Estudante de Engenharia Civil (7º semestre) com um ano e meio dentro de construtoras e oito anos de rotina contábil. No dia a
+dia: orçamento e proposta comercial a partir do projeto, compras e cotações de obra, acompanhamento de canteiro,
+cronograma, diário de obra, medição, contratos e fluxo de caixa. Orcei obras de R$ 29 mil a R$ 24,5 milhões, com
+composições de custo que reproduzem a SINAPI com desvio máximo de 0,25%. Criei o SIGE, sistema de gestão para
+construtoras hoje em uso numa empresa de Light Steel Frame.
 EXPERIÊNCIA
 
-Processos, Orçamentos e Gestão de Obras (PJ) | VEKS Engenharia                                                  03/2026 – 09/2026
+Processos, Orçamentos e Gestão de Obras (PJ) | VEKS Engenharia                                             03/2026 – 09/2026
 Construtora de Light Steel Frame · São José dos Campos/SP · contrato de 6 meses, cumprido até o fim
-  Elaborei orçamentos e propostas comerciais de diversas obras (R$ 29 mil a R$ 24,5 milhões), com quantitativos medidos no
-  projeto e composição de custos que reproduz as composições SINAPI com desvio máximo de 0,25%, conferida serviço a
-  serviço.
-  Idealizei e dirigi o sistema de orçamento da empresa: lê o desenho do cliente, mede, orça, gera cronograma e proposta; a
-  mesma obra sai em três tamanhos de proposta sem mover nenhum número.
-  Reduzi uma proposta de mão de obra (26 ambientes, 328 m²) de 1 dia útil (estimativa) para 36 minutos medidos.
-  Dei suporte à obra de 2 galpões e 22 baias em Itu/SP: requisições, cotações e quadro de concorrência, especificação de
-  concreto e aditivos de escopo.
-  Reorcei uma residência de R$ 1,18 milhão para caber no teto do cliente: R$ 452 mil, 54 dias de obra, cada acréscimo
-  opcional precificado.
-  Projetei, orcei e fiz a proposta da casa modular B-36 (linha off-site, 37 decisões registradas, plano de 8 semanas); revisei
-  contrato de empreitada, redigi contrato de mão de obra e implantei a classificação do fluxo de caixa por centro de custo.
+  Orçamento e propostas: levantamento de quantitativos no projeto, composição de custos, BDI e proposta comercial no
+  modelo da empresa, para obras residenciais, comerciais e rurais.
+  Sistema de orçamento: idealizei e dirigi a ferramenta da empresa, que mede no desenho do cliente, orça e gera
+  cronograma e proposta.
+  Compras e obra: requisições, cotações e quadro de concorrência, especificação de materiais, aditivos de escopo e
+  acompanhamento de canteiro.
+  Contratos e financeiro: revisão de contrato de empreitada, contratos de mão de obra e fluxo de caixa por centro de custo.
+  Processos e produto: implantação do SIGE na empresa; projeto, orçamento e proposta da linha de casas modulares em
+  LSF.
 Gerente de Produção e Operações (CLT, meio período) | V Alves Construção                                                02/2025 – 07/2026
 São José dos Campos/SP · em paralelo com o estágio abaixo
-  Acompanhamento das obras, compras e rotina de produção da construtora.
-Estagiário Comercial (meio período) | Estruturas do Vale                                                   04/2025 – 03/2026
+  Acompanhamento das obras e da rotina de produção da construtora.
+  Compras de materiais e serviços para as obras.
+Estagiário Comercial (meio período) | Estruturas do Vale                                                 04/2025 – 03/2026
 Estruturas metálicas · São José dos Campos/SP
-  Elaborei orçamentos e propostas comerciais a partir do projeto e atuei em vendas internas.
-  Criei o SIGE sobre a rotina real da empresa: mais de 10 módulos na primeira fase, de ponto por reconhecimento facial a
-  diário de obra (RDO) e almoxarifado.
+  Orçamentos e propostas comerciais de estruturas metálicas a partir do projeto; vendas internas.
+  Cotação e acompanhamento de sondagem SPT; pré-dimensionamento de estrutura e fundação para as propostas.
+  Criei a primeira versão do SIGE sobre a rotina da empresa: ponto, diário de obra (RDO) e almoxarifado.
 Analista Contábil | AZ Contabilidade (escritório da família)                                                    2017 – atual
   Folha de pagamento, emissão de notas fiscais e balancete — base da prática com custo, imposto e fluxo de caixa.
 Diretor de Vendas | InLoco Jr. (empresa júnior da UNIFEI)                                                               03/2023 – 12/2024
@@ -40,12 +38,10 @@ Axiom — sistemas personalizados e chatbots                                    
   Site institucional e desenvolvimento sob demanda para pequenas empresas.
 P R O J E T O P R Ó P R I O — S I G E , S I S T E M A D E G E S T Ã O PA R A C O N S T R U T O R A S ( 2 0 2 5 – 2 0 2 6 )
 
-  Cerca de 50 módulos em 6 áreas: proposta → obra → cronograma → diário de obra → medição → compras → financeiro.
-  Compras em 9 etapas, com aprovação por faixa de valor.
-  Recuperei 23 diários de obra que estavam só no WhatsApp (185 fotos, 72 registros de avanço): 28 atividades concluídas
-  deixaram de aparecer como atrasadas no cronograma.
-  Software meu, licenciado para a empresa que o usa; manual de 17 capítulos e 4 guias para a equipe. Desenvolvimento
-  dirigido por mim, com assistentes de IA sob minha revisão.
+  Da proposta ao financeiro: obra, cronograma, diário de obra, medição, compras com aprovação por faixa de valor e portal do
+  cliente.
+  Software meu, licenciado para a empresa que o usa, com manual e guias para a equipe. Desenvolvimento dirigido por mim,
+  com assistentes de IA sob minha revisão.
 FORMAÇÃO
 
 Engenharia Civil — Universidade Cruzeiro do Sul (EAD), 7º semestre · após 6 semestres na UNIFEI, Itajubá/MG (2020–2024).
