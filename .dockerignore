@@ -1,0 +1,6 @@
+# Só o site entra na imagem
+*
+!Dockerfile
+!deploy/
+!portfolio/site/
+!portfolio/video-alta/
