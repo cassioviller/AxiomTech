@@ -125,3 +125,8 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - **Prancha do B-36 redesenhada sem móveis** (`cenas/prancha_b36.py` → `site/docs/b36-caixas.webp` e o recorte; mesmo tamanho e posições, destaque e recorte de `documentos.json` valem): a original tinha móveis sobrepostos. Usada no site, no modulares e na abertura.
 - Ferramentas no PC (fora do git): Blender 5.2.2, ffmpeg 9.0.2 e ImageMagick 7.1.2 em `C:\Users\cassi\ferramentas` (o `check_v2.py` precisa do `magick` no PATH).
 - Vídeos em alta qualidade (os mestres crf 16, 8–16 MB) em `portfolio/video-alta/v2-<caso>-alta.mp4`, fora de `site/` para não pesar no deploy; o vídeo do site sai com crf 32–36 para caber em 2,5 MB.
+
+## 05/10/2026 — ajustes de texto pedidos pelo Cássio, Dockerfile, push
+- Texto: "diversas obras" no lugar de "13 obras" (e sem "11 com proposta"); sem a ressalva "a gestão de obra ainda não rodou numa obra real"; sem "sujeito à revisão do engenheiro responsável" ("projetei, orcei e fiz a proposta"); sem a linha das ferramentas na trajetória; manchete do caso modulares "Projetei casas modulares para chegar à obra em 3 caminhões."; sem o número de módulos do SIGE; currículo reescrito pelas atribuições de cada emprego (sem casos individuais).
+- Deploy: `Dockerfile` (nginx, porta 5001, Range nativo) + `deploy/nginx.conf` + `.dockerignore`; no EasyPanel, build por Dockerfile e porta 5001.
+- `site-v2-fase-2` e `main` no GitHub em `58d0b39`. Falta: deploy no EasyPanel, `check_historia.py --origem <URL>`, iPhone real.
