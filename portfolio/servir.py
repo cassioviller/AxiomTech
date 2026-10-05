@@ -15,8 +15,17 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 class ComRange(SimpleHTTPRequestHandler):
     extensions_map = {**SimpleHTTPRequestHandler.extensions_map, ".webp": "image/webp", ".mp4": "video/mp4", ".js": "text/javascript"}
 
+    def handle(self):
+        try:
+            super().handle()
+        except (ConnectionResetError, BrokenPipeError):
+            # Navegação e busca em vídeos podem cancelar a requisição em curso.
+            # Apenas encerre esta conexão; os demais erros continuam visíveis.
+            self.close_connection = True
+
     def end_headers(self):
         self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Cache-Control", "no-cache")  # o navegador sempre confere se o arquivo mudou (304 se não mudou)
         super().end_headers()
 
     def send_head(self):

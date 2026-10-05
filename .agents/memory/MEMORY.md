@@ -1,0 +1,1 @@
+- [Servidor do portfólio](servidor-portfolio.md) — preserve HTTP Range para busca em vídeos; desconexões do navegador são esperadas.
