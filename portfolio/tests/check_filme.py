@@ -40,7 +40,7 @@ CAPITULOS = [
     ("mar → set/2026", "Na VEKS, toda conta repetida virou ferramenta.",
      "PJ, 6 meses, cumprido até o fim, com a V Alves até julho. Calculadora de parede e classificador de caixa.", "", 8),
     ("mai → set/2026", "O SIGE ganhou versão nova.",
-     "Cerca de 50 módulos em 6 áreas; entregas de 22/07 a 14/09/2026. Portal e diário em uso nos galpões.", "", 8),
+     "6 áreas, da proposta ao financeiro; entregas de 22/07 a 14/09/2026. Portal e diário em uso nos galpões.", "", 8),
     ("jul → set/2026", "Diversas obras no sistema.",
      "Lê o desenho, mede e orça. Nos 19 serviços SINAPI conferidos, desvio máximo de 0,25%. Código com assistentes de IA.",
      "", 8.5),

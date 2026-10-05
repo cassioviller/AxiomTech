@@ -70,7 +70,7 @@ ROTEIRO = [
         ("clipe", 8), ("ferramentas", "Ver as ferramentas: calculadora e classificador →")),
     cap("sige", "h2", ("mai → set/2026", ["2026-05", "2026-09"]),
         "De maio a setembro, o SIGE ganhou versão nova.",
-        "Cerca de 50 módulos em 6 áreas, entregas registradas de 22/07 a 14/09/2026; código escrito com assistente de IA, sob a minha direção.",
+        "6 áreas, da proposta ao financeiro; entregas registradas de 22/07 a 14/09/2026; código escrito com assistente de IA, sob a minha direção.",
         ("clipe", 8), ("sige", "Ver o caso completo: SIGE →")),
     cap("galpoes", "h2", ("jun/2026", ["2026-06-08"]),
         "Em junho, começou a obra que testaria o SIGE.",

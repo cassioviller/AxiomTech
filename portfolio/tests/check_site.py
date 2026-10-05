@@ -107,8 +107,8 @@ class Balanco(HTMLParser):
 
 
 def checar_invariantes(atual, base):
-    # fase 3 do site v2 (spec §5): o multiplicador "≈ 27×" saiu do portfólio; nenhum outro número pode sumir ou aparecer
-    na, nb = numeros(atual), numeros(base) - {"27"}
+    # fase 3 do site v2 (spec §5): o multiplicador "≈ 27×" saiu do portfólio, e o "50" (módulos do SIGE) a pedido do Cássio; nenhum outro número pode sumir ou aparecer
+    na, nb = numeros(atual), numeros(base) - {"27", "50"}
     check(na == nb, f"números mudaram — novos: {sorted(na - nb)}; sumiram: {sorted(nb - na)}")
     t = texto(atual)
     for r in RESSALVAS:

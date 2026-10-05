@@ -391,8 +391,8 @@ def checar_pagina_estatica():
                  "Conferência com a SINAPI: desvio máximo de 0,25% nos 19 serviços conferidos."),
         "sige": ("Implantei a gestão de obra em dois galpões com 22 baias.",
                  "Construí o cronograma ligado ao diário de obra (RDO) e ao portal do cliente: 109 etapas, 65 diários e 378 fotos num link que dá acesso ao cliente."),
-        "modulares": ("A casa modular não cabia no caminhão: dividi em 2 caixas.",
-                      "Projetei, orcei e fiz a proposta: três viagens, telhado em kit, 37 decisões registradas."),
+        "modulares": ("Projetei casas modulares para chegar à obra em 3 caminhões.",
+                      "Duas caixas de 3,00 × 6,00 m e o telhado em kit, uma carga por caminhão. Também orcei e fiz a proposta."),
     }
     # o caso 1 do spec (36 minutos) não tem cena própria: os prints originais não vêm e os de 760 px não podem ser ampliados.
     # O número entra no caso do orçamento, cujo documento é a proposta feita nesses 36 minutos.
@@ -448,7 +448,7 @@ def checar_pagina_estatica():
     check(len(itens) == 4 and [it.split(" ")[0] for it in itens] == ["2017", "2020", "fev/2025", "mar"], f"página: trajetória {itens}")
     for nome in ("AZ Contabilidade", "UNIFEI", "InLoco Jr.", "V Alves", "Estruturas do Vale", "VEKS"):
         check(nome in " ".join(itens), f"página: trajetória sem {nome!r}")
-    check("calculadora de parede" in vis and "classificador de fluxo de caixa" in vis, "página: trajetória sem a linha das ferramentas")
+    check("calculadora de parede" not in vis and "classificador de fluxo de caixa" not in vis, "página: a linha das ferramentas saiu da trajetória")
     check('<script src="clipes.js?v=' in p and '<script src="v2.js?v=' in p, "página: scripts clipes.js e v2.js")
 
 
