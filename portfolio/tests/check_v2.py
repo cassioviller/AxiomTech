@@ -425,7 +425,7 @@ def checar_pagina_estatica():
         check(f'class="destaque" style="{esperado}"' in corpo, f"página {caso}: destaque ≠ destaques.json (esperava style=\"{esperado}\")")
         rx, ry, rw, rh = d["recorte"]
         check(f'<img src="docs/{doc}-recorte.webp" width="{rw}" height="{rh}"' in corpo, f"página {caso}: recorte de {doc} com src/width/height errados")
-        check(f'<figure class="clipe" data-clipe="video/v2-{caso}-hd.mp4" data-dur="{CASOS[caso]["dur"]:g}" aria-hidden="true">' in corpo, f"página {caso}: figure.clipe")
+        check(f'<figure class="clipe" data-clipe="video/v2-{caso}.mp4" data-clipe-hd="video/v2-{caso}-hd.mp4" data-dur="{CASOS[caso]["dur"]:g}" aria-hidden="true">' in corpo, f"página {caso}: figure.clipe")
         elo = re.search(r'<p class="caso-link">(.*?)</p>', corpo, re.S)
         alvos = re.findall(r'<a href="portfolio\.html#([a-z-]+)">', elo.group(1)) if elo else []
         check(alvos == LINKS[caso], f"página {caso}: links do caso completo {alvos}, esperava {LINKS[caso]}")
@@ -436,7 +436,7 @@ def checar_pagina_estatica():
     check(re.search(r"\bItu\b", vis) is None, "página: nome do município do cliente (Itu)")
     for src, w, h in re.findall(r'<img src="(docs/[^"]+)" width="(\d+)" height="(\d+)"', p):
         check(dims(SITE / src) == (int(w), int(h)), f"página: {src} com width/height {w}×{h} ≠ arquivo {dims(SITE / src)}")
-    check('<section class="caso cena so-cena" id="mesa" data-caso="mesa">' in p and '<figure class="clipe" data-clipe="video/v2-abertura-hd.mp4" data-dur="8" aria-hidden="true">' in p, "página: a cena da abertura (#mesa, só cena, 8 s)")
+    check('<section class="caso cena so-cena" id="mesa" data-caso="mesa">' in p and '<figure class="clipe" data-clipe="video/v2-abertura.mp4" data-clipe-hd="video/v2-abertura-hd.mp4" data-dur="8" aria-hidden="true">' in p, "página: a cena da abertura (#mesa, só cena, 8 s)")
     check('<img src="video/v2-abertura.webp" alt="" width="1920" height="1080" fetchpriority="high">' in p, "página: o pôster da abertura é o LCP (width/height/fetchpriority)")
     trilho = re.search(r'<nav class="trilho" aria-label="Seções">(.*?)</nav>', p, re.S)
     hrefs = re.findall(r'href="#([a-z]+)"', trilho.group(1)) if trilho else []
@@ -465,9 +465,12 @@ def abrir_pagina(nav, base, largura, altura, **kw):
 
 
 def rolar(pg, caso, p):
-    """Rola até o progresso p (0..1) do caso e espera dois quadros de animação."""
+    """Rola até o progresso p (0..1) do caso, espera o progresso suavizado do v2.js (c.__p) chegar lá e mais dois quadros."""
     pg.evaluate(f"""(function(){{var c=document.getElementById('{caso}'),r=c.getBoundingClientRect();
       scrollTo(0,scrollY+r.top+{p}*(c.offsetHeight-innerHeight));}})()""")
+    pg.wait_for_function(f"""(function(){{var c=document.getElementById('{caso}'),curso=c.offsetHeight-innerHeight;
+      var alvo=curso>0?Math.max(0,Math.min(1,-c.getBoundingClientRect().top/curso)):1;
+      return c.__p===undefined||c.__p===alvo;}})()""", timeout=5000)
     pg.evaluate("new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r);});})")
 
 
@@ -660,7 +663,7 @@ def checar_trilho():
 
 
 def checar_troca_de_clipes():
-    """clipes.js mantém no máximo 2 vídeos com dados: ir da abertura ao caso 4 e voltar ao caso 2 traz o caso 2 de volta a .viva."""
+    """clipes.js mantém no máximo 3 vídeos com dados em tela larga (2 nas estreitas): ir da abertura ao caso 4 e voltar ao caso 2 traz o caso 2 de volta a .viva."""
     from render import navegador, servidor
     with servidor() as base, navegador() as nav:
         ctx, pg, erros = abrir_pagina(nav, base, 1920, 1080)
@@ -668,7 +671,7 @@ def checar_troca_de_clipes():
             rolar(pg, caso, .3)
             pg.wait_for_function(f"document.querySelector('#{caso} figure.clipe').classList.contains('viva')", timeout=20000)
         com_dados = pg.evaluate("[].filter.call(document.querySelectorAll('figure.clipe video'),function(v){return v.readyState>0;}).length")
-        check(com_dados <= 2, f"clipes: {com_dados} vídeos com dados ao mesmo tempo (máx. 2)")
+        check(com_dados <= 3, f"clipes: {com_dados} vídeos com dados ao mesmo tempo (máx. 3 em tela larga)")
         rolar(pg, "veks", .3)
         pg.wait_for_function("document.querySelector('#veks figure.clipe').classList.contains('viva')", timeout=20000)
         check(not erros, f"clipes: erros/404: {erros}")

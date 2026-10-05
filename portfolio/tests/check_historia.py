@@ -555,7 +555,7 @@ def checar_clipes_js():
     for proibido in ("play(", "autoplay", "loop", "fastSeek", "requestAnimationFrame", "fetch(", "createObjectURL",
                      "scrollTo", "scrollBy", "scrollIntoView", "preventDefault", "'wheel'", "'touchmove'", "aria-live"):
         check(proibido not in js, f"clipes.js não pode usar {proibido}")
-    for exigido in ("canPlayType", "'seeked'", "seekable", "rootMargin:'600px", "preload='auto'", ".load()", "removeAttribute('src')",
+    for exigido in ("canPlayType", "'seeked'", "seekable", "'600px 0px'", "preload='auto'", ".load()", "removeAttribute('src')",
                     "prefers-reduced-motion: reduce", "'change'", "saveData", "clipes=nao", "readyState", "'load'",
                     "TETO=250", "LENTOS=3", "VOO=600", "MAXIMO=2", "fig.__clipe=api", "'progress'", "'canplay'", "'emptied'", "networkState", "esperados",
                     "ESPERA_RANGE=1500", "temRange", "desde", "||!temRange()", "Math.min(Math.round(t*FPS),ultimo)"):

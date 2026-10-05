@@ -22,14 +22,22 @@ function marcar(){
   secoes.forEach(function(s,i){if(s&&s.getBoundingClientRect().top<=meio)atual=i;});
   trilho.forEach(function(a,i){if(i===atual)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current');});
 }
-function atualizar(){
+// a roda do mouse anda aos saltos (100 px por clique): o progresso mostrado persegue o da rolagem com amortecimento
+// exponencial, quadro a quadro, igual na descida e na subida; fora da tela (salto pelo menu) ele vai direto ao alvo
+var SEGUE=.16,ultimoT=0; // fração do caminho que falta percorrida a cada quadro de 60 Hz
+function atualizar(agora){
   pendente=false;
+  var dt=ultimoT?Math.min(100,agora-ultimoT):16.7,k=1-Math.pow(1-SEGUE,dt/16.7),anda=false;
+  ultimoT=agora;
   marcar();
   if(CURTA.matches)return;
   casos.forEach(function(c){
     var r=c.getBoundingClientRect(),curso=c.offsetHeight-innerHeight;
-    if(r.bottom<-innerHeight||r.top>2*innerHeight)return;
-    var p=curso>0?Math.max(0,Math.min(1,-r.top/curso)):1;
+    if(r.bottom<-innerHeight||r.top>2*innerHeight){c.__p=undefined;return;}
+    var alvo=curso>0?Math.max(0,Math.min(1,-r.top/curso)):1;
+    var p=c.__p===undefined||r.bottom<=0||r.top>=innerHeight?alvo:c.__p+(alvo-c.__p)*k;
+    if(Math.abs(alvo-p)<.0004)p=alvo;else anda=true;
+    c.__p=p;
     var fig=c.querySelector('figure.clipe'),cena=c.classList.contains('so-cena')?1:.5;
     if(fig&&fig.__clipe)fig.__clipe.seek(Math.min(1,p/cena)*fig.__clipe.dur);
     if(cena===1)return;
@@ -39,6 +47,7 @@ function atualizar(){
     c.style.setProperty('--lado',lado);
     c.style.setProperty('--vis',lado>0?'visible':'hidden'); // texto invisível fora do fluxo de foco (teclado)
   });
+  if(anda)pedir();else ultimoT=0;
 }
 function pedir(){if(!pendente){pendente=true;requestAnimationFrame(atualizar);}}
 addEventListener('scroll',pedir,{passive:true});

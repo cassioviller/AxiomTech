@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-clipes-max="3">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -33,6 +33,14 @@ img{display:block;max-width:100%;height:auto}
 .barra .nome{font-family:var(--display);font-weight:700;font-size:1.15rem;text-transform:uppercase;color:var(--ink);text-decoration:none}
 .barra nav{display:flex;flex-wrap:wrap;gap:6px 16px;flex:1 1 auto}
 .barra a{color:var(--ink)}
+/* celular: a barra numa linha só (os links rolam de lado) e sem o PDF, que está no contato; não cobre o palco */
+@media (max-width:600px){
+  .barra{flex-wrap:nowrap;gap:0 14px;padding:8px 16px}
+  .barra .nome{white-space:nowrap;flex:none}
+  .barra nav{flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none;min-width:0}
+  .barra nav::-webkit-scrollbar{display:none}
+  .barra>a[href$=".pdf"]{display:none}
+}
 .abertura,.fechamento{max-width:62rem;margin:0 auto;padding:10vh 20px}
 .abertura h1{font-family:var(--display);font-size:clamp(2.6rem,7vw,5rem);line-height:1;margin:0 0 .25em;text-transform:uppercase}
 .vaga{font-size:1.35rem;font-weight:500;margin:0 0 .6em}
@@ -63,8 +71,8 @@ img{display:block;max-width:100%;height:auto}
 .recorte{display:none;margin:0 0 1em}
 .recorte img{max-height:30vh;width:auto;max-width:100%}
 .caso-link a{color:var(--texto-palco)}
-/* a cena da abertura: só o vídeo, 200 vh de rolagem, sem documento nem texto */
-.js-v2 .caso.so-cena{height:500vh}
+/* a cena da abertura: só o vídeo, 500 vh de rolagem (no mínimo 4800 px, para não correr numa janela baixa), sem documento nem texto */
+.js-v2 .caso.so-cena{height:max(500vh,4800px)}
 /* trajetória: uma faixa em HTML, sem cena */
 .trajetoria{max-width:62rem;margin:0 auto;padding:10vh 20px}
 .trajetoria h2{font-family:var(--display);font-size:2rem;margin:0 0 .6em}
@@ -81,8 +89,8 @@ img{display:block;max-width:100%;height:auto}
   .trilho a{color:var(--muted);text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid var(--rule)}
   .trilho a[aria-current="true"]{color:var(--accent);border-color:var(--accent)}
 }
-/* com JS e movimento: o palco fica preso na tela por 300vh; a cena anda na 1ª metade, o documento e o texto na 2ª */
-.js-v2 .caso{height:900vh}
+/* com JS e movimento: o palco fica preso na tela por 900vh (no mínimo 8600 px); a cena anda na 1ª metade, o documento e o texto na 2ª */
+.js-v2 .caso{height:max(900vh,8600px)}
 .js-v2 .palco{position:sticky;top:0;height:100vh}
 .js-v2 .quadro{position:absolute;left:50%;top:50%;width:max(100vw,177.78vh);transform:translate(-50%,-50%) translateX(calc(var(--lado,0)*-17%)) scale(calc(1 - .28*var(--lado,0)))}
 .js-v2 .texto{position:absolute;right:3vw;top:50%;width:min(30rem,26vw);transform:translateY(-50%);opacity:var(--lado,0);visibility:var(--vis,hidden);padding:0;margin:0}
@@ -127,7 +135,7 @@ img{display:block;max-width:100%;height:auto}
   <section class="caso cena so-cena" id="mesa" data-caso="mesa">
     <div class="palco">
       <div class="quadro">
-        <figure class="clipe" data-clipe="video/v2-abertura-hd.mp4" data-dur="8" aria-hidden="true">
+        <figure class="clipe" data-clipe="video/v2-abertura.mp4" data-clipe-hd="video/v2-abertura-hd.mp4" data-dur="8" aria-hidden="true">
           <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
           <img src="video/v2-abertura.webp" alt="" width="1920" height="1080" fetchpriority="high">
         </figure>
@@ -138,7 +146,7 @@ img{display:block;max-width:100%;height:auto}
   <section class="caso cena" id="veks" data-caso="veks">
     <div class="palco">
       <div class="quadro">
-        <figure class="clipe" data-clipe="video/v2-veks-hd.mp4" data-dur="10" aria-hidden="true">
+        <figure class="clipe" data-clipe="video/v2-veks.mp4" data-clipe-hd="video/v2-veks-hd.mp4" data-dur="10" aria-hidden="true">
           <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
           <img src="video/v2-veks.webp" alt="" width="1920" height="1080">
         </figure>
@@ -161,7 +169,7 @@ img{display:block;max-width:100%;height:auto}
   <section class="caso cena" id="sige" data-caso="sige">
     <div class="palco">
       <div class="quadro">
-        <figure class="clipe" data-clipe="video/v2-sige-hd.mp4" data-dur="10" aria-hidden="true">
+        <figure class="clipe" data-clipe="video/v2-sige.mp4" data-clipe-hd="video/v2-sige-hd.mp4" data-dur="10" aria-hidden="true">
           <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
           <img src="video/v2-sige.webp" alt="" width="1920" height="1080">
         </figure>
@@ -183,7 +191,7 @@ img{display:block;max-width:100%;height:auto}
   <section class="caso cena" id="modulares" data-caso="modulares">
     <div class="palco">
       <div class="quadro">
-        <figure class="clipe" data-clipe="video/v2-modulares-hd.mp4" data-dur="12" aria-hidden="true">
+        <figure class="clipe" data-clipe="video/v2-modulares.mp4" data-clipe-hd="video/v2-modulares-hd.mp4" data-dur="12" aria-hidden="true">
           <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
           <img src="video/v2-modulares.webp" alt="" width="1920" height="1080">
         </figure>

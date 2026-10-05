@@ -1,10 +1,12 @@
 // Clipes de fundo da história: um vídeo curto e mudo por capítulo, cujo tempo é o progresso da rolagem (historia.js chama
 // fig.__clipe.seek(t), o mesmo contrato das maquetes). O clipe nunca anda sozinho: só currentTime, quantizado ao quadro,
 // um seek em voo por vez, o último pedido vence. Carga em três portas: depois do 'load' da janela, quando a cena chega a
-// 600 px da tela, e nunca com economia de dados, rede 2g, sem H.264 ou com ?clipes=nao (fica o pôster). Movimento
+// 600 px da tela (2 alturas de tela no site v2), e nunca com economia de dados, rede 2g, sem H.264 ou com ?clipes=nao (fica o pôster). Movimento
 // reduzido, inclusive ligado no meio, descarrega tudo. A imagem só some (.viva) quando há um quadro pronto. Carregados
-// ficam só os MAXIMO (2) clipes mais perto do meio da tela dentro da faixa de 600 px; arrumar() reavalia isso a cada
-// seek, entrada/saída da faixa ou troca de movimento reduzido — nunca descarte por ordem de chegada.
+// ficam no máximo MAXIMO (2; o site v2 pede 3 em tela larga) clipes, os mais perto do meio da tela dentro da faixa;
+// no site v2 um clipe que saiu da faixa continua com os dados até um mais perto precisar da vaga, para a volta (rolar
+// para cima) não baixar tudo de novo. arrumar() reavalia isso a cada seek, entrada/saída da faixa ou troca de movimento reduzido — nunca
+// descarte por ordem de chegada.
 (function(){
 'use strict';
 var figs=[].slice.call(document.querySelectorAll('figure.clipe'));
@@ -14,17 +16,23 @@ var v0=document.createElement('video'),con=navigator.connection||{};
 var PODE=!/[?&]clipes=nao\b/.test(location.search)&&v0.canPlayType('video/mp4; codecs="avc1.64001F"')!==''
   &&!con.saveData&&!/^(slow-)?2g$/.test(con.effectiveType||'');
 var reduzir=matchMedia('(prefers-reduced-motion: reduce)'),todas=[];
+// <html data-clipes-max="N"> (opcional): a página aceita N clipes carregados em tela larga (o site v2 usa 3: a volta não recarrega)
+// e quem saiu da faixa guarda os dados até um mais perto precisar da vaga (GUARDA); sem o atributo, sai ao deixar a faixa
+var GUARDA='clipesMax' in document.documentElement.dataset;
+if(+document.documentElement.dataset.clipesMax>MAXIMO&&matchMedia('(min-width: 901px)').matches)MAXIMO=+document.documentElement.dataset.clipesMax;
+// data-clipe-hd (opcional): a versão em alta, só em tela larga e sem economia de dados; no resto fica data-clipe (leve)
+var HD=matchMedia('(min-width: 901px)').matches&&!con.saveData;
 function depoisDoLoad(fn){if(document.readyState==='complete')fn();else addEventListener('load',fn);}
 function chave(a){return a.dist()-(a.pronto?FOLGA:0);}
 function arrumar(){
   if(reduzir.matches){todas.forEach(function(a){a.descarregar();});return;}
-  var quer=todas.filter(function(a){return a.perto&&!a.morto;}).sort(function(a,b){return chave(a)-chave(b);}).slice(0,MAXIMO);
+  var quer=todas.filter(function(a){return (a.perto||GUARDA&&a.pronto)&&!a.morto;}).sort(function(a,b){return chave(a)-chave(b);}).slice(0,MAXIMO);
   todas.forEach(function(a){if(a.pronto&&quer.indexOf(a)<0)a.descarregar();});   // sai quem não está mais entre os mais perto
-  quer.forEach(function(a){a.carregar();});                                      // entra quem está, se ainda não tiver dados
+  quer.forEach(function(a){if(a.perto)a.carregar();});                           // entra quem está na faixa, se ainda não tiver dados
 }
 
 figs.forEach(function(fig){
-  var v=fig.querySelector('video'),cena=fig.closest('.cena')||fig,src=fig.dataset.clipe,dur=parseFloat(fig.dataset.dur)||0;
+  var v=fig.querySelector('video'),cena=fig.closest('.cena')||fig,src=HD&&fig.dataset.clipeHd||fig.dataset.clipe,dur=parseFloat(fig.dataset.dur)||0;
   var alvo=-1,pedido=-1,emVoo=0,vivo=false,lentos=0,tinha=false,ligado=false,esperados=0,desde=0; // esperados: 'emptied' que os nossos load() ainda vão disparar; desde: hora dos metadados da carga atual (0: nenhuma)
   var ultimo=Math.round(dur*FPS)-1;                                         // índice do último quadro: o fim da cena pede este quadro, nunca além
   function quadro(t){return (Math.min(Math.round(t*FPS),ultimo)+0.5)/FPS;}
@@ -34,7 +42,8 @@ figs.forEach(function(fig){
   fig.__clipe=api;
   if(!PODE||!v||!dur||!src)return; // fica a imagem
   ligado=true;todas.push(api);
-  function dist(){var r=cena.getBoundingClientRect();return Math.abs(r.top+r.height/2-innerHeight/2);}
+  function dist(){var r=cena.getBoundingClientRect(),meio=innerHeight/2;                       // v2 (cenas de 9 telas): 0 com o meio da tela
+    return GUARDA?Math.max(0,r.top-meio,meio-r.bottom):Math.abs(r.top+r.height/2-meio);}         // dentro da cena; na história, do centro dela
   function viver(sim){vivo=sim;fig.classList.toggle('viva',sim);}
   function pedir(){
     if(!api.pronto||api.morto||reduzir.matches||alvo<0||v.readyState<1||!temRange())return;   // nunca antes dos metadados nem sem seekable completo: o alvo fica guardado
@@ -84,7 +93,7 @@ figs.forEach(function(fig){
   });
   depoisDoLoad(function(){
     new IntersectionObserver(function(es){api.perto=es[es.length-1].isIntersecting;arrumar();}, // um observer por figure, um alvo só: vale a entrada mais nova do lote
-      {rootMargin:'600px 0px'}).observe(cena);                             // a figure mora no palco sticky: observa-se a cena
+      {rootMargin:GUARDA?'200% 0px':'600px 0px'}).observe(cena);           // a figure mora no palco sticky: observa-se a cena; no v2 a faixa é de 2 telas
   });
 });
 if(reduzir.addEventListener)reduzir.addEventListener('change',arrumar);else reduzir.addListener(arrumar); // Safari ≤ 13: só addListener(fn), sem o tipo
