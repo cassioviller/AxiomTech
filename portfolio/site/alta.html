@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vídeos em alta</title>
+<style>
+body{margin:0;background:#111;color:#eee;font:15px system-ui,sans-serif;padding:16px}
+.barra{position:sticky;top:0;background:#111;padding:8px 0 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:1}
+.barra button{background:#222;color:#eee;border:1px solid #444;border-radius:4px;padding:6px 12px;font:inherit;cursor:pointer}
+.barra button[aria-pressed=true]{background:#eee;color:#111}
+section{max-width:1600px;margin:0 auto 32px}
+h2{font-size:16px;font-weight:500;margin:0 0 8px}
+video{width:100%;height:auto;display:block;background:#000}
+</style>
+</head>
+<body>
+<div class="barra">Velocidade:
+  <button data-v="0.25">0,25×</button><button data-v="0.5" aria-pressed="true">0,5×</button><button data-v="0.75">0,75×</button><button data-v="1">1×</button>
+</div>
+<section><h2>Abertura</h2><video src="video/alta/v2-abertura-alta.mp4" controls muted loop playsinline preload="auto"></video></section>
+<section><h2>VEKS</h2><video src="video/alta/v2-veks-alta.mp4" controls muted loop playsinline preload="auto"></video></section>
+<section><h2>SIGE</h2><video src="video/alta/v2-sige-alta.mp4" controls muted loop playsinline preload="auto"></video></section>
+<section><h2>Modulares</h2><video src="video/alta/v2-modulares-alta.mp4" controls muted loop playsinline preload="auto"></video></section>
+<script>
+var vids=[].slice.call(document.querySelectorAll('video')),botoes=[].slice.call(document.querySelectorAll('.barra button')),vel=0.5;
+function aplicar(){vids.forEach(function(v){v.defaultPlaybackRate=vel;v.playbackRate=vel;});}
+vids.forEach(function(v){v.addEventListener('loadedmetadata',aplicar);v.addEventListener('play',aplicar);});
+botoes.forEach(function(b){b.addEventListener('click',function(){
+  vel=parseFloat(b.dataset.v);aplicar();
+  botoes.forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});
+});});
+// toca só o vídeo que está na tela
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.play().catch(function(){});else e.target.pause();});},{threshold:.5});
+vids.forEach(function(v){io.observe(v);});
+aplicar();
+</script>
+</body>
+</html>

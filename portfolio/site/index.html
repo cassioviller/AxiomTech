@@ -64,7 +64,7 @@ img{display:block;max-width:100%;height:auto}
 .recorte img{max-height:30vh;width:auto;max-width:100%}
 .caso-link a{color:var(--texto-palco)}
 /* a cena da abertura: só o vídeo, 200 vh de rolagem, sem documento nem texto */
-.js-v2 .caso.so-cena{height:200vh}
+.js-v2 .caso.so-cena{height:500vh}
 /* trajetória: uma faixa em HTML, sem cena */
 .trajetoria{max-width:62rem;margin:0 auto;padding:10vh 20px}
 .trajetoria h2{font-family:var(--display);font-size:2rem;margin:0 0 .6em}
@@ -82,7 +82,7 @@ img{display:block;max-width:100%;height:auto}
   .trilho a[aria-current="true"]{color:var(--accent);border-color:var(--accent)}
 }
 /* com JS e movimento: o palco fica preso na tela por 300vh; a cena anda na 1ª metade, o documento e o texto na 2ª */
-.js-v2 .caso{height:300vh}
+.js-v2 .caso{height:900vh}
 .js-v2 .palco{position:sticky;top:0;height:100vh}
 .js-v2 .quadro{position:absolute;left:50%;top:50%;width:max(100vw,177.78vh);transform:translate(-50%,-50%) translateX(calc(var(--lado,0)*-17%)) scale(calc(1 - .28*var(--lado,0)))}
 .js-v2 .texto{position:absolute;right:3vw;top:50%;width:min(30rem,26vw);transform:translateY(-50%);opacity:var(--lado,0);visibility:var(--vis,hidden);padding:0;margin:0}
@@ -127,7 +127,7 @@ img{display:block;max-width:100%;height:auto}
   <section class="caso cena so-cena" id="mesa" data-caso="mesa">
     <div class="palco">
       <div class="quadro">
-        <figure class="clipe" data-clipe="video/v2-abertura.mp4" data-dur="8" aria-hidden="true">
+        <figure class="clipe" data-clipe="video/v2-abertura-hd.mp4" data-dur="8" aria-hidden="true">
           <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
           <img src="video/v2-abertura.webp" alt="" width="1920" height="1080" fetchpriority="high">
         </figure>
@@ -138,7 +138,7 @@ img{display:block;max-width:100%;height:auto}
   <section class="caso cena" id="veks" data-caso="veks">
     <div class="palco">
       <div class="quadro">
-        <figure class="clipe" data-clipe="video/v2-veks.mp4" data-dur="10" aria-hidden="true">
+        <figure class="clipe" data-clipe="video/v2-veks-hd.mp4" data-dur="10" aria-hidden="true">
           <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
           <img src="video/v2-veks.webp" alt="" width="1920" height="1080">
         </figure>
@@ -161,7 +161,7 @@ img{display:block;max-width:100%;height:auto}
   <section class="caso cena" id="sige" data-caso="sige">
     <div class="palco">
       <div class="quadro">
-        <figure class="clipe" data-clipe="video/v2-sige.mp4" data-dur="10" aria-hidden="true">
+        <figure class="clipe" data-clipe="video/v2-sige-hd.mp4" data-dur="10" aria-hidden="true">
           <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
           <img src="video/v2-sige.webp" alt="" width="1920" height="1080">
         </figure>
@@ -183,7 +183,7 @@ img{display:block;max-width:100%;height:auto}
   <section class="caso cena" id="modulares" data-caso="modulares">
     <div class="palco">
       <div class="quadro">
-        <figure class="clipe" data-clipe="video/v2-modulares.mp4" data-dur="12" aria-hidden="true">
+        <figure class="clipe" data-clipe="video/v2-modulares-hd.mp4" data-dur="12" aria-hidden="true">
           <video muted playsinline preload="none" disableremoteplayback width="1920" height="1080"></video>
           <img src="video/v2-modulares.webp" alt="" width="1920" height="1080">
         </figure>
