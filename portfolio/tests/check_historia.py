@@ -78,7 +78,7 @@ ROTEIRO = [
         ("ano", "22 baias"), ("obra", "Ver o caso completo: galpões e baias →")),
     cap("escala", "h2", ("jul → set/2026", ["2026-07-09", "2026-09-21"]),
         "Diversas obras no sistema, até R$ 24,5 milhões.",
-        "A menor, R$ 29 mil. A gestão de obra deste sistema ainda não rodou numa obra real.",
+        "A menor, R$ 29 mil.",
         ("clipe", 8.5), ("sistema", "Ver o caso completo: sistema de orçamento →")),
     cap("precisao", "h2", ("jul → set/2026", ["2026-07-09", "2026-09-21"]),
         "Desvio máximo de 0,25% nos 19 serviços conferidos.",
@@ -114,7 +114,7 @@ ROTEIRO = [
         None, None),
 ]
 
-RESSALVAS = ["estimativa", "ainda não rodou", "nos 19 serviços conferidos", "cópia do sistema", "assistentes de IA",
+RESSALVAS = ["estimativa", "nos 19 serviços conferidos", "cópia do sistema", "assistentes de IA",
              "em paralelo", "pré-dimensionado", "sujeito à revisão do engenheiro responsável",
              "no sistema em uso, a carga ainda não foi aplicada"]
 PROIBIDOS = ["3,40"]

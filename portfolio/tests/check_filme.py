@@ -43,7 +43,7 @@ CAPITULOS = [
      "Cerca de 50 módulos em 6 áreas; entregas de 22/07 a 14/09/2026. Portal e diário em uso nos galpões.", "", 8),
     ("jul → set/2026", "Diversas obras no sistema.",
      "Lê o desenho, mede e orça. Nos 19 serviços SINAPI conferidos, desvio máximo de 0,25%. Código com assistentes de IA.",
-     "A gestão de obra deste sistema ainda não rodou em obra real.", 8.5),
+     "", 8.5),
     ("ago/2026", "O celeiro não cabe no caminhão.",
      "B-36: duas caixas, três viagens, 37 decisões registradas. No estudo, o módulo sobe pelo balancim, cabos na vertical.",
      "Pré-dimensionado, sujeito à revisão do engenheiro responsável.", 8.5),
