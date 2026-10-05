@@ -29,7 +29,7 @@ Assunto: `Candidatura — [nome da vaga] — Cássio Viller`
 > - Orçamentos e propostas de 13 obras, de R$ 29 mil a R$ 24,5 milhões, com levantamento de quantitativos medido no
 >   projeto e conferência contra o SINAPI (desvio máximo de 0,25%).
 > - Rotina de compras, cotações, cronograma físico-financeiro, diário de obra e medição em construtoras de São José dos Campos.
-> - Engenharia Civil, 7º semestre (faltam 3). Excel avançado, AutoCAD, Revit, OrçaFascio.
+> - Engenharia Civil, 7º semestre. Excel avançado, AutoCAD, Revit, OrçaFascio.
 >
 > Currículo em anexo e portfólio em [URL]. Disponível para início imediato, presencial ou remoto.
 >

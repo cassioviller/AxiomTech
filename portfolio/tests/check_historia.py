@@ -54,7 +54,7 @@ ROTEIRO = [
         ("clipe", 8), ("curriculo", "Ver no currículo: contabilidade e UNIFEI →")),
     cap("mudanca", "h2", ("2025", ["2025"]),
         "Em 2025, mudei de cidade e de curso.",
-        "Cruzeiro do Sul (EAD), morando em São José dos Campos: hoje no 7º semestre, faltam 3. Sistemas de Informação na PUC, em paralelo.",
+        "Cruzeiro do Sul (EAD), morando em São José dos Campos: hoje no 7º semestre. Sistemas de Informação na PUC, em paralelo.",
         ("ano", "2025"), ("curriculo", "Ver no currículo: formação →")),
     cap("obra", "h2", ("fev/2025 → mar/2026", ["2025-02", "2026-03"]),
         "Mas na obra, vi a mesma informação digitada cinco vezes.",
@@ -109,7 +109,7 @@ ROTEIRO = [
         "De 2017 a 2026: contabilidade, obra e sistemas. Idealizei e dirigi; o código foi escrito com assistentes de IA, e as regras e a revisão são minhas.",
         ("img", "o-proposta.webp", 885, 1060), None),
     cap("convite", "h2", None,
-        "Faltam 3 semestres para o diploma. Não falta obra feita.",
+        "Diploma em curso. Obra já feita.",
         "Você me manda o pacote do projeto; eu devolvo levantamento, orçamento com faixa e proposta no seu modelo.",
         None, None),
 ]
@@ -1135,7 +1135,7 @@ NOTA = ('<p class="nota">As cenas ao fundo da história são dioramas em 3D feit
 
 def checar_nota(pagina):
     ficha = re.search(r'<section class="ficha"[^>]*>(.*?)</section>', pagina, re.S)
-    check(ficha is not None and NOTA in ficha.group(1) and ficha.group(1).index(NOTA) > ficha.group(1).index("faltam 3 · CLT ou PJ"),
+    check(ficha is not None and NOTA in ficha.group(1) and ficha.group(1).index(NOTA) > ficha.group(1).index("7º semestre · CLT ou PJ"),
           "a linha de crédito dos dioramas fica na ficha, depois de \"Engenharia Civil, 7º semestre…\"")
 
 

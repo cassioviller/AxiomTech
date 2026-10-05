@@ -243,6 +243,12 @@ INSERCOES_RODADA_4 = [
      ""),
 ]
 
+# Formação sem a contagem de semestres que faltam (cartão de abertura e cartão final). Cada entrada: (antes, depois, vezes).
+TROCAS_FORMACAO = [
+    ("7º semestre, faltam 3 · Sistemas", "7º semestre · Sistemas", 2),
+    ("Faltam 3 semestres para o diploma.<br>Não falta obra feita.", "Diploma em curso.<br>Obra já feita.", 1),
+]
+
 
 def main():
     s = FILME.read_text(encoding="utf-8")
@@ -254,6 +260,9 @@ def main():
         s = s.replace(velho, novo)
     for velho, novo in TROCAS_RODADA_9:
         assert s.count(velho) == 1, f"trecho da rodada 9 não encontrado (ou repetido): {velho[:60]!r}"
+        s = s.replace(velho, novo)
+    for velho, novo, vezes in TROCAS_FORMACAO:
+        assert s.count(velho) == vezes, f"trecho da formação: esperava {vezes}×: {velho[:60]!r}"
         s = s.replace(velho, novo)
     for ancora, antes, depois in INSERCOES_RODADA_4:
         assert s.count(ancora) == 1, f"âncora da rodada 4 não encontrada (ou repetida): {ancora[:60]!r}"
