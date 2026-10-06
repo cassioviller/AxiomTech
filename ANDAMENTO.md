@@ -145,3 +145,4 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Currículo em PDF refeito a partir do `Curriculo_Cassio_v4` (o de base, no `handoff-portfolio-cassio.zip`): três blocos, uma a três linhas por experiência; saíram o resumo, a seção do SIGE e a lista longa de competências. Desenho novo no padrão do site (carimbo, Barlow Condensed, IBM Plex, datas à esquerda). Sem foto, nascimento, estado civil e endereço (regra do BRIEF).
 - Linha de cota do SIGE no `portfolio.html`: "portal" (com "portal do cliente" o meio quebrava em 4 linhas no celular).
 - `check_historia.py --navegador` falha neste ambiente igual no commit anterior à reescrita ("o harness não terminou"): não vem do texto; causa não investigada.
+- LinkedIn trocado pelo site (`https://www.axiom.cassioviller.tech/`) no currículo e no `portfolio.html` (contatos e JSON-LD). No currículo, o link vem com o aviso "para a melhor experiência, abra no computador".

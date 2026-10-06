@@ -1,11 +1,12 @@
- CURRÍCULO      ORÇAMENTO · PLANEJAMENTO · CUSTOS DE OBRA                              SÃO JOSÉ DOS CAMPOS/SP
+ CURRÍCULO      ORÇAMENTO · PLANEJAMENTO · CUSTOS DE OBRA                             SÃO JOSÉ DOS CAMPOS/SP
 
 
 
 
 CÁSSIO VILLER
 Analista de orçamento, planejamento e custos · CLT ou PJ
-(12) 98207-1116 · cassiovillers@gmail.com · linkedin.com/in/cassioviller
+(12) 98207-1116 · cassiovillers@gmail.com
+Site: www.axiom.cassioviller.tech (para a melhor experiência, abra no computador)
 
 
 
@@ -50,11 +51,11 @@ CONHECIMENTOS E HABILIDADES
 Obra e custos          Orçamento de obras, levantamento de quantitativos, composições SINAPI e BDI,
                        cronograma físico-financeiro, medição, diário de obra, compras e fluxo de caixa.
 
-Ferramentas            Excel                             avançado      AutoCAD                      intermediário
+Ferramentas            Excel                             avançado     AutoCAD                      intermediário
 
-                       Revit              básico a intermediário       Python                       intermediário
+                       Revit              básico a intermediário      Python                       intermediário
 
-                       Civil 3D                            básico      SketchUp                             básico
+                       Civil 3D                            básico     SketchUp                              básico
 
-                       OrçaFascio                                      Inglês                       intermediário
+                       OrçaFascio                                     Inglês                       intermediário
 
