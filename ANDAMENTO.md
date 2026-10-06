@@ -130,3 +130,11 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Texto: "diversas obras" no lugar de "13 obras" (e sem "11 com proposta"); sem a ressalva "a gestão de obra ainda não rodou numa obra real"; sem "sujeito à revisão do engenheiro responsável" ("projetei, orcei e fiz a proposta"); sem a linha das ferramentas na trajetória; manchete do caso modulares "Projetei casas modulares para chegar à obra em 3 caminhões."; sem o número de módulos do SIGE; currículo reescrito pelas atribuições de cada emprego (sem casos individuais).
 - Deploy: `Dockerfile` (nginx, porta 5001, Range nativo) + `deploy/nginx.conf` + `.dockerignore`; no EasyPanel, build por Dockerfile e porta 5001.
 - `site-v2-fase-2` e `main` no GitHub em `58d0b39`. Falta: deploy no EasyPanel, `check_historia.py --origem <URL>`, iPhone real.
+
+## 06/10/2026 — revisão de texto (prints do revisor em `erro/`, fora do git)
+- "o SINAPI"; "num link que o cliente pode acessar"; os 0,25% agora dizem o que foi comparado (composições do sistema × SINAPI, 19 serviços); "fecha ao centavo" = o total bate com a planilha padrão; "71 → 0" = informação que só a empresa deveria ver.
+- `portfolio.html`: `width`/`height` reais nas 41 imagens — o link "Ver o caso completo" caía no SIGE porque as imagens lazy empurravam a âncora (medido no Chromium com rede lenta: `#modular` a 1.305 px antes, 0 px depois).
+- Números alinhados: 1 dia útil à mão em todo lugar; sistema de orçamento jul → set/2026; manchete dos modulares igual à da home e sem "37 decisões" nos destaques; "propostas de R$ 29 mil a 24,5 milhões" (não obras executadas).
+- Autoria: "idealizei e dirigi" → "criei", com a IA citada como ferramenta para escrever o código (site, currículo, folhas de caso).
+- Contato: o Cássio procura emprego ou serviço pontual; todos os botões viram "Entre em contato", sem a oferta de orçamento grátis.
+- Em aberto: as 80,1 h da parede de 100 m² (0,79 h/m² × 100 = 79 h; o número vem do sistema); o tom "de IA" do texto (travessões, frases de efeito).

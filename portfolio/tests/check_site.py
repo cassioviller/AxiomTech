@@ -33,7 +33,7 @@ CASOS_MINTO = [
 RESSALVAS = [
     "cópia do sistema",
     "onde a empresa ligou",
-    "nos 19 serviços conferidos",
+    "19 serviços",
     "ligadas empresa por empresa",
     "assistentes de IA",
     "Dados de exemplo do manual",

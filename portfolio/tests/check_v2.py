@@ -387,10 +387,10 @@ def checar_pagina_estatica():
     vis = texto_visivel(p)
     check("Orço obras, acompanho a execução e construí os sistemas que uso para isso." in vis, "página: frase da abertura ausente")
     TEXTOS = {
-        "veks": ("Orcei diversas obras, de R$ 29 mil a R$ 24,5 milhões.",
-                 "Conferência com a SINAPI: desvio máximo de 0,25% nos 19 serviços conferidos."),
+        "veks": ("Orcei diversas obras: propostas de R$ 29 mil a 24,5 milhões.",
+                 "Comparei as composições calculadas pelo sistema com as do SINAPI, serviço a serviço: nos 19 serviços conferidos, a maior diferença foi de 0,25%."),
         "sige": ("Implantei a gestão de obra em dois galpões com 22 baias.",
-                 "Construí o cronograma ligado ao diário de obra (RDO) e ao portal do cliente: 109 etapas, 65 diários e 378 fotos num link que dá acesso ao cliente."),
+                 "Construí o cronograma ligado ao diário de obra (RDO) e ao portal do cliente: 109 etapas, 65 diários e 378 fotos num link que o cliente pode acessar."),
         "modulares": ("Projetei casas modulares para chegar à obra em 3 caminhões.",
                       "Duas caixas de 3,00 × 6,00 m e o telhado em kit, uma carga por caminhão. Também orcei e fiz a proposta."),
     }

@@ -5,17 +5,17 @@ RESUMO
 
 Estudante de Engenharia Civil (7º semestre) com um ano e meio dentro de construtoras e oito anos de rotina contábil. No dia a
 dia: orçamento e proposta comercial a partir do projeto, compras e cotações de obra, acompanhamento de canteiro,
-cronograma, diário de obra, medição, contratos e fluxo de caixa. Orcei obras de R$ 29 mil a R$ 24,5 milhões, com
-composições de custo que reproduzem a SINAPI com desvio máximo de 0,25%. Criei o SIGE, sistema de gestão para
-construtoras hoje em uso numa empresa de Light Steel Frame.
+cronograma, diário de obra, medição, contratos e fluxo de caixa. Orcei obras com propostas de R$ 29 mil a R$ 24,5 milhões;
+comparadas com o SINAPI, as composições de custo ficaram no máximo 0,25% diferentes. Criei o SIGE, sistema de gestão
+para construtoras hoje em uso numa empresa de Light Steel Frame.
 EXPERIÊNCIA
 
 Processos, Orçamentos e Gestão de Obras (PJ) | VEKS Engenharia                                             03/2026 – 09/2026
 Construtora de Light Steel Frame · São José dos Campos/SP · contrato de 6 meses, cumprido até o fim
   Orçamento e propostas: levantamento de quantitativos no projeto, composição de custos, BDI e proposta comercial no
   modelo da empresa, para obras residenciais, comerciais e rurais.
-  Sistema de orçamento: idealizei e dirigi a ferramenta da empresa, que mede no desenho do cliente, orça e gera
-  cronograma e proposta.
+  Sistema de orçamento: criei a ferramenta da empresa, que mede no desenho do cliente, orça e gera cronograma e
+  proposta.
   Compras e obra: requisições, cotações e quadro de concorrência, especificação de materiais, aditivos de escopo e
   acompanhamento de canteiro.
   Contratos e financeiro: revisão de contrato de empreitada, contratos de mão de obra e fluxo de caixa por centro de custo.
@@ -40,8 +40,8 @@ P R O J E T O P R Ó P R I O — S I G E , S I S T E M A D E G E S T Ã O PA R A
 
   Da proposta ao financeiro: obra, cronograma, diário de obra, medição, compras com aprovação por faixa de valor e portal do
   cliente.
-  Software meu, licenciado para a empresa que o usa, com manual e guias para a equipe. Desenvolvimento dirigido por mim,
-  com assistentes de IA sob minha revisão.
+  Software meu, licenciado para a empresa que o usa, com manual e guias para a equipe. Criado por mim, com assistentes de
+  IA para escrever o código, sob minha revisão.
 FORMAÇÃO
 
 Engenharia Civil — Universidade Cruzeiro do Sul (EAD), 7º semestre · após 6 semestres na UNIFEI, Itajubá/MG (2020–2024).

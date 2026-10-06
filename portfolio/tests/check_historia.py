@@ -46,7 +46,7 @@ def cap(passo, tag, data, frase, ressalva, fundo, caso):
 ROTEIRO = [
     cap("tese", "h1", None,
         "Um número sem origem custa caro na obra.",
-        "Cássio Viller, estudante de Engenharia Civil (7º semestre), mira orçamento, planejamento e custos.",
+        "Estudante de Engenharia Civil (7º semestre). Busco vaga em orçamento, planejamento e custos.",
         ("img", "o-quantitativos.webp", 1040, 1000), None),
     cap("origem", "h2", ("2017 → 2024", ["2017", "2024"]),
         "Comecei pela contabilidade, não pela obra.",
@@ -70,7 +70,7 @@ ROTEIRO = [
         ("clipe", 8), ("ferramentas", "Ver as ferramentas: calculadora e classificador →")),
     cap("sige", "h2", ("mai → set/2026", ["2026-05", "2026-09"]),
         "De maio a setembro, o SIGE ganhou versão nova.",
-        "6 áreas, da proposta ao financeiro; entregas registradas de 22/07 a 14/09/2026; código escrito com assistente de IA, sob a minha direção.",
+        "6 áreas, da proposta ao financeiro; entregas registradas de 22/07 a 14/09/2026; criado por mim, com assistente de IA para escrever o código.",
         ("clipe", 8), ("sige", "Ver o caso completo: SIGE →")),
     cap("galpoes", "h2", ("jun/2026", ["2026-06-08"]),
         "Em junho, começou a obra que testaria o SIGE.",
@@ -81,12 +81,12 @@ ROTEIRO = [
         "A menor, R$ 29 mil.",
         ("clipe", 8.5), ("sistema", "Ver o caso completo: sistema de orçamento →")),
     cap("precisao", "h2", ("jul → set/2026", ["2026-07-09", "2026-09-21"]),
-        "Desvio máximo de 0,25% nos 19 serviços conferidos.",
-        "Serviço a serviço, contra a tabela SINAPI da Caixa; acima de 1% de desvio, a importação é recusada.",
+        "Até 0,25% de diferença do SINAPI, em 19 serviços.",
+        "Comparei, serviço a serviço, as composições calculadas pelo sistema com as da tabela SINAPI da Caixa. Acima de 1% de diferença, a importação é recusada.",
         ("img", "o-orcamento.webp", 1040, 1080), ("sistema", "Ver o caso completo: conferência SINAPI →")),
     cap("casa", "h2", ("ago/2026", ["2026-08"]),
         "O celeiro não cabe inteiro no caminhão.",
-        "B-36: projetei, orcei e fiz a proposta. Duas caixas, três viagens, 37 decisões registradas.",
+        "B-36: projetei, orcei e fiz a proposta. Duas caixas e o telhado em kit, em três viagens.",
         ("clipe", 10), ("modular", "Ver o caso completo: celeiro B-36 →")),
     cap("icamento", "h2", ("ago/2026", ["2026-08"]),
         "No estudo, o módulo sobe pelo balancim, cabos na vertical.",
@@ -102,19 +102,19 @@ ROTEIRO = [
         ("clipe", 8), ("sige", "Ver o caso completo: diários recuperados →")),
     cap("zip", "h2", ("set/2026", ["2026-09"]),
         "Em setembro, uma proposta assinável em 36 minutos.",
-        "Medidos: 11:35 → 12:11, numa ampliação de unidade de saúde com 26 ambientes e 328 m². À mão, cerca de 2 dias úteis (estimativa).",
+        "Medidos: 11:35 → 12:11, numa ampliação de unidade de saúde com 26 ambientes e 328 m². À mão, cerca de 1 dia útil (estimativa).",
         ("clipe", 10), ("orcamento", "Ver o caso completo: 36 minutos →")),
     cap("metodo", "h2", None,
         "Construí o jeito de o número não sumir.",
-        "De 2017 a 2026: contabilidade, obra e sistemas. Idealizei e dirigi; o código foi escrito com assistentes de IA, e as regras e a revisão são minhas.",
+        "De 2017 a 2026: contabilidade, obra e sistemas. Criei os sistemas, com assistentes de IA para escrever o código; as regras e a revisão são minhas.",
         ("img", "o-proposta.webp", 885, 1060), None),
     cap("convite", "h2", None,
         "Diploma em curso. Obra já feita.",
-        "Você me manda o pacote do projeto; eu devolvo levantamento, orçamento com faixa e proposta no seu modelo.",
+        "Procuro uma vaga em orçamento, planejamento e custos de obra, CLT ou PJ, ou um serviço pontual nessas áreas.",
         None, None),
 ]
 
-RESSALVAS = ["estimativa", "nos 19 serviços conferidos", "cópia do sistema", "assistentes de IA",
+RESSALVAS = ["estimativa", "19 serviços", "cópia do sistema", "assistentes de IA",
              "em paralelo", "no sistema em uso, a carga ainda não foi aplicada"]
 PROIBIDOS = ["3,40"]
 PALAVRAS_CHAVE = ["quantitativos", "SINAPI", "BDI", "cronograma físico-financeiro", "curva S", "medição", "cotação"]
@@ -322,7 +322,7 @@ def checar_texto(pagina, portfolio):
         check(r in t, f"ressalva ausente: {r!r}")
     for p in PROIBIDOS:
         check(p not in t, f"texto proibido na página: {p!r}")
-    check(t.lower().count("você") == 1, "\"você\" deve aparecer uma vez só, no convite final")
+    check(t.lower().count("você") <= 1, "\"você\" deve aparecer no máximo uma vez, no convite final")
     check("centavo, não na parede" not in portfolio, "portfolio.html ainda abre com a frase do centavo (agora é a da contabilidade)")
 
 
