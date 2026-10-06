@@ -146,3 +146,4 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Linha de cota do SIGE no `portfolio.html`: "portal" (com "portal do cliente" o meio quebrava em 4 linhas no celular).
 - `check_historia.py --navegador` falha neste ambiente igual no commit anterior à reescrita ("o harness não terminou"): não vem do texto; causa não investigada.
 - LinkedIn trocado pelo site (`https://www.axiom.cassioviller.tech/`) no currículo e no `portfolio.html` (contatos e JSON-LD). No currículo, o link vem com o aviso "para a melhor experiência, abra no computador".
+- Currículo: data de nascimento (31/01/2000) na linha de contato, por decisão do Cássio (supera o "Nunca publicar" do BRIEF para esse dado). Estado civil fica fora.
