@@ -137,4 +137,5 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Números alinhados: 1 dia útil à mão em todo lugar; sistema de orçamento jul → set/2026; manchete dos modulares igual à da home e sem "37 decisões" nos destaques; "propostas de R$ 29 mil a 24,5 milhões" (não obras executadas).
 - Autoria: "idealizei e dirigi" → "criei", com a IA citada como ferramenta para escrever o código (site, currículo, folhas de caso).
 - Contato: o Cássio procura emprego ou serviço pontual; todos os botões viram "Entre em contato", sem a oferta de orçamento grátis.
-- Em aberto: as 80,1 h da parede de 100 m² (0,79 h/m² × 100 = 79 h; o número vem do sistema); o tom "de IA" do texto (travessões, frases de efeito).
+- Parede de 100 m²: 80,1 h → 79 h (0,595 + 0,195 h/m² × 100), 5 dias em vez de 6 (79 ÷ 16 = 4,94).
+- Em aberto: o tom "de IA" do texto (travessões, frases de efeito).
