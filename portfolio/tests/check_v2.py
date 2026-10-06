@@ -390,13 +390,13 @@ def checar_pagina_estatica():
         "veks": ("Orcei diversas obras: propostas de R$ 29 mil a 24,5 milhões.",
                  "Comparei as composições calculadas pelo sistema com as do SINAPI, serviço a serviço: nos 19 serviços conferidos, a maior diferença foi de 0,25%."),
         "sige": ("Implantei a gestão de obra em dois galpões com 22 baias.",
-                 "Construí o cronograma ligado ao diário de obra (RDO) e ao portal do cliente: 109 etapas, 65 diários e 378 fotos num link que o cliente pode acessar."),
+                 "Construí o cronograma ligado ao diário de obra (RDO) e ao portal do cliente, que reúne 109 etapas, 65 diários e 378 fotos."),
         "modulares": ("Projetei casas modulares para chegar à obra em 3 caminhões.",
-                      "Duas caixas de 3,00 × 6,00 m e o telhado em kit, uma carga por caminhão. Também orcei e fiz a proposta."),
+                      "São duas caixas de 3,00 × 6,00 m e o telhado em kit, uma carga por caminhão. Também orcei e fiz a proposta."),
     }
     # o caso 1 do spec (36 minutos) não tem cena própria: os prints originais não vêm e os de 760 px não podem ser ampliados.
     # O número entra no caso do orçamento, cujo documento é a proposta feita nesses 36 minutos.
-    MEDIDAS = {"veks": "Esta proposta (ampliação de 328 m², 26 ambientes) saiu em 36 minutos, medidos do primeiro arquivo aberto ao PDF. À mão, cerca de 1 dia útil (estimativa)."}
+    MEDIDAS = {"veks": "Esta proposta (ampliação de 328 m², 26 ambientes) saiu em 36 minutos, medidos do primeiro arquivo aberto ao PDF. À mão, levaria cerca de 1 dia útil (estimativa)."}
     LINKS = {"veks": ["sistema", "orcamento"], "sige": ["sige"], "modulares": ["modular"]}
     portfolio = (SITE / "portfolio.html").read_text(encoding="utf-8")
     secoes = re.findall(r'<section class="caso cena" id="([a-z]+)" data-caso="\1">(.*?)</section>', p, re.S)

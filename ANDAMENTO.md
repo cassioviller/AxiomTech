@@ -138,4 +138,7 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - Autoria: "idealizei e dirigi" → "criei", com a IA citada como ferramenta para escrever o código (site, currículo, folhas de caso).
 - Contato: o Cássio procura emprego ou serviço pontual; todos os botões viram "Entre em contato", sem a oferta de orçamento grátis.
 - Parede de 100 m²: 80,1 h → 79 h (0,595 + 0,195 h/m² × 100), 5 dias em vez de 6 (79 ÷ 16 = 4,94).
-- Em aberto: o tom "de IA" do texto (travessões, frases de efeito).
+- Tom "de IA" retirado do site inteiro (index, portfolio, história), do currículo, das folhas de caso e das legendas das maquetes: sem travessão, sem "não X, Y", sem frase de efeito, sem frase picada, sem pergunta retórica; descrições de trabalho na primeira pessoa com verbo. Regras, fontes da pesquisa e um prompt pronto em `portfolio/REDACAO.md`. Frases grandes da história trocadas (ex.: "Um número sem origem custa caro na obra." → "Trabalho com orçamento, planejamento e custos de obra."; "Diploma em curso. Obra já feita." → "Estou no 7º semestre e já tenho experiência de obra."); o roteiro do `check_historia.py` acompanha.
+- "Portal do cliente" como nome da coisa nos títulos e destaques (home e `portfolio.html`); "link" fica só onde é o que o cliente recebe e abre. O destaque do topo do portfólio passou de "1 link" para "65 diários".
+- `site/og.png` refeito a partir de `portfolio/og.html` (dizia "13 obras orçadas" e "Cada número com origem."); o `build.sh` passa a gerá-lo.
+- Em aberto: o texto do caso dos 36 minutos chama de "método" o que executa o orçamento, sem dizer se é programa, assistente de IA ou trabalho manual (decisão do Cássio).

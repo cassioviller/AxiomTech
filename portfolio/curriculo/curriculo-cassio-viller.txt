@@ -4,7 +4,7 @@ Analista de orçamento, planejamento e custos · CLT ou PJ · São José dos Cam
 RESUMO
 
 Estudante de Engenharia Civil (7º semestre) com um ano e meio dentro de construtoras e oito anos de rotina contábil. No dia a
-dia: orçamento e proposta comercial a partir do projeto, compras e cotações de obra, acompanhamento de canteiro,
+dia, faço orçamento e proposta comercial a partir do projeto, compras e cotações de obra, acompanhamento de canteiro,
 cronograma, diário de obra, medição, contratos e fluxo de caixa. Orcei obras com propostas de R$ 29 mil a R$ 24,5 milhões;
 comparadas com o SINAPI, as composições de custo ficaram no máximo 0,25% diferentes. Criei o SIGE, sistema de gestão
 para construtoras hoje em uso numa empresa de Light Steel Frame.
@@ -21,7 +21,7 @@ Construtora de Light Steel Frame · São José dos Campos/SP · contrato de 6 me
   Contratos e financeiro: revisão de contrato de empreitada, contratos de mão de obra e fluxo de caixa por centro de custo.
   Processos e produto: implantação do SIGE na empresa; projeto, orçamento e proposta da linha de casas modulares em
   LSF.
-Gerente de Produção e Operações (CLT, meio período) | V Alves Construção                                                02/2025 – 07/2026
+Gerente de Produção e Operações (CLT, meio período) | V Alves Construção                                                     02/2025 – 07/2026
 São José dos Campos/SP · em paralelo com o estágio abaixo
   Acompanhamento das obras e da rotina de produção da construtora.
   Compras de materiais e serviços para as obras.
@@ -30,13 +30,13 @@ Estruturas metálicas · São José dos Campos/SP
   Orçamentos e propostas comerciais de estruturas metálicas a partir do projeto; vendas internas.
   Cotação e acompanhamento de sondagem SPT; pré-dimensionamento de estrutura e fundação para as propostas.
   Criei a primeira versão do SIGE sobre a rotina da empresa: ponto, diário de obra (RDO) e almoxarifado.
-Analista Contábil | AZ Contabilidade (escritório da família)                                                    2017 – atual
-  Folha de pagamento, emissão de notas fiscais e balancete — base da prática com custo, imposto e fluxo de caixa.
-Diretor de Vendas | InLoco Jr. (empresa júnior da UNIFEI)                                                               03/2023 – 12/2024
+Analista Contábil | AZ Contabilidade (escritório da família)                                                      2017 – atual
+  Folha de pagamento, emissão de notas fiscais e balancete. Foi onde aprendi a lidar com custo, imposto e fluxo de caixa.
+Diretor de Vendas | InLoco Jr. (empresa júnior da UNIFEI)                                                                    03/2023 – 12/2024
   Prospecção de clientes, orçamento e gestão de equipe. Antes: Fiscal Financeiro do DCE UNIFEI (2022).
-Axiom — sistemas personalizados e chatbots                                                projetos próprios, sem dedicação de expediente
+Axiom | sistemas personalizados e chatbots                                                 projetos próprios, sem dedicação de expediente
   Site institucional e desenvolvimento sob demanda para pequenas empresas.
-P R O J E T O P R Ó P R I O — S I G E , S I S T E M A D E G E S T Ã O PA R A C O N S T R U T O R A S ( 2 0 2 5 – 2 0 2 6 )
+P R O J E T O P R Ó P R I O : S I G E , S I S T E M A D E G E S T Ã O PA R A C O N S T R U T O R A S ( 2 0 2 5 – 2 0 2 6 )
 
   Da proposta ao financeiro: obra, cronograma, diário de obra, medição, compras com aprovação por faixa de valor e portal do
   cliente.
@@ -44,8 +44,8 @@ P R O J E T O P R Ó P R I O — S I G E , S I S T E M A D E G E S T Ã O PA R A
   IA para escrever o código, sob minha revisão.
 FORMAÇÃO
 
-Engenharia Civil — Universidade Cruzeiro do Sul (EAD), 7º semestre · após 6 semestres na UNIFEI, Itajubá/MG (2020–2024).
-Sistemas de Informação — PUC (EAD), 3º semestre, em paralelo.
+Engenharia Civil, Universidade Cruzeiro do Sul (EAD), 7º semestre · após 6 semestres na UNIFEI, Itajubá/MG (2020–2024).
+Sistemas de Informação, PUC (EAD), 3º semestre, em paralelo.
 C O M P E T Ê N C I A S E F E R R A M E N TA S
 
 Obra e custos: orçamento de obras · levantamento de quantitativos · composição de custos (SINAPI) · cronograma físico-

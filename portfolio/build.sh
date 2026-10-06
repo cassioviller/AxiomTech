@@ -9,3 +9,5 @@ for f in casos/caso-*.html; do pdf "$f" "${f%.html}.pdf"; done
 # o site serve os mesmos PDFs
 cp curriculo/curriculo-cassio-viller.pdf site/
 cp casos/caso-*.pdf site/casos/
+# a imagem de compartilhamento (og:image), a partir de og.html
+chromium --headless --no-sandbox --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --window-size=1200,630 --virtual-time-budget=8000 --screenshot=site/og.png "file://$PWD/og.html" 2>/dev/null; echo "site/og.png: $(identify -format '%w × %h' site/og.png)"

@@ -158,11 +158,11 @@ def checar_design(atual):
 LEGENDAS = {
     # antiga → nova
     "Rede de restaurantes de rodovia · o prédio medido e desenhado pelo sistema a partir do arquivo do cliente, cobertura em corte":
-        "Rede de restaurantes de rodovia · sem nenhuma quantidade no pacote, o prédio foi medido no próprio arquivo do cliente — cobertura em corte",
+        "Rede de restaurantes de rodovia · o pacote veio sem nenhuma quantidade, e o prédio foi medido no próprio arquivo do cliente (na imagem, a cobertura em corte)",
     "B-36 · celeiro 6 × 6 m com sótão, entregue em duas caixas":
-        "B-36 · o celeiro 6 × 6 m não cabe inteiro no caminhão: vai em duas caixas",
+        "B-36 · o celeiro 6 × 6 m não cabe inteiro no caminhão e vai em duas caixas",
     "B-36 · interior com bancada sob a viga da junção":
-        "B-36 · a viga da junção ficou aparente — sai mais barato que fechar — e a bancada vai embaixo dela",
+        "B-36 · a viga da junção ficou aparente, porque sai mais barato que fechar, e a bancada vai embaixo dela",
     "Kitnet modular 30 m² · layouts validados por código":
         "Kitnet modular 30 m² · cada layout passa pelo validador de colisões antes de ser desenhado",
     "Como cada caixa viaja e como fica depois de unida":

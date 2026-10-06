@@ -76,7 +76,7 @@ function cena36(fig){
     S.add(walls);api.dirty=true;
   };img.src='img/upa-plan.webp';
   var CAM=[[0,[0,46,4],[0,0,.5]],[T0,[0,44,6],[0,0,.5]],[8,[-16,18,26],[-7,1,0]],[14,[5,15,27],[7,1,0]],[T1,[16,14,27],[13,1,2]],[20.5,[25,11,25],[16.5,1,PH/2+2.2]],[DUR,[4,34,34],[2,0,2]]];
-  var LEG=[[0,'Entra o pacote: 3 pranchas de arquitetura, 3 de estrutura e a proposta de material.'],[T0,'As paredes a construir são medidas direto no desenho do cliente.'],[8,'Cada número sai com origem e grau de confiança. O que falta, se declara.'],[14,'Rodam os motores da mesma planilha que o diretor usa.'],[T1,'12:11 — proposta assinável. 36 minutos, fechando ao centavo.']];
+  var LEG=[[0,'O pacote tem 3 pranchas de arquitetura, 3 de estrutura e a proposta de material.'],[T0,'As paredes a construir são medidas direto no desenho do cliente.'],[8,'Cada número sai com origem e grau de confiança, e o que falta entra como pendência.'],[14,'O cálculo é feito na mesma planilha que o diretor usa.'],[T1,'Às 12:11 a proposta está pronta para assinar, 36 minutos depois.']];
   var api={dur:DUR,dirty:true,
     update:function(t,wide){
       var p=seg2(t,T0,T1),sx=lerp(-PW/2-.5,PW/2+.5,p);
@@ -157,9 +157,9 @@ function cenaCasa(fig){
   var CAM=[[0,[20,10,22],[1,2,0]],[5,[17,5.5,7],[8,2,-.5]],[7.2,[17,5.5,7],[8,2,-.5]],[9.5,[15,11,14],[2,5.5,0]],[12,[10.5,6,10],[1,3,.5]],
     [14.5,[17,5.5,-7],[8,2,-.5]],[16.2,[17,5.5,-7],[8,2,-.5]],[19,[15,9.5,-10],[1,4.5,0]],[21,[11,6.5,9.5],[0,3.5,0]],
     [23.3,[20,8,-11],[7,1.5,-1]],[24.5,[20,8,-11],[7,1.5,-1]],[26.5,[15,11,-18],[3,4,-4]],[29,[9,7,-17],[-.5,1.5,-6]],[32.5,[-4,10,-19],[0,4,-1]],[36,[14,6.5,13],[0,3,0]]];
-  var SUBS=[[0,'A conta veio antes do desenho: casas que saem prontas da fábrica.',''],[3,'Caixa 1 chega. A face de junção viaja aberta: pórtico, viga à vista e filme.',''],[8.5,'Guindaste da classe certa: 3,8 t por caixa.','3,8 t'],
-    [11.6,'No lugar, o filme sai. O pórtico fica.',''],[14.6,'A segunda viagem. Mesma face aberta, mesmo filme.','4,12 m'],[17.5,'Vão livre de seis metros: a viga, não o pilar.','6,00 m'],
-    [21.5,'Terceira viagem: o telhado vai deitado, em painéis.','3 viagens'],[27,'Montado no chão, ao lado da casa.',''],[31,'Sobe inteiro, de uma vez.',''],[34.5,'Uma casa que sai pronta da fábrica.','59,5 m²']];
+  var SUBS=[[0,'As casas saem prontas da fábrica, e a conta foi feita antes do desenho.',''],[3,'A caixa 1 chega com a face de junção aberta, protegida por filme.',''],[8.5,'Cada caixa pesa 3,8 t, e o guindaste é escolhido para essa carga.','3,8 t'],
+    [11.6,'Com a caixa no lugar, o filme é retirado e o pórtico fica.',''],[14.6,'A segunda viagem traz a outra caixa, também com a face aberta.','4,12 m'],[17.5,'A viga vence o vão livre de seis metros, sem pilar no meio.','6,00 m'],
+    [21.5,'Na terceira viagem, o telhado vem deitado, em painéis.','3 viagens'],[27,'O telhado é montado no chão, ao lado da casa.',''],[31,'Depois sobe inteiro, de uma vez.',''],[34.5,'A casa está montada.','59,5 m²']];
   var api={dur:DUR,update:function(t,wide){
     var tz;if(t<6)tz=lerp(-30,0,seg(t,1.5,6));else if(t<11.8)tz=0;else if(t<13.2)tz=lerp(0,30,seg(t,11.8,13.2));else if(t<15)tz=lerp(-30,0,seg(t,13.2,15));else if(t<20)tz=0;
     else if(t<21.5)tz=lerp(0,30,seg(t,20,21.5));else if(t<23.3)tz=lerp(-30,0,seg(t,21.5,23.3));else if(t<27.5)tz=0;else tz=lerp(0,30,seg(t,27.5,29));
