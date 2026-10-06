@@ -142,3 +142,6 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - "Portal do cliente" como nome da coisa nos títulos e destaques (home e `portfolio.html`); "link" fica só onde é o que o cliente recebe e abre. O destaque do topo do portfólio passou de "1 link" para "65 diários".
 - `site/og.png` refeito a partir de `portfolio/og.html` (dizia "13 obras orçadas" e "Cada número com origem."); o `build.sh` passa a gerá-lo.
 - Em aberto: o texto do caso dos 36 minutos chama de "método" o que executa o orçamento, sem dizer se é programa, assistente de IA ou trabalho manual (decisão do Cássio).
+- Currículo em PDF refeito a partir do `Curriculo_Cassio_v4` (o de base, no `handoff-portfolio-cassio.zip`): três blocos, uma a três linhas por experiência; saíram o resumo, a seção do SIGE e a lista longa de competências. Desenho novo no padrão do site (carimbo, Barlow Condensed, IBM Plex, datas à esquerda). Sem foto, nascimento, estado civil e endereço (regra do BRIEF).
+- Linha de cota do SIGE no `portfolio.html`: "portal" (com "portal do cliente" o meio quebrava em 4 linhas no celular).
+- `check_historia.py --navegador` falha neste ambiente igual no commit anterior à reescrita ("o harness não terminou"): não vem do texto; causa não investigada.

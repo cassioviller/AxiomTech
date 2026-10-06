@@ -420,7 +420,7 @@ CURRICULO_TXT = ROOT / "curriculo" / "curriculo-cassio-viller.txt"
 # (trecho da história, trecho do currículo em PDF): as datas precisam bater nos dois
 DATAS_CV = [("fev/2025 → mar/2026", "02/2025 – 07/2026"), ("fev/2025 → mar/2026", "04/2025 – 03/2026"),
             ("mar/2026 → set/2026", "03/2026 – 09/2026"), ("de 2023 a 2024", "03/2023 – 12/2024"),
-            ("DCE em 2022", "DCE UNIFEI (2022)")]
+            ("DCE em 2022", "2022 Fiscal Financeiro · DCE UNIFEI")]
 
 
 def checar_curriculo(pagina):
