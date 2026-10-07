@@ -116,6 +116,15 @@ img{display:block;max-width:100%;height:auto}
   .js-v2 .texto{left:0;right:0;top:auto;bottom:0;width:auto;transform:none;padding:40px 20px 20px;background:linear-gradient(transparent,rgba(10,14,18,.92) 40px)}
 }
 @media (prefers-reduced-motion: reduce){.clipe video{display:none}}
+/* aviso de rolagem (criado pelo v2.js): cápsula escura à direita, enquanto a cena anda e o texto ainda não entrou; a barra enche com a cena */
+.rolar{position:fixed;right:max(16px,env(safe-area-inset-right));top:50%;z-index:25;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 9px 12px;border-radius:999px;background:rgba(15,20,25,.78);box-shadow:0 2px 12px rgba(0,0,0,.25);transform:translateY(-50%);opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s;pointer-events:none;font-family:var(--mono);font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.14em;color:var(--texto-palco)}
+.rolar.ver{opacity:1;visibility:visible;transition:opacity .35s}
+.rolar span{writing-mode:vertical-rl}
+.rolar i{position:relative;width:3px;height:84px;background:rgba(242,241,236,.25);border-radius:2px}
+.rolar i::after{content:"";position:absolute;left:0;top:0;width:100%;height:calc(var(--avanco,0)*100%);background:var(--laranja);border-radius:2px}
+.rolar b{width:11px;height:11px;margin-top:-4px;border-right:2px solid var(--laranja);border-bottom:2px solid var(--laranja);transform:rotate(45deg);animation:rolar-seta 1.6s ease-in-out infinite}
+@keyframes rolar-seta{0%,100%{transform:translateY(-3px) rotate(45deg);opacity:.5}50%{transform:translateY(5px) rotate(45deg);opacity:1}}
+@media (max-width:600px){.rolar{top:40%;right:12px}}
 </style>
 </head>
 <body>
@@ -247,6 +256,6 @@ img{display:block;max-width:100%;height:auto}
   </section>
 </main>
 <script src="clipes.js?v=2026-10-05b" defer></script>
-<script src="v2.js?v=2026-10-05b" defer></script>
+<script src="v2.js?v=2026-10-07" defer></script>
 </body>
 </html>

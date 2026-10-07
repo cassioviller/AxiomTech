@@ -147,3 +147,6 @@ Atualizado em 24/09/2026. Leia de cima para baixo; o último bloco é o estado a
 - `check_historia.py --navegador` falha neste ambiente igual no commit anterior à reescrita ("o harness não terminou"): não vem do texto; causa não investigada.
 - LinkedIn trocado pelo site (`https://www.axiom.cassioviller.tech/`) no currículo e no `portfolio.html` (contatos e JSON-LD). No currículo, o link vem com o aviso "para a melhor experiência, abra no computador".
 - Currículo: data de nascimento (31/01/2000) na linha de contato, por decisão do Cássio (supera o "Nunca publicar" do BRIEF para esse dado). Estado civil fica fora.
+
+## 07/10/2026 — aviso de rolagem
+- Home: cápsula fixa à direita ("Role", barra que enche com a cena, seta pulsando), criada pelo `v2.js`. Aparece no topo da página e enquanto um caso está preso na tela e a cena anda; some quando o texto entra pela direita. Sem JS ou com movimento reduzido, não existe.

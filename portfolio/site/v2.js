@@ -14,6 +14,24 @@ document.documentElement.classList.add('js-v2');
 var DOC=[.5,.6],DESTAQUE=[.6,.7],LADO=[.62,.72],pendente=false;
 var trilho=[].slice.call(document.querySelectorAll('nav.trilho a[href^="#"]'));
 var secoes=trilho.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));});
+// aviso de rolagem à direita: no topo da página e enquanto um caso está preso na tela e a cena anda (antes do texto
+// entrar, que ocupa a direita); a barra mostra quanto da cena já passou.
+var aviso=document.createElement('div');
+aviso.className='rolar';aviso.setAttribute('aria-hidden','true');
+aviso.innerHTML='<span>Role</span><i></i><b></b>';
+document.body.appendChild(aviso);
+function avisar(){
+  var ver=false,avanco=0;
+  if(scrollY<innerHeight*.25)ver=true;
+  casos.forEach(function(c){
+    var r=c.getBoundingClientRect();
+    if(c.__p===undefined||r.top>1||r.bottom<innerHeight-1)return;
+    var fim=c.classList.contains('so-cena')?1:LADO[0];
+    if(c.__p<fim-.01){ver=true;avanco=c.__p/fim;}
+  });
+  aviso.classList.toggle('ver',ver);
+  aviso.style.setProperty('--avanco',avanco.toFixed(3));
+}
 function faixa(p,f){return Math.max(0,Math.min(1,(p-f[0])/(f[1]-f[0])));}
 function marcar(){
   var meio=innerHeight/2,atual=-1;
@@ -44,6 +62,7 @@ function atualizar(agora){
     c.style.setProperty('--lado',lado);
     c.style.setProperty('--vis',lado>0?'visible':'hidden'); // texto invisível fora do fluxo de foco (teclado)
   });
+  avisar();
   if(anda)pedir();else ultimoT=0;
 }
 function pedir(){if(!pendente){pendente=true;requestAnimationFrame(atualizar);}}
